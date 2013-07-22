@@ -191,4 +191,5 @@ GRAPPELLI_ADMIN_TITLE = "Geosurvey Admin"
 
 HEROKU = False
 
+MAP_API_KEY = ""
 ANALYTICS_ID = ""

@@ -40,6 +40,7 @@ urlpatterns = patterns('',
     url(r'^report', include(report_urls)),
     #anon survey user for specific survey
     url(r'^respond/(?P<survey_slug>[\w\d-]+)$', 'apps.survey.views.survey'),
+    url(r'^respond/(?P<survey_slug>[\w\d-]+)/(?P<question_slug>[\w\d-]+)$', 'apps.survey.views.surveyAnonWithQuestion'),
     #survey responder with preassigned uuid
     url(r'^respond$', 'apps.survey.views.survey'),
     #other survey urls
@@ -51,10 +52,7 @@ urlpatterns = patterns('',
     url(r'^dash$', 'apps.survey.views.dash'),
     #other survey urls
     url(r'^dash', include(survey_urls)),
-
-    # (r'^register', survey_urls.register),
-    #(r'^survey/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.SURVEY_ROOT}),
-    # (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+    (r'^register', survey_urls.register),
 )
 
 if settings.DEBUG:

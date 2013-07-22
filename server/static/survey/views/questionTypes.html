@@ -5,7 +5,7 @@
     <div ng-switch-when="info">
         
         <div class="info-content" ng-include="infoView"></div>
-        <button class="btn btn-primary btn-block button-block btn-large" ng-tap="gotoNextQuestion()">continue</button>
+        <button class="btn btn-primary btn-block btn-large" ng-click="answerQuestion('')">Continue <img class="ajax-spinner" ng-show="showSpinner" src="/static/survey/img/ajax-loader.gif" alt="loading..." width="24" height="24"></button>
     </div>
     <div ng-switch-when="integer">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
@@ -38,7 +38,8 @@
                 ui-event="{ keypress : 'onlyDigits($event)' }"
                 autofocus
                 required/>
-            <button type="submit" class="btn btn-primary btn-large btn-block button-block" ng-disabled="question.required && ! answer && answer != 0">continue</button>
+            <button type="submit" class="btn btn-primary btn-large btn-block button-block" ng-disabled="question.required && ! answer && answer != 0">
+            Continue <img class="ajax-spinner" ng-show="showSpinner" src="/static/survey/img/ajax-loader.gif" alt="loading..." width="24" height="24"></button>
         </form>
     </div>
     <div ng-switch-when="auto-single-select">
@@ -58,14 +59,14 @@
                 </option>
                 <option selected value="other">Other</option>
             </select>
-            <input class="input-block-level" type="text" placeholder="{{ question.label }}" ng-show="answer == 'other'" ng-model="otherAnswer" autofocus/>   
-            <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
+            <input class="input-block-level input-other" type="text" placeholder="{{ question.label }}" ng-show="answer == 'other'" ng-model="otherAnswer" autofocus/>   
+            <button type="submit" class="btn btn-primary btn-large btn-block">Continue <img class="ajax-spinner" ng-show="showSpinner" src="/static/survey/img/ajax-loader.gif" alt="loading..." width="24" height="24"></button>
         </form>
     </div>
     <div ng-switch-when="text">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
             <input class="input-block-level" type="text" placeholder="{{ question.label }}" ng-model="answer" autofocus />
-            <button type="submit" class="btn btn-primary btn-large btn-block button-block" ng-disabled="question.required && ! answer">continue</button>
+            <button type="submit" class="btn btn-primary btn-large btn-block" ng-disabled="question.required && ! answer">Continue <img class="ajax-spinner" ng-show="showSpinner" src="/static/survey/img/ajax-loader.gif" alt="loading..." width="24" height="24"></button>
         </form>
     </div>
     <div ng-switch-when="currency">
@@ -75,8 +76,6 @@
               <span class="add-on">$</span>
               <input class="input-block-level" type="number" step="any" placeholder="{{ question.label }}" ng-model="answer" autofocus/>
             </div>
-
-            <!-- <button type="submit" class="btn btn-primary btn-large btn-block button-block" ng-disabled="question.required && ! answer">continue</button> -->
             <button type="submit" class="btn btn-primary btn-large btn-block button-block" ng-disabled="question.required && ! answer && answer != 0">continue</button>
         </form>
     </div>
@@ -96,10 +95,10 @@
     <div ng-switch-when="textarea">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
             <textarea rows="5" placeholder="{{ question.label }}" ng-model="answer" autofocus></textarea>
-            <button type="submit" class="btn btn-primary btn-large btn-block button-block" ng-disabled="question.required && ! answer">continue</button>
+            <button type="submit" class="btn btn-primary btn-large btn-block" ng-disabled="question.required && ! answer">Continue <img class="ajax-spinner" ng-show="showSpinner" src="/static/survey/img/ajax-loader.gif" alt="loading..." width="24" height="24"></button>
         </form>
     </div>
-    <div ng-switch-when="single-select">
+    <div ng-switch-when="single-select" ng-cloak>
         <form class="question" ng-show="survey.questions.length" ng-submit="answerSingleSelect(question.options, question.otherAnswer)">
             <div class="todo mrm">
                 <ul>
@@ -149,11 +148,11 @@
                   </li>
                 </ul>
               </div>
-            <input class="input-block-level" type="text" placeholder="Other Option" ng-show="question.otherOption.checked" ng-model="question.otherAnswer" autofocus/>             
-            <button type="submit" class="btn btn-large btn-block button-block" ng-class="{'btn-primary': isAnswerValid, disabled: !isAnswerValid }">continue</button>
+            <input class="input-block-level input-other" type="text" placeholder="Other" ng-show="question.otherOption.checked" ng-model="question.otherAnswer" autofocus/>             
+            <button type="submit" class="btn btn-large btn-block" ng-class="{'btn-primary': isAnswerValid, disabled: !isAnswerValid }">Continue <img class="ajax-spinner" ng-show="showSpinner" src="/static/survey/img/ajax-loader.gif" alt="loading..." width="24" height="24"></button>
         </form>
     </div>
-    <div ng-switch-when="multi-select">
+    <div ng-switch-when="multi-select" ng-cloak>
         <form class="question" ng-submit="answerMultiSelect(question)">
             <div class="todo mrm">
                 <div ng-show="question.hoisted_options.length" ng-cloak class="hoisted-activities">
@@ -192,6 +191,7 @@
                   <li 
                     ng-show="question.allow_other"
                     ng-tap="onMultiSelectClicked(question.otherOption, question)"
+                    ng-cloak
                     ng-class="{'todo-done': question.otherOption.checked }"
                     ng-model="question.otherAnswer.text">
                     <!-- <div class="todo-icon fui-man-24"></div> -->
@@ -199,14 +199,12 @@
                       <h4 class="todo-name">
                         Other
                       </h4>
-                      
                     </div>
                   </li>
                 </ul>
               </div>
-
-            <input class="input-block-level" type="text" placeholder="Other Option" ng-show="question.allow_other && question.otherOption.checked" ng-model="question.otherAnswer" autofocus/> 
-            <button type="submit" class="btn btn-large btn-block button-block" ng-hide="dialog" ng-class="{'btn-primary': isAnswerValid, 'disabled': !isAnswerValid }">continue</button>
+            <input class="input-block-level input-other" type="text" placeholder="Other" ng-show="question.allow_other && question.otherOption.checked" ng-model="question.otherAnswer" autofocus ng-cloak/> 
+            <button type="submit" class="btn btn-large btn-block" ng-hide="dialog" ng-class="{'btn-primary': isAnswerValid, 'disabled': !isAnswerValid }">Continue <img class="ajax-spinner" ng-show="showSpinner" src="/static/survey/img/ajax-loader.gif" alt="loading..." width="24" height="24"></button>
         </form>
     </div>
     <div ng-switch-when="map-multipoint">

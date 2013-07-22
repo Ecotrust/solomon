@@ -30,11 +30,25 @@ def survey(request, survey_slug=None, template='survey/survey.html'):
         respondant = Respondant(survey=survey)
         respondant.save()
         if request.GET.get('get-uid', None) is not None:
-            import pdb
-            pdb.set_trace()
             return HttpResponse(simplejson.dumps({'success': "true", "uuid": respondant.uuid}))
         return redirect("/respond#/survey/%s/%s" % (survey.slug, respondant.uuid))
-    context = {'ANALYTICS_ID': settings.ANALYTICS_ID}
+    context = {'ANALYTICS_ID': settings.ANALYTICS_ID, 'MAP_API_KEY': settings.MAP_API_KEY}
+    return render_to_response(template, RequestContext(request, context))
+
+def surveyAnonWithQuestion(request, survey_slug=None, question_slug=None, template='survey/survey.html'):
+    # Not very DRY considering this is a repeat of the 'survey' view above but allowing for anonymous 
+    # entry to a specific question.
+    if survey_slug is not None:
+        survey = get_object_or_404(Survey, slug=survey_slug, anon=True)
+        respondant = Respondant(survey=survey)
+        respondant.save()
+        if request.GET.get('get-uid', None) is not None:
+            return HttpResponse(simplejson.dumps({'success': "true", "uuid": respondant.uuid}))
+        if question_slug is not None:
+            return redirect("/respond#/survey/%s/%s/%s" % (survey.slug, question_slug, respondant.uuid))
+        else:
+            return redirect("/respond#/survey/%s/%s" % (survey.slug, respondant.uuid))
+    context = {'ANALYTICS_ID': settings.ANALYTICS_ID, 'MAP_API_KEY': settings.MAP_API_KEY}
     return render_to_response(template, RequestContext(request, context))
 
 @staff_member_required
@@ -60,6 +74,7 @@ def answer(request, survey_slug, question_slug, uuid): #, survey_slug, question_
             return HttpResponse(simplejson.dumps({'success': False, 'complete': True}))
         response, created = Response.objects.get_or_create(question=question,respondant=respondant)
         response.answer_raw = simplejson.dumps(simplejson.loads(request.POST.keys()[0]).get('answer', None))
+        response.user_agent = request.META.get('HTTP_USER_AGENT', '')
         response.save()
         respondant.responses.add(response)
         respondant.last_question = question_slug

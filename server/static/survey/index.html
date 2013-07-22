@@ -67,6 +67,7 @@
     <script src="{{ STATIC_URL }}survey/components/select2/select2.js"></script>
     <script src="{{ STATIC_URL }}survey/components/underscore/underscore.js"></script>
     <script src="{{ STATIC_URL }}survey/components/leaflet/dist/leaflet-src.js"></script>
+    <script src="{{ STATIC_URL }}survey/lib/js/leaflet.layers-toggle.js"></script>
     <script src="{{ STATIC_URL }}survey/lib/js/leaflet-pip.min.js"></script>
     <script src="{{ STATIC_URL }}survey/lib/js/Bing.js"></script>
     <script src="{{ STATIC_URL }}survey/lib/js/leaflet.awesome-markers.min.js"></script>
@@ -84,6 +85,8 @@
     <script>
     var token = "{{csrf_token}}";
     var static_url = "{{STATIC_URL}}";
+    var map_api_key = "{{MAP_API_KEY}}";
+
     {% if user.is_authenticated %}
     var isAuthenticated = true;
     {% else %}
@@ -91,7 +94,7 @@
     {% endif %}
     </script>
 
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <!-- Google Analytics-->
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
