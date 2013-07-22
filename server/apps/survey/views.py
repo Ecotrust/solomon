@@ -72,12 +72,21 @@ def answer(request, survey_slug, question_slug, uuid): #, survey_slug, question_
         respondant = get_object_or_404(Respondant, uuid=uuid)
         if respondant.complete is True and not request.user.is_staff:
             return HttpResponse(simplejson.dumps({'success': False, 'complete': True}))
+
         response, created = Response.objects.get_or_create(question=question,respondant=respondant)
         response.answer_raw = simplejson.dumps(simplejson.loads(request.POST.keys()[0]).get('answer', None))
-        response.user_agent = request.META.get('HTTP_USER_AGENT', '')
-        response.save()
-        respondant.responses.add(response)
+
+        response.save_related()
+
+        if created:
+            respondant.responses.add(response)
+            respondant.save()
+
+        if request.user:
+            respondant.surveyor = request.user
+
         respondant.last_question = question_slug
+        response.user_agent = request.META.get('HTTP_USER_AGENT', '')
         respondant.save()
         return HttpResponse(simplejson.dumps({'success': "%s/%s/%s" % (survey_slug, question_slug, uuid)}))
     return HttpResponse(simplejson.dumps({'success': False}))
@@ -85,7 +94,6 @@ def answer(request, survey_slug, question_slug, uuid): #, survey_slug, question_
 
 def complete(request, survey_slug, uuid, action=None, question_slug=None):
     if request.method == 'POST':
-        
         survey = get_object_or_404(Survey, slug=survey_slug)
         respondant = get_object_or_404(Respondant, uuid=uuid, survey=survey)
         print action, question_slug

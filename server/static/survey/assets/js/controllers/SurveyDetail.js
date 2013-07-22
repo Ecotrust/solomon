@@ -184,7 +184,7 @@ angular.module('askApp')
         $scope.path = $location.path().slice(1,5);
         if (app.user) {
             $scope.user = app.user;
-        } else {
+        } else if (app.offline) {
             console.log('redirecting' + $location.path());
             if (!app) {
                 app = {};
@@ -193,7 +193,6 @@ angular.module('askApp')
             $location.path('/');
             return false;
         }
-
 
     $scope.survey = {
         state: 'loading'
@@ -250,12 +249,12 @@ angular.module('askApp')
 
     $scope.getNextQuestionPath = function(numQsToSkips) {
         var nextQuestion = $scope.getNextQuestion(numQsToSkips);
+
         if (nextQuestion) {
-            return ['survey', $scope.survey.slug, nextQuestion, $routeParams.uuidSlug].join('/');    
+            return ['survey', $scope.survey.slug, nextQuestion, $routeParams.uuidSlug].join('/');
         } else {
             return ['survey', $scope.survey.slug, 'complete', $routeParams.uuidSlug].join('/');
         }
-        
     };
 
     $scope.deleteAnswer = function (question, uuidSlug) {
@@ -308,7 +307,6 @@ angular.module('askApp')
         }
         return foundQuestion;
     };
-
 
     $scope.getResumeQuestionPath = function(lastQuestion) {
         var resumeQuestion = $scope.survey.questions[_.indexOf($scope.survey.questions, _.findWhere($scope.survey.questions, {
@@ -451,7 +449,7 @@ angular.module('askApp')
                     return returnValue;
                 }));
             }
-            if ($scope.survey.offline) {
+            if (app.offline) {
 
                 $scope.answerOffline({
                     answer: answer,
@@ -585,7 +583,6 @@ angular.module('askApp')
     };
 
     $scope.onSingleSelectClicked = function(option, question) {
-
         // turn off all other options
         _.each(_.without(question.options, option), function(option) {
             option.checked = false;
@@ -666,7 +663,6 @@ angular.module('askApp')
 $scope.loadSurvey = function(data) {
         $scope.survey = data.survey;
         $scope.survey.status = data.status;
-
         if (data.status === 'complete' || data.status === 'terminate') {
             $location.path(['survey', $scope.survey.slug, 'complete', $routeParams.uuidSlug].join('/'));
         }
@@ -703,8 +699,6 @@ $scope.loadSurvey = function(data) {
             $scope.infoView = 'survey-pages/' + $routeParams.surveySlug + '/' + $scope.question.info + '.html';
 
         }
-
-        //$scope.nextQuestionPath = $scope.getNextQuestionPath();
 
         /* Specific to single and multi select for now. */
         $scope.isAnswerValid = $scope.question && !$scope.question.required;
@@ -1415,16 +1409,17 @@ $scope.loadSurvey = function(data) {
 
             $scope.now = $scope.answer || (new Date()).toString("HH:mm");
         }
-        if ($scope.question.foreach_question) {
-            $scope.question.foreach = true;
-            $scope.question.foreachAnswers = $scope.getAnswer($scope.question.foreach_question.slug);
-        } else {
-            $scope.question.foreach = false;
-        }
-        
+        // if ($scope.question.foreach_question) {
+        //     $scope.question.foreach = true;
+        //     $scope.question.foreachAnswers = $scope.getAnswer($scope.question.foreach_question.slug);
+        // } else {
+        //     $scope.question.foreach = false;
+        // }
+        $scope.nextQuestionPath = $scope.getNextQuestionPath();
         $scope.loading = false;
     };
-    if ($routeParams.uuidSlug && ! _.string.startsWith($routeParams.uuidSlug, 'offline')) {
+    $scope.viewPath = app.viewPath;
+    if ($routeParams.uuidSlug && ! _.string.startsWith($routeParams.uuidSlug, 'offline') && app.offline) {
         $http.get(app.server + '/api/v1/survey/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
             app.data = {
                 survey: data
@@ -1432,6 +1427,12 @@ $scope.loadSurvey = function(data) {
             $scope.loadSurvey({
                 survey: data
             });
+        });
+    } else if ($routeParams && app.data && $routeParams.uuidSlug === app.data.uuid) {
+        // online surveys that have already been started
+        $scope.loadSurvey({
+            survey: app.data.survey,
+            responses: app.data.responses
         });
     } else if ($routeParams && _.string.startsWith($routeParams.uuidSlug, 'offline')) {
         var ts = new Date();
@@ -1455,7 +1456,7 @@ $scope.loadSurvey = function(data) {
             }),
             responses: app.respondents[$routeParams.uuidSlug].responses
         });
-    } else if (!app.data && !app.surveys) {
+    } else {
         $http.get(app.server + '/api/v1/respondant/' + $routeParams.uuidSlug + '/?format=json').success(function(data) {
             app.data = data;
             $scope.loadSurvey(data);
