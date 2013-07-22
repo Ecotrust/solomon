@@ -258,17 +258,20 @@ angular.module('askApp')
     };
 
     $scope.deleteAnswer = function (question, uuidSlug) {
-        var index, responses = app.respondents[uuidSlug].responses;
+        var index, responses = [];
         if ($scope.answers[question.slug]) {
             delete $scope.answers[question.slug];
         }
-        _.each(responses, function (response, i) {
-            if (response.question.slug === question.slug) {
-                index = i;
+        if (app.offline) {
+            responses = app.respondents[uuidSlug].responses;
+            _.each(responses, function (response, i) {
+                if (response.question.slug === question.slug) {
+                    index = i;
+                }
+            });
+            if (index) {
+                app.respondents[uuidSlug].responses.splice(index, 1);
             }
-        });
-        if (index) {
-            app.respondents[uuidSlug].responses.splice(index, 1);
         }
         $scope.saveState();
     }
@@ -312,7 +315,7 @@ angular.module('askApp')
         var resumeQuestion = $scope.survey.questions[_.indexOf($scope.survey.questions, _.findWhere($scope.survey.questions, {
             slug: lastQuestion
         })) + 1];
-        return ['survey', $scope.survey.slug, resumeQuestion.slug, $routeParams.uuidSlug].join('/');
+        return ['survey', $scope.survey.slug, resumeQuestion ? resumeQuestion.slug: null, $routeParams.uuidSlug].join('/');
     };
     
     /* () */ 
@@ -856,10 +859,15 @@ $scope.loadSurvey = function(data) {
         }
 
         if ($scope.question && $scope.question.type === 'yes-no') {
-            if ($scope.answer) {
+            if ($scope.answer && _.isArray($scope.answer)) {
                 $scope.question.options = [
                     {'text': 'Yes', 'label': "Yes", checked: $scope.answer[0].text === 'Yes'},
                     {'text': 'No', 'label': "No", checked: $scope.answer[0].text === 'No'}
+                ]    
+            } else if ($scope.answer && ! _.isArray($scope.answer)) {
+                $scope.question.options = [
+                    {'text': 'Yes', 'label': "Yes", checked: $scope.answer.text === 'Yes'},
+                    {'text': 'No', 'label': "No", checked: $scope.answer.text === 'No'}
                 ]    
             } else {
                 $scope.question.options = [
@@ -1458,15 +1466,13 @@ $scope.loadSurvey = function(data) {
         });
     } else {
         $http.get(app.server + '/api/v1/respondant/' + $routeParams.uuidSlug + '/?format=json').success(function(data) {
+            $timeout(function () {
+                window.scrollTo(0, 0);    
+            }, 0);
             app.data = data;
             $scope.loadSurvey(data);
         }).error(function(data, status, headers, config) {
             $scope.survey.status = 'invalid';
         });    
-    } else {
-        $timeout(function () {
-            window.scrollTo(0, 0);    
-        }, 0);
-        $scope.loadSurvey(app.data);
     }
 });
