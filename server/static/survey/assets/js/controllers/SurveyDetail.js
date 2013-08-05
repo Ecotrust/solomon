@@ -259,7 +259,6 @@ angular.module('askApp')
         var index = _.indexOf($scope.survey.questions, $scope.question) + 1 + (numQsToSkips || 0);
         // should return the slug of the next question
         var nextQuestion = $scope.survey.questions[index];
-        //if (nextQuestion && nextQuestion.blocks && nextQuestion.blocks.length) {
         
         if (nextQuestion) {
             if ($scope.skipIf(nextQuestion)) {
