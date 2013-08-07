@@ -60,6 +60,11 @@ angular.module('askApp')
                     _.each(data.answer_domain.surveys, function (survey) {
                         survey.locations = locationIdx[survey.answer];
                     });
+
+                    if (_.size(locationIdx) === 0) {
+                        scope.gridOptions.columnDefs.pop();
+                    }
+
                     scope.distributionData = data.answer_domain;
                 });
             };

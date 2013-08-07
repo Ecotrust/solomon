@@ -11,7 +11,8 @@ class QuestionReport(Question):
         proxy = True
 
     def get_answer_domain(self, survey, filters=None):
-        answers = self.response_set.filter(respondant__complete=True)
+        answers = self.response_set.all() #self.response_set.filter(respondant__complete=True)
+        print answers.count()
         if self.type in ['map-multipoint']:
             locations = LocationAnswer.objects.filter(location__response__in=answers)
         if filters is not None:    

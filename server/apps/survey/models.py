@@ -186,7 +186,7 @@ class Question(caching.base.CachingMixin, models.Model):
     @property
     def answer_domain(self):
         if self.visualize or self.filterBy:
-            answers = self.response_set.filter(respondant__complete=True)
+            answers = self.response_set.all()#self.response_set.filter(respondant__complete=True)
             if self.type in ['map-multipoint']:
                 return LocationAnswer.objects.filter(location__response__in=answers).values('answer').annotate(locations=Count('answer'), surveys=Count('location__respondant', distinct=True))
             else:

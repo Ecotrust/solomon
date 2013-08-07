@@ -5,7 +5,7 @@ angular.module('askApp')
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
-        
+        console.log($scope.survey);
 
         _.each($scope.survey.questions, function (question) {
             // save a reference to filter questions which are specified by uri
@@ -21,7 +21,7 @@ angular.module('askApp')
         
 
     }).success(function() {
-        $http.get('/api/v1/reportrespondant/?format=json&survey__slug__exact=' + $routeParams.surveySlug).success(function(data) {
+        $http.get('/api/v1/reportrespondant/?format=json&limit=5&survey__slug__exact=' + $routeParams.surveySlug).success(function(data) {
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
         });
