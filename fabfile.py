@@ -19,6 +19,10 @@ env.activate = 'source %s/bin/activate ' % env.virtualenv
 env.code_dir = '%s/%s' % (env.root_dir, app)
 env.media_dir = '%s/media' % env.root_dir
 
+vars = {
+    'app_dir': '/vagrant/server',
+    'venv': '/usr/local/venv/geosurvey'
+}
 
 @contextmanager
 def _virtualenv():
@@ -314,3 +318,19 @@ def provision():
 def prepare():
     install_chef(latest=False)
     provision()
+
+@task
+def package():
+        run("cd %s && %s/bin/python manage.py package simarketsurvey.herokuapp.com" % (vars['app_dir'], vars['venv']))
+        local("android/app/cordova/build --debug")
+        local("cp ./android/app/bin/HapiFis-debug.apk server/static/simarket.apk")
+
+@task
+def package_test():
+        run("cd %s && %s/bin/python manage.py package simarketsurvey-test.herokuapp.com" % (vars['app_dir'], vars['venv']))
+        local("android/app/cordova/build --debug")
+        local("cp ./android/app/bin/HapiFis-debug.apk server/static/simarket-test.apk")
+@task
+def emulator():
+        run("cd %s && %s/bin/python manage.py package localhost:8000" % (vars['app_dir'], vars['venv']))
+        local("android/app/cordova/run --emulator")
