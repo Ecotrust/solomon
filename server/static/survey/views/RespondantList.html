@@ -36,11 +36,11 @@
 
             <div  ui-if="question.visualize">
                 <div class="clearfix">
-                    <select class="pull-right" placeholder="filter by {{ question.slug }}" multiple=true ng-model="question.filters[question.slug]" ng-show="question.type == 'map-multipoint'" ui-select2 style="width: 200px">
+                <!--     <select class="pull-right" placeholder="filter by {{ question.slug }}" multiple=true ng-model="question.filters[question.slug]" ng-show="question.type == 'map-multipoint'" ui-select2 style="width: 200px">
                         <option value="{{answer.answer}}" ng-repeat="answer in question.answer_domain">
                             <strong>{{answer.answer}}</strong>
                         </option>
-                    </select>
+                    </select> -->
                     <div ng-repeat="filterQuestion in question.filterQuestions">
                         <select class="pull-right" placeholder="filter by {{ filterQuestion.slug }}" multiple=true ng-model="question.filters[filterQuestion.slug]" ui-select2 ng-hide="filterQuestion.slug == question.slug" style="width: 200px">
                             <option value="{{answer.answer}}" ng-repeat="answer in filterQuestion.answer_domain">
