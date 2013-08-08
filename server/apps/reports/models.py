@@ -3,7 +3,7 @@ from django.db.models import Avg, Max, Min, Count, Sum
 
 import caching.base
 
-from apps.survey.models import Survey, Question, Response, Respondant, Location, LocationAnswer
+from apps.survey.models import Survey, Question, Response, Respondant, Location, LocationAnswer, MultiAnswer
 
 class QuestionReport(Question):
 
@@ -12,7 +12,6 @@ class QuestionReport(Question):
 
     def get_answer_domain(self, survey, filters=None):
         answers = self.response_set.all() #self.response_set.filter(respondant__complete=True)
-        print answers.count()
         if self.type in ['map-multipoint']:
             locations = LocationAnswer.objects.filter(location__response__in=answers)
         if filters is not None:    
@@ -20,7 +19,7 @@ class QuestionReport(Question):
                 slug = filter.keys()[0]
                 value = filter[slug]
                 filter_question = QuestionReport.objects.get(slug=slug, survey=survey)
-                
+    
                 if self.type in ['map-multipoint']:
                     if filter_question == self:
                         locations = locations.filter(answer__in=value)
@@ -31,5 +30,7 @@ class QuestionReport(Question):
                     answers = answers.filter(respondant__responses__in=filter_question.response_set.filter(answer__in=value))
         if self.type in ['map-multipoint']:
             return locations.values('answer').annotate(locations=Count('answer'), surveys=Count('location__respondant', distinct=True))
+        elif self.type in ['multi-select']:
+            return MultiAnswer.objects.filter(response__in=answers).values('answer_text').annotate(surveys=Count('answer_text'))
         else:
             return answers.values('answer').annotate(locations=Sum('respondant__locations'), surveys=Count('answer'))        

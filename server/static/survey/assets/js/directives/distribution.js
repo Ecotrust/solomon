@@ -19,7 +19,7 @@ angular.module('askApp')
             scope.gridOptions = {
                 data: 'distributionData',
                 columnDefs: [
-                    {field:'answer', displayName:scope.question.label.replace('?','')},
+                    {field: scope.question.type === 'multi-select'? 'answer_text' : 'answer', displayName:scope.question.label.replace('?','')},
                     {field:'surveys', displayName:'Surveys'},
                     {field:'locations', displayName:'Activity Points'}
                 ]
