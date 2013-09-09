@@ -403,6 +403,10 @@ angular.module('askApp')
     };
 
     $scope.answerQuestion = function(answer, otherAnswer) {
+        // returnFlag is used for grid validation
+        var gridValidated = true,
+            url = ['/respond/answer', $scope.survey.slug, $routeParams.questionSlug, $routeParams.uuidSlug].join('/');
+
         if ($scope.question.type === 'integer' || $scope.question.type === 'number') {
             if ($scope.question.interger_max && $scope.question.integer_max < answer) {
                 return false;
@@ -415,7 +419,20 @@ angular.module('askApp')
             }
         }
 
-        var url = ['/respond/answer', $scope.survey.slug, $routeParams.questionSlug, $routeParams.uuidSlug].join('/');
+        if ($scope.question.type === 'grid') {
+            // validate grid questions
+            _.each($scope.question.grid_cols, function (col) {
+                _.each(answer, function (gridAnswer) {
+                    if (col.required && (gridAnswer === undefined || gridAnswer === null)) {
+                        gridValidated = false;
+                    }    
+                });
+            });
+            if (! gridValidated) {
+                return false;
+            }
+        }
+
         if ($scope.dialog) {
             if (!$scope.question.update) {
                 $scope.dialog.options.save($scope.question, answer);
