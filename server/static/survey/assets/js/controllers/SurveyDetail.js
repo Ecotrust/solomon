@@ -423,7 +423,7 @@ angular.module('askApp')
             // validate grid questions
             _.each($scope.question.grid_cols, function (col) {
                 _.each(answer, function (gridAnswer) {
-                    if (col.required && (gridAnswer === undefined || gridAnswer === null)) {
+                    if (col.required && (gridAnswer[col.label] === undefined || gridAnswer[col.label] === null)) {
                         gridValidated = false;
                     }    
                 });
