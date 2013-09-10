@@ -13,8 +13,11 @@ class SurveyModelResource(ModelResource):
         bundle = super(SurveyModelResource, self).obj_update(bundle, **kwargs)
         for field_name in self.fields:
             field = self.fields[field_name]
-            if type(field) is fields.ToOneField and field.null and bundle.data[field_name] is None:
-                setattr(bundle.obj, field_name, None)
+            try:
+                if type(field) is fields.ToOneField and field.null and bundle.data[field_name] is None:
+                    setattr(bundle.obj, field_name, None)
+            except KeyError:
+                pass
 
         bundle.obj.save()
 
@@ -65,7 +68,7 @@ class ResponseResource(SurveyModelResource):
 
 class OfflineResponseResource(SurveyModelResource):
     question = fields.ToOneField('apps.survey.api.QuestionResource', 'question', null=True, blank=True)
-
+    respondant = fields.ToOneField('apps.survey.api.OfflineRespondantResource', 'respondant')
     class Meta:
         queryset = Response.objects.all()
         authorization = StaffUserOnlyAuthorization()
@@ -83,6 +86,11 @@ class OfflineRespondantResource(SurveyModelResource):
     
     def obj_create(self, bundle, **kwargs):
         return super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
+
+    def save_related(self, bundle):
+        resource_uri = self.get_resource_uri(bundle.obj)
+        for response in bundle.data.get('responses'):
+            response['respondant'] = resource_uri
 
 
 class ReportRespondantResource(SurveyModelResource):

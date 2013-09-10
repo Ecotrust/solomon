@@ -337,7 +337,12 @@ class Response(caching.base.CachingMixin, models.Model):
                 self.respondant.save()
             self.save()
             print self.answer
-
+    
+    def __unicode__(self):
+        if self.respondant and self.question:
+            return "%s/%s (%s)" %(self.respondant.survey.slug, self.question.slug, self.respondant.uuid)
+        else:
+            return "No Respondant"
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''

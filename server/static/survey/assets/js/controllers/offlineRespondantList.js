@@ -59,8 +59,9 @@ angular.module('askApp')
         }
 
         $scope.sendRespondent = function (respondent) {
-            var url = app.server + '/api/v1/offlinerespondant/';
-            _.each(respondent.responses, function (response) {
+            var url = app.server + '/api/v1/offlinerespondant/',
+                newResponses = angular.copy(respondent.responses);
+            _.each(newResponses, function (response) {
                 var question_uri = response.question.resource_uri;
                 response.question = question_uri;
                 response.answer_raw = JSON.stringify(response.answer);
@@ -68,7 +69,7 @@ angular.module('askApp')
             var newRespondent = {
                 ts: respondent.ts,
                 uuid: respondent.uuid.replace(':', '_'),
-                responses: respondent.responses,
+                responses: newResponses,
                 status: respondent.status,
                 complete: respondent.complete,
                 survey: '/api/v1/survey/' + respondent.survey + '/'
