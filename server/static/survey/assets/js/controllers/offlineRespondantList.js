@@ -46,7 +46,11 @@ angular.module('askApp')
 
         }
 
-
+        $scope.toggleComplete = function (respondent) {
+            respondent.complete = ! respondent.complete;
+            respondent.ts = new Date();
+            $scope.saveState();
+        }
 
         $scope.deleteRespondent = function (respondent) {
             $scope.respondents = _.without($scope.respondents, respondent);

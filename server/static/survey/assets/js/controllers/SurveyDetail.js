@@ -392,6 +392,7 @@ angular.module('askApp')
     $scope.answerOffline = function(answer) {
         $scope.deleteAnswer($scope.question, $routeParams.uuidSlug);
         app.respondents[$routeParams.uuidSlug].responses.push(answer);
+        app.respondents[$routeParams.uuidSlug].ts = new Date();
         $scope.answers[$routeParams.questionSlug] = answer;
         $scope.saveState();
         $scope.gotoNextQuestion();
