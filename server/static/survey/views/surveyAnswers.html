@@ -15,18 +15,18 @@
             <span ng-switch-when="single-select">{{question.response.text}}</span>
             <span ng-switch-when="yes-no">{{question.response.text}}</span>
             <ul class="list" ng-switch-when="multi-select">
-                <li ng-repeat="answer in question.response">{{answer.text}}</li>
+                <li ng-show="question.response" ng-repeat="answer in question.response">{{answer.text}}</li>
             </ul>
-            <table class="table" ng-switch-when="grid">
+            <table class="table" ng-switch-when="grid" ng-show="question.response">
                 <thead>
                     <th></th>
-                    <th ng-repeat="grid_col in $scope.respondent.responses[$index].question.grid_cols"><strong>{{grid_col.text}}</strong></th>
+                    <th ng-repeat="grid_col in question.response.grid_cols"><strong>{{grid_col.text}}</strong></th>
                 </thead>
                 <tbody>
                     <tr ng-repeat="answer in question.response">
                         <td>{{ answer.text }}</td>
-                        <td ng-repeat="grid_col in $scope.respondent.responses[$index].question.grid_cols" ng-hide="grid_col.type=='multi-select'">{{answer[grid_col.label.replace('-', '')]}}</td>
-                        <td ng-repeat="grid_col in $scope.respondent.responses[$index].question.grid_cols" ng-show="grid_col.type=='multi-select'">
+                        <td ng-repeat="grid_col in question.grid_cols" ng-hide="grid_col.type=='multi-select'">{{answer[grid_col.label.replace('-', '')]}}</td>
+                        <td ng-repeat="grid_col in question.grid_cols" ng-show="grid_col.type=='multi-select'">
                             <span ng-repeat="multiAnswer in answer[grid_col.label.replace(''-'', '')]">{{multiAnswer}}<span ng-hide="$last">,</span> </span>
                         </td>
                     </tr>
