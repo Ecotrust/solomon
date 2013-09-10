@@ -14,17 +14,36 @@ angular.module('askApp')
 
         $scope.path = $location.path().slice(1,5);
 
+        
+
 
         if ($routeParams.uuidSlug) {
             $scope.respondent = $scope.respondentIndex[$routeParams.uuidSlug];
-
-            _.each($scope.respondent.responses, function (response) {
-                if (response.question.grid_cols) {
-                    _.each(response.question.grid_cols, function (grid_col) {
+            $scope.survey = angular.copy(_.findWhere(app.surveys, { slug: $scope.respondent.survey}));
+            _.each($scope.survey.questions, function (question, index, questions) {
+                var response = $scope.respondent.responses[index];
+                if (question.grid_cols) {
+                    _.each(question.grid_cols, function (grid_col) {
                         grid_col.label = grid_col.label.replace(/-/g, '');
                     });
                 }
+
+                // check for the start of new block
+                if (question.blocks.length && ! _.isEqual(question.blocks, questions[index-1].blocks)) {
+                    question.newBlocks = true;
+                } else {
+                    question.newBlocks = false;
+                }
+
+                // check for end of a blocks
+                if (! questions[index-1] || question.blocks.length === 0 && questions[index-1].blocks.length > 0) {
+                    question.noBlocks = true;
+                }
+                if (response) {
+                    question.response = response.answer;    
+                }
             });
+
         }
 
 
