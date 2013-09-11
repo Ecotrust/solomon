@@ -11,6 +11,7 @@
         <div class="progress" style="width: 100%">
           <div class="bar" style="width: {{ synchronized.length/respondents.length * 100 }}%;"></div>
         </div>
+        <a class="btn btn-block btn-large" ng-click="busy = false">cancel</a>
     </div>
     <div ng-show="confirmSubmit">
         <a class="btn btn-block btn-large btn-danger" ng-click="syncronize(respondents)">ok</a>
