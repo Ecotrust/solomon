@@ -327,9 +327,9 @@ def package():
 
 @task
 def package_test():
-        run("cd %s && %s/bin/python manage.py package simarketsurvey-test.herokuapp.com" % (vars['app_dir'], vars['venv']))
+        run("cd %s && %s/bin/python manage.py package hapifis-test.herokuapp.com" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
-        local("cp ./android/app/bin/HapiFis-debug.apk server/static/simarket-test.apk")
+        local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-test.apk")
 @task
 def emulator():
         run("cd %s && %s/bin/python manage.py package localhost:8000" % (vars['app_dir'], vars['venv']))
