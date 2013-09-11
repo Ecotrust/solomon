@@ -12,8 +12,9 @@ DATABASES = {
 DEBUG = False
 HEROKU = True
 
-ALLOWED_HOSTS = [os.environ['ALLOWED_HOSTS']]
-
+ALLOWED_HOSTS = [
+    '.herokuapp.com',
+]
 
 try:
     EMAIL_HOST_USER = os.environ['SENDGRID_USERNAME']
