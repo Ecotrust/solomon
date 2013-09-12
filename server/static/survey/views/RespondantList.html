@@ -7,7 +7,7 @@
         <!-- <div class="row-fluid">
             <div heatmap question="question.slug"></div>
         </div> -->
-        <h3>Reports</h3>
+        <div start="startDate" end="endDate" range-slider></div>
         <div ng-repeat="chart in charts">
             <h2>{{ chart.yLabel}} by {{ chart.xLabel }}</h2>
             <div bar-chart chart="chart"></div>

@@ -14,7 +14,10 @@ background-color: #f5f5f5;
     position: absolute;
     top: 10px;
 }
-
+.range-slider {
+  margin-left: 30px;
+  margin-right: 30px;
+}
 .respondant {
 max-width: 800px;
 padding: 9px 29px 29px;

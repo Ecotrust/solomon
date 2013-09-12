@@ -2,8 +2,9 @@
 
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
-    
-    $scope.survey = $routeParams.surveySlug;
+    $scope.startDate = Date.today().add(-365).days();
+    $scope.endDate = Date.today();
+
 
     $scope.charts = [];
 
