@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Max, Min, Count
 from django.contrib.admin.views.decorators import staff_member_required
-
+from django.db.models import Sum
 import simplejson
 
 from apps.survey.models import Survey, Question, Response, Respondant, Location, LocationAnswer
@@ -70,3 +70,19 @@ def get_distribution(request, survey_slug, question_slug):
         filter_question = None
     answer_domain = question.get_answer_domain(survey, filter_list)
     return HttpResponse(simplejson.dumps({'success': "true", "answer_domain": list(answer_domain)}))
+
+@staff_member_required
+def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
+    survey = Survey.objects.get(slug = survey_slug)
+    question_a = Question.objects.get(slug = question_a_slug, survey=survey)
+    question_b = Question.objects.get(slug = question_b_slug, survey=survey)
+    question_a_responses = Response.objects.filter(question=question_a)
+    crosstab = []
+    for question_a_answer in question_a_responses.values('answer').distinct():
+        respondants = Respondant.objects.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
+        if question_b.type in ['currency', 'integer', 'number']:
+            crosstab.append({
+                'name': question_a_answer['answer'],
+                'value': Response.objects.filter(respondant__in=respondants, question=question_b).aggregate(sum=Sum('answer_number'))['sum']
+            })
+    return HttpResponse(simplejson.dumps({'success': "true", "crosstab": list(crosstab)}))

@@ -36,7 +36,6 @@ class StaffUserOnlyAuthorization(Authorization):
         return bundle.request.user.is_staff
 
     def update_detail(self, object_list, bundle):
-        print bundle.request.user
         return bundle.request.user.is_staff
 
     def delete_list(self, object_list, bundle):

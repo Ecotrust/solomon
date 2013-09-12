@@ -34,6 +34,8 @@ class Respondant(caching.base.CachingMixin, models.Model):
 
     surveyor = models.ForeignKey(User, null=True, blank=True)
 
+    test_data = models.BooleanField(default=False)
+
     objects = caching.base.CachingManager()
 
     def __str__(self):
@@ -262,6 +264,7 @@ class Response(caching.base.CachingMixin, models.Model):
     question = models.ForeignKey(Question)
     respondant = models.ForeignKey(Respondant, null=True, blank=True)
     answer = models.TextField(null=True, blank=True)
+    answer_number = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
     answer_raw = models.TextField(null=True, blank=True)
     ts = models.DateTimeField(default=datetime.datetime.now())
     objects = caching.base.CachingManager()
@@ -269,6 +272,9 @@ class Response(caching.base.CachingMixin, models.Model):
     def save_related(self):
         if self.answer_raw:
             self.answer = simplejson.loads(self.answer_raw)
+            if self.question.type in ['currency', 'integer', 'number']:
+                self.answer_number = self.answer
+                print "number"
             if self.question.type in ['auto-single-select', 'single-select']:
                 answer = simplejson.loads(self.answer_raw)
                 if answer.get('text'):
