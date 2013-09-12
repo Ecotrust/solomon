@@ -76,13 +76,15 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
     survey = Survey.objects.get(slug = survey_slug)
     question_a = Question.objects.get(slug = question_a_slug, survey=survey)
     question_b = Question.objects.get(slug = question_b_slug, survey=survey)
-    question_a_responses = Response.objects.filter(question=question_a)
+    question_a_responses = Response.objects.filter(question=question_a).order_by('answer')
     crosstab = []
     for question_a_answer in question_a_responses.values('answer').distinct():
         respondants = Respondant.objects.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
         if question_b.type in ['currency', 'integer', 'number']:
             crosstab.append({
                 'name': question_a_answer['answer'],
-                'value': Response.objects.filter(respondant__in=respondants, question=question_b).aggregate(sum=Sum('answer_number'))['sum']
+                'value': Response.objects.filter(respondant__in=respondants, question=question_b).aggregate(sum=Sum('answer_number'))['sum'],
+                question_a.slug: question_a.label,
+                question_b.slug: question_b.label
             })
     return HttpResponse(simplejson.dumps({'success': "true", "crosstab": list(crosstab)}))

@@ -46,6 +46,10 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
         templateUrl: '/static/survey/views/RespondantDetail.html',
         controller: 'RespondantDetailCtrl'
     })
+        .when('/crosstab/:surveySlug/:questionSlugX/:questionSlugY', {
+        templateUrl: '/static/survey/views/crosstab.html',
+        controller: 'CrossTabCtrl'
+    })
         .otherwise({
         redirectTo: '/'
     });

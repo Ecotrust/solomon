@@ -19,7 +19,7 @@ class Command(BaseCommand):
         volume_question = Question.objects.get(slug = 'total-volume', survey=survey)
 
         for i in range(1000):
-	        respondant = Respondant(survey=survey)
+	        respondant = Respondant(survey=survey, test_data=True)
 	        market_response = Response(question=market_question, respondant=respondant)
 	        volume_response = Response(question=volume_question, respondant=respondant)
 	        volume_response.answer_raw = simplejson.dumps(randint(1,500))
