@@ -2,6 +2,30 @@
 
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
+    
+    $scope.survey = $routeParams.surveySlug;
+
+    $scope.charts = [];
+
+    $http.get(['/reports/crosstab', $routeParams.surveySlug, 'market', 'total-volume'].join('/')).success(function(data) {
+        $scope.charts.push({
+            labels: _.pluck(data.crosstab, 'name'),
+            data: _.pluck(data.crosstab, 'value'),
+            xLabel: 'market',
+            yLabel: 'total-volume'
+        });
+    });
+
+    $http.get(['/reports/crosstab', $routeParams.surveySlug, 'source-province', 'total-volume'].join('/')).success(function(data) {
+        $scope.charts.push({
+            labels: _.pluck(data.crosstab, 'name'),
+            data: _.pluck(data.crosstab, 'value'),
+            xLabel: 'source-province',
+            yLabel: 'total-volume'
+        });
+    });
+
+
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;

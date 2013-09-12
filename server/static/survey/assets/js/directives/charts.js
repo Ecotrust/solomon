@@ -11,6 +11,8 @@ angular.module('askApp')
 
             link: function postLink(scope, element, attrs) {
 
+
+
                 scope.$watch('chart', function(newValue) {
                     // Draw the graph
                     var labels, data;
@@ -26,6 +28,7 @@ angular.module('askApp')
                         Flotr.draw(
                             element[0], [data], {
                                 HtmlText: false,
+                                fontSize: 12,
                                 mouse: {
                                     track: false
                                 },
@@ -40,12 +43,15 @@ angular.module('askApp')
                                     relative: true
                                 },
                                 xaxis: {
+                                    fontSize: 12,
                                     ticks: labels,
                                     title: scope.chart.xLabel
                                 },
                                 yaxis: {
-                                    min: 5000,
+                                    fontSize: 12,
+                                    min: 0,
                                     autoscaleMargin: 1,
+                                    autscale: true,
                                     title: scope.chart.yLabel,
                                     titleAngle: 90
 

@@ -246,3 +246,6 @@ form .btn-block {
   height: 400px;
 }
 
+.flotr-mouse-value {
+  display: none;
+}
