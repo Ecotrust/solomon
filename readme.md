@@ -136,6 +136,11 @@ curl -o latest.dump `heroku pgbackups:url`
 ```
 
 ##restore a backup
+To restore to the vagrant instance, log in to the vm and execute the following
+```bash
+pg_restore --verbose --clean --no-acl --no-owner -d geosurvey latest.dump
+```
+
 Transfer the dump file to a web accessible space.  To find the database url, use the pg:info command.
 ```bash
 heroku pg:info
