@@ -17,12 +17,12 @@ angular.module('askApp')
                     type: data.type,
                     labels: _.pluck(data.crosstab, 'name'),
                     data: _.pluck(data.crosstab, 'value'),
-                    xLabel: 'survey-site',
-                    yLabel: 'total-volume'
+                    xLabel: 'Survey Site',
+                    yLabel: 'Total Volume'
                 });
             });
 
-            url = ['/reports/crosstab', $routeParams.surveySlug, 'source-province', 'total-volume'].join('/');
+            url = ['/reports/crosstab', $routeParams.surveySlug, 'province-purchased-caught', 'total-volume'].join('/');
                 url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
                 url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
@@ -31,8 +31,8 @@ angular.module('askApp')
                     type: data.type,
                     labels: _.pluck(data.crosstab, 'name'),
                     data: _.pluck(data.crosstab, 'value'),
-                    xLabel: 'source-province',
-                    yLabel: 'total-volume'
+                    xLabel: 'Province',
+                    yLabel: 'Total Volume'
                 });
             });    
 
@@ -47,8 +47,8 @@ angular.module('askApp')
                     seriesNames: data.seriesNames,
                     type: data.type,
                     data: data.crosstab,
-                    xLabel: 'survey-site',
-                    yLabel: 'cost'
+                    xLabel: 'Survey Site',
+                    yLabel: 'Average Costs'
                 });
 
             });    

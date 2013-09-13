@@ -108,7 +108,7 @@ angular.module('askApp')
                             yAxis: {
                                 min: 0,
                                 title: {
-                                    text: 'Total Cost per Vendor'
+                                    text: 'Average Cost per Vendor'
                                 },
                                 stackLabels: {
                                     enabled: true,

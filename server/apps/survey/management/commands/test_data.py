@@ -44,10 +44,10 @@ class Command(BaseCommand):
     	respondants = Respondant.objects.filter(test_data=True)
     	Response.objects.filter(respondant__in=respondants).delete()
     	respondants.delete()
-    	survey = Survey.objects.get(slug = 'volume-and-origin')
+    	survey = Survey.objects.get(slug = 'reef-fish-market-survey')
         market_question = Question.objects.get(slug = 'survey-site', survey=survey)
         volume_question = Question.objects.get(slug = 'total-volume', survey=survey)
-        origin_question = Question.objects.get(slug = 'source-province', survey=survey)
+        origin_question = Question.objects.get(slug = 'province-purchased-caught', survey=survey)
         cost_question = Question.objects.get(slug = 'cost', survey=survey)
         date_question = Question.objects.get(slug = 'survey-date', survey=survey)
         for i in range(500):
