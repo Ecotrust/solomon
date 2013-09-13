@@ -2,40 +2,59 @@
 
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
-    $scope.filter = {
-        startDate: Date.today().add(-365).days(),
-        endDate:Date.today()
-    }
+  
+    $scope.filter = null;
 
+    $scope.$watch('filter', function (newValue) {
+        if (newValue) {
+            $scope.charts = [];
+            var url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-volume'].join('/');
+                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');;
+                url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
-
-    $scope.$watch('filter', function () {
-        $scope.charts = [];
-        var url = ['/reports/crosstab', $routeParams.surveySlug, 'market', 'total-volume'].join('/');
-            url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');;
-            url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
-
-        $http.get(url).success(function(data) {
-            $scope.charts.push({
-                labels: _.pluck(data.crosstab, 'name'),
-                data: _.pluck(data.crosstab, 'value'),
-                xLabel: 'market',
-                yLabel: 'total-volume'
+            $http.get(url).success(function(data) {
+                $scope.charts.push({
+                    type: data.type,
+                    labels: _.pluck(data.crosstab, 'name'),
+                    data: _.pluck(data.crosstab, 'value'),
+                    xLabel: 'survey-site',
+                    yLabel: 'total-volume'
+                });
             });
-        });
 
-        url = ['/reports/crosstab', $routeParams.surveySlug, 'source-province', 'total-volume'].join('/');
-            url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
-            url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
+            url = ['/reports/crosstab', $routeParams.surveySlug, 'source-province', 'total-volume'].join('/');
+                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
+                url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
-        $http.get(url).success(function(data) {
-            $scope.charts.push({
-                labels: _.pluck(data.crosstab, 'name'),
-                data: _.pluck(data.crosstab, 'value'),
-                xLabel: 'source-province',
-                yLabel: 'total-volume'
-            });
-        });
+            $http.get(url).success(function(data) {
+                $scope.charts.push({
+                    type: data.type,
+                    labels: _.pluck(data.crosstab, 'name'),
+                    data: _.pluck(data.crosstab, 'value'),
+                    xLabel: 'source-province',
+                    yLabel: 'total-volume'
+                });
+            });    
+
+            url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'cost'].join('/');
+                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
+                url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
+
+            $http.get(url).success(function(data) {
+                console.log(data.type);
+                $scope.charts.push({
+                    labels: _.pluck(data.crosstab, 'name'),
+                    seriesNames: data.seriesNames,
+                    type: data.type,
+                    data: data.crosstab,
+                    xLabel: 'survey-site',
+                    yLabel: 'cost'
+                });
+
+            });    
+
+        }
+        
     }, true);
     
 
@@ -44,6 +63,12 @@ angular.module('askApp')
         data.questions.reverse();
         $scope.survey = data;
         console.log($scope.survey);
+
+        $scope.filter = {
+            startDate: new Date($scope.survey.response_date_start),
+            endDate: new Date($scope.survey.response_date_end).add(1).day(),
+        }
+
 
         _.each($scope.survey.questions, function (question) {
             // save a reference to filter questions which are specified by uri

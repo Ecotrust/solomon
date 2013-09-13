@@ -66,3 +66,93 @@ angular.module('askApp')
             }
         }
     });
+
+angular.module('askApp')
+    .directive('stackedColumn', function($http) {
+        return {
+            template: '<div style="height: 400px"></div>',
+            restrict: 'EA',
+            replace: true,
+            transclude: true,
+            scope: {
+                chart: "=chart"
+            },
+
+            link: function postLink(scope, element, attrs) {
+
+
+
+                scope.$watch('chart', function(newValue) {
+                    // Draw the graph
+                    var series = _.map(scope.chart.seriesNames, function (name) {
+                        return {
+                            name: name,
+                            data: _.map(scope.chart.data, function (item) {
+                                console.log(item.name + _.findWhere(item.value, {row_text: name}).average);
+                                return _.findWhere(item.value, {row_text: name}).average;
+                            })
+                        }
+                    });
+                    console.log(series);
+                    if (newValue) {
+                        element.highcharts({
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: 'Stacked column chart'
+                            },
+                            xAxis: {
+                                categories: scope.chart.labels
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: 'Total Cost per Vendor'
+                                },
+                                stackLabels: {
+                                    enabled: true,
+                                    style: {
+                                        fontWeight: 'bold',
+                                        color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                    }
+                                }
+                            },
+                            credits: {
+                                  enabled: false
+                              },
+                            legend: {
+                                align: 'right',
+                                x: -70,
+                                verticalAlign: 'top',
+                                y: 20,
+                                floating: true,
+                                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
+                                borderColor: '#CCC',
+                                borderWidth: 1,
+                                shadow: false
+                            },
+                            tooltip: {
+                                formatter: function() {
+                                    return '<b>' + this.x + '</b><br/>' +
+                                        this.series.name + ': ' + this.y + '<br/>' +
+                                        'Total: ' + this.point.stackTotal;
+                                }
+                            },
+                            plotOptions: {
+                                column: {
+                                    stacking: 'normal',
+                                    dataLabels: {
+                                        enabled: true,
+                                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                                    }
+                                }
+                            },
+                            series: series
+                        });
+                    }
+                });
+
+            }
+        }
+    });

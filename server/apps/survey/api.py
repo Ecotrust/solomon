@@ -210,3 +210,5 @@ class SurveyReportResource(SurveyResource):
     completes = fields.IntegerField(attribute='completes', readonly=True)
     survey_responses = fields.IntegerField(attribute='survey_responses', readonly=True)
     activity_points = fields.IntegerField(attribute='activity_points', readonly=True)
+    response_date_start = fields.DateField(attribute='response_date_start', readonly=True, null=True, blank=True)
+    response_date_end = fields.DateField(attribute='response_date_end', readonly=True, null=True, blank=True)

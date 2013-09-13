@@ -88,8 +88,8 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
     question_b = Question.objects.get(slug = question_b_slug, survey=survey)
     date_question = Question.objects.get(slug = 'survey-date', survey=survey)
     question_a_responses = Response.objects.filter(question=question_a).order_by('answer')
-
     crosstab = []
+    obj = {}
     for question_a_answer in question_a_responses.values('answer').distinct():
         respondants = Respondant.objects.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
 
@@ -99,11 +99,20 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         if end_date is not None:
             respondants = respondants.filter(responses__in=date_question.response_set.filter(answer_date__lte=end_date))
 
-        if question_b.type in ['currency', 'integer', 'number']:
+        if question_b.type in ['grid']:
+            obj['type'] = 'stacked-column'
+            rows = Response.objects.filter(respondant__in=respondants, question=question_b)[0].gridanswer_set.all().values('row_text','row_label').order_by('row_label')
+            obj['seriesNames'] = [row['row_text'] for row in rows]
             crosstab.append({
                 'name': question_a_answer['answer'],
-                'value': Response.objects.filter(respondant__in=respondants, question=question_b).aggregate(sum=Sum('answer_number'))['sum'],
-                question_a.slug: question_a.label,
-                question_b.slug: question_b.label
+                'value': list(rows.annotate(average=Avg('answer_number')))
             })
-    return HttpResponse(simplejson.dumps({'success': "true", "crosstab": list(crosstab)}))
+        elif question_b.type in ['currency', 'integer', 'number']:
+            obj['type'] = 'bar-chart'
+            crosstab.append({
+                'name': question_a_answer['answer'],
+                'value': Response.objects.filter(respondant__in=respondants, question=question_b).aggregate(sum=Sum('answer_number'))['sum']
+            })
+        obj['crosstab'] = crosstab
+        obj['success'] = 'true'
+    return HttpResponse(simplejson.dumps(obj))

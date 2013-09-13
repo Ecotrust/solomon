@@ -91,6 +91,14 @@ class Survey(caching.base.CachingMixin, models.Model):
         return Location.objects.filter(response__respondant__in=self.respondant_set.filter(complete=True)).count()
         
 
+    @property
+    def response_date_start(self):
+        return self.questions.filter(slug='survey-date').aggregate(date=Min('response__answer_date')).get('date', None)
+
+    @property
+    def response_date_end(self):
+        return self.questions.filter(slug='survey-date').aggregate(date=Max('response__answer_date')).get('date', None)
+
     def __str__(self):
         return "%s" % self.name
 
@@ -255,6 +263,7 @@ class GridAnswer(caching.base.CachingMixin, models.Model):
     col_text = models.TextField(null=True, blank=True)
     col_label = models.TextField(null=True, blank=True)
     answer_text = models.TextField(null=True, blank=True)
+    answer_number = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
 
     def __str__(self):
         return "%s: %s" % (self.row_text, self.col_text)
@@ -316,6 +325,7 @@ class Response(caching.base.CachingMixin, models.Model):
                             try:
                                 grid_answer = GridAnswer(response=self,
                                     answer_text=answer[grid_col.label.replace('-', '')],
+                                    answer_number=answer[grid_col.label.replace('-', '')],
                                     row_label=answer['label'], row_text=answer['text'],
                                     col_label=grid_col.label, col_text=grid_col.text)
                                 grid_answer.save()

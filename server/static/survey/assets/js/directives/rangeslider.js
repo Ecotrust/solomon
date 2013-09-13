@@ -13,25 +13,36 @@ angular.module('askApp')
         },
         link: function (scope, element, attrs) {            
             // initialize slider
-            element.dateRangeSlider({
-                bounds:{
-                    min: scope.start,
-                    max: scope.end
-                },
-                set: {
-                    days: 1
-                }
+            scope.initializeSlider = _.once(function () {
+                element.dateRangeSlider({
+                    bounds:{
+                        min: scope.start,
+                        max: scope.end
+                    },
+                    set: {
+                        days: 1
+                    }
+                });
             });
+            
 
             // listen from updates for the controller
             if (attrs.start) {
                 scope.$watch('start', function (newStart) {
-                    element.dateRangeSlider("min", newStart);
+                    if (newStart) {
+                        scope.initializeSlider();
+                        element.dateRangeSlider("min", newStart);    
+                    }
+                    
                 });
             }
             if (attrs.end) {
                 scope.$watch('end', function (newEnd) {
-                    element.dateRangeSlider("max", newEnd);  
+                    if (newEnd) {
+                        scope.initializeSlider();
+                        element.dateRangeSlider("max", newEnd);      
+                    }
+                    
                 });
                 
             }
