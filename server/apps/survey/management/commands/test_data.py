@@ -50,7 +50,7 @@ class Command(BaseCommand):
         origin_question = Question.objects.get(slug = 'province-purchased-caught', survey=survey)
         cost_question = Question.objects.get(slug = 'cost', survey=survey)
         date_question = Question.objects.get(slug = 'survey-date', survey=survey)
-        for i in range(500):
+        for i in range(5000):
         	date = (datetime.date.today() + datetime.timedelta(-randint(0, 365))).isoformat()
 	        respondant = Respondant(survey=survey, test_data=True)
 	        market_response = Response(question=market_question, respondant=respondant)
