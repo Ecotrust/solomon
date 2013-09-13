@@ -266,15 +266,17 @@ class Response(caching.base.CachingMixin, models.Model):
     answer = models.TextField(null=True, blank=True)
     answer_number = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
     answer_raw = models.TextField(null=True, blank=True)
+    answer_date = models.DateTimeField(null=True, blank=True)
     ts = models.DateTimeField(default=datetime.datetime.now())
     objects = caching.base.CachingManager()
 
     def save_related(self):
         if self.answer_raw:
             self.answer = simplejson.loads(self.answer_raw)
+            if self.question.type in ['datepicker']:
+                self.answer_date = datetime.datetime.strptime(self.answer, '%Y-%m-%d')
             if self.question.type in ['currency', 'integer', 'number']:
                 self.answer_number = self.answer
-                print "number"
             if self.question.type in ['auto-single-select', 'single-select']:
                 answer = simplejson.loads(self.answer_raw)
                 if answer.get('text'):

@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Max, Min, Count
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
-import simplejson
+import simplejson, datetime
 
 from apps.survey.models import Survey, Question, Response, Respondant, Location, LocationAnswer
 from apps.reports.models import QuestionReport
@@ -73,13 +73,32 @@ def get_distribution(request, survey_slug, question_slug):
 
 @staff_member_required
 def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
+    start_date = request.GET.get('startdate', None)
+    end_date = request.GET.get('enddate', None)
+
+    if start_date is not None:
+        start_date = datetime.datetime.strptime(start_date, '%Y%m%d')
+
+    if end_date is not None:
+        end_date = datetime.datetime.strptime(end_date, '%Y%m%d')
+
     survey = Survey.objects.get(slug = survey_slug)
+
     question_a = Question.objects.get(slug = question_a_slug, survey=survey)
     question_b = Question.objects.get(slug = question_b_slug, survey=survey)
+    date_question = Question.objects.get(slug = 'survey-date', survey=survey)
     question_a_responses = Response.objects.filter(question=question_a).order_by('answer')
+
     crosstab = []
     for question_a_answer in question_a_responses.values('answer').distinct():
         respondants = Respondant.objects.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
+
+        if start_date is not None:
+            respondants = respondants.filter(responses__in=date_question.response_set.filter(answer_date__gte=start_date))
+
+        if end_date is not None:
+            respondants = respondants.filter(responses__in=date_question.response_set.filter(answer_date__lte=end_date))
+
         if question_b.type in ['currency', 'integer', 'number']:
             crosstab.append({
                 'name': question_a_answer['answer'],

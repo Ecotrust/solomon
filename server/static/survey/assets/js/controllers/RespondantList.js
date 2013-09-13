@@ -2,29 +2,42 @@
 
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
-    $scope.startDate = Date.today().add(-365).days();
-    $scope.endDate = Date.today();
+    $scope.filter = {
+        startDate: Date.today().add(-365).days(),
+        endDate:Date.today()
+    }
 
 
-    $scope.charts = [];
 
-    $http.get(['/reports/crosstab', $routeParams.surveySlug, 'market', 'total-volume'].join('/')).success(function(data) {
-        $scope.charts.push({
-            labels: _.pluck(data.crosstab, 'name'),
-            data: _.pluck(data.crosstab, 'value'),
-            xLabel: 'market',
-            yLabel: 'total-volume'
+    $scope.$watch('filter', function () {
+        $scope.charts = [];
+        var url = ['/reports/crosstab', $routeParams.surveySlug, 'market', 'total-volume'].join('/');
+            url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');;
+            url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
+
+        $http.get(url).success(function(data) {
+            $scope.charts.push({
+                labels: _.pluck(data.crosstab, 'name'),
+                data: _.pluck(data.crosstab, 'value'),
+                xLabel: 'market',
+                yLabel: 'total-volume'
+            });
         });
-    });
 
-    $http.get(['/reports/crosstab', $routeParams.surveySlug, 'source-province', 'total-volume'].join('/')).success(function(data) {
-        $scope.charts.push({
-            labels: _.pluck(data.crosstab, 'name'),
-            data: _.pluck(data.crosstab, 'value'),
-            xLabel: 'source-province',
-            yLabel: 'total-volume'
+        url = ['/reports/crosstab', $routeParams.surveySlug, 'source-province', 'total-volume'].join('/');
+            url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
+            url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
+
+        $http.get(url).success(function(data) {
+            $scope.charts.push({
+                labels: _.pluck(data.crosstab, 'name'),
+                data: _.pluck(data.crosstab, 'value'),
+                xLabel: 'source-province',
+                yLabel: 'total-volume'
+            });
         });
-    });
+    }, true);
+    
 
 
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
