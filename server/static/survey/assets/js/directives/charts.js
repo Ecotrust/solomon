@@ -100,7 +100,7 @@ angular.module('askApp')
                                 type: 'column'
                             },
                             title: {
-                                text: 'Stacked column chart'
+                                text: false
                             },
                             xAxis: {
                                 categories: scope.chart.labels
