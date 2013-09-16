@@ -8,7 +8,7 @@ angular.module('askApp')
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
             $scope.charts = [];
-            var url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-volume'].join('/');
+            var url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
                 url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');;
                 url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
@@ -18,11 +18,11 @@ angular.module('askApp')
                     labels: _.pluck(data.crosstab, 'name'),
                     data: _.pluck(data.crosstab, 'value'),
                     xLabel: 'Survey Site',
-                    yLabel: 'Total Volume'
+                    yLabel: 'Total weight'
                 });
             });
 
-            url = ['/reports/crosstab', $routeParams.surveySlug, 'province-purchased-caught', 'total-volume'].join('/');
+            url = ['/reports/crosstab', $routeParams.surveySlug, 'province-purchased-caught', 'total-weight'].join('/');
                 url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
                 url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
@@ -32,7 +32,7 @@ angular.module('askApp')
                     labels: _.pluck(data.crosstab, 'name'),
                     data: _.pluck(data.crosstab, 'value'),
                     xLabel: 'Province',
-                    yLabel: 'Total Volume'
+                    yLabel: 'Total weight'
                 });
             });    
 
