@@ -24,7 +24,7 @@
         </div> -->
         
         <div ng-repeat="chart in charts" class="dash-chart">
-            <h2>{{ chart.yLabel}} by {{ chart.xLabel }}</h2>
+            <h2>{{ chart.title }}</h2>
             <div ng-switch on="chart.type">
                 <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
                 <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>

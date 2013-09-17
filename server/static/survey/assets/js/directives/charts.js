@@ -27,7 +27,6 @@ angular.module('askApp')
 
                         Flotr.draw(
                             element[0], [data], {
-                                title : scope.chart.title,
                                 HtmlText: false,
                                 fontSize: 12,
                                 mouse: {
