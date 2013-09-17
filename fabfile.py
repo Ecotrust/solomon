@@ -321,9 +321,9 @@ def prepare():
 
 @task
 def package():
-        run("cd %s && %s/bin/python manage.py package simarketsurvey.herokuapp.com" % (vars['app_dir'], vars['venv']))
+        run("cd %s && %s/bin/python manage.py package hapifis.herokuapp.com" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
-        local("cp ./android/app/bin/HapiFis-debug.apk server/static/simarket.apk")
+        local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis.apk")
 
 @task
 def package_test():
