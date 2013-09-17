@@ -144,6 +144,6 @@ pg_restore --verbose --clean --no-acl --no-owner -d geosurvey 201309170950.dump
 Transfer the dump file to a web accessible space.  To find the database url, use the pg:info command.
 ```bash
 heroku pg:info
-heroku pgbackups:restore HEROKU_POSTGRESQL_WHITE_URL 'http://www.example.org/latest.dump'
+heroku pgbackups:restore DATABASE_URL 'http://www.example.org/latest.dump'
 ```
 
