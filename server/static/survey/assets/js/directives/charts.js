@@ -27,6 +27,7 @@ angular.module('askApp')
 
                         Flotr.draw(
                             element[0], [data], {
+                                title : scope.chart.title,
                                 HtmlText: false,
                                 fontSize: 12,
                                 mouse: {
@@ -84,6 +85,7 @@ angular.module('askApp')
 
                 scope.$watch('chart', function(newValue) {
                     // Draw the graph
+                    var chart;
                     var series = _.map(scope.chart.seriesNames, function (name) {
                         return {
                             name: name,
@@ -95,7 +97,7 @@ angular.module('askApp')
                     });
                     console.log(series);
                     if (newValue) {
-                        element.highcharts({
+                        chart = element.highcharts({
                             chart: {
                                 type: 'column'
                             },
@@ -103,12 +105,15 @@ angular.module('askApp')
                                 text: false
                             },
                             xAxis: {
-                                categories: scope.chart.labels
+                                categories: scope.chart.labels,
+                                title: {
+                                    text: 'Market'
+                                },
                             },
                             yAxis: {
                                 min: 0,
                                 title: {
-                                    text: 'Average Cost per Vendor'
+                                    text: 'Average Cost (SBD)'
                                 },
                                 stackLabels: {
                                     enabled: true,

@@ -14,12 +14,15 @@ angular.module('askApp')
 
             $http.get(url).success(function(data) {
                 $scope.charts.push({
+                    title: "Total Fish Weight by Market",
                     type: data.type,
                     labels: _.pluck(data.crosstab, 'name'),
                     data: _.pluck(data.crosstab, 'value'),
-                    xLabel: 'Survey Site',
-                    yLabel: 'Total weight'
+                    xLabel: 'Market',
+                    yLabel: 'Total Weight (kg)',
+                    order: 2
                 });
+                $scope.charts.sort(function (a,b) { return a-b;})
             });
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'province-purchased-caught', 'total-weight'].join('/');
@@ -28,12 +31,15 @@ angular.module('askApp')
 
             $http.get(url).success(function(data) {
                 $scope.charts.push({
+                    title: "Total Fish Weight by Province",
                     type: data.type,
                     labels: _.pluck(data.crosstab, 'name'),
                     data: _.pluck(data.crosstab, 'value'),
                     xLabel: 'Province',
-                    yLabel: 'Total weight'
+                    yLabel: 'Total Weight (kg)',
+                    order: 3
                 });
+                $scope.charts.sort(function (a,b) { return a-b;})
             });    
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'cost'].join('/');
@@ -47,10 +53,11 @@ angular.module('askApp')
                     seriesNames: data.seriesNames,
                     type: data.type,
                     data: data.crosstab,
-                    xLabel: 'Survey Site',
-                    yLabel: 'Average Costs'
+                    xLabel: 'Market',
+                    yLabel: 'Average Trip Costs',
+                    order: 1
                 });
-
+                $scope.charts.sort(function (a,b) { return a-b;})
             });    
 
         }

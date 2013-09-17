@@ -17,7 +17,13 @@ background-color: #f5f5f5;
 .range-slider {
   margin-left: 30px;
   margin-right: 30px;
+  margin-top: 10px;
+  margin-bottom: 40px;
 }
+.dash-chart {
+  margin-bottom: 40px;
+}
+
 .respondant {
 max-width: 800px;
 padding: 9px 29px 29px;
