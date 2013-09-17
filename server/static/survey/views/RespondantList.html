@@ -13,11 +13,16 @@
 </div>
 <div class="row-fluid">
     <div class="span12">
+        <h3>Filter by Date Range</h3>
+        <div start="filter.startDate" end="filter.endDate" range-slider></div>
+    </div>
+</div>
+<div class="row-fluid">
+    <div class="span10 offset1">
         <!-- <div class="row-fluid">
             <div heatmap question="question.slug"></div>
         </div> -->
-        <h3>Filter by Date Range</h3>
-        <div start="filter.startDate" end="filter.endDate" range-slider></div>
+        
         <div ng-repeat="chart in charts" class="dash-chart">
             <h2>{{ chart.yLabel}} by {{ chart.xLabel }}</h2>
             <div ng-switch on="chart.type">
