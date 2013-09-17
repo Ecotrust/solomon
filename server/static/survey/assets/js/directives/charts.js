@@ -100,6 +100,7 @@ angular.module('askApp')
                             chart: {
                                 type: 'column'
                             },
+                            backgroundColor:'rgba(255, 255, 255, 0)',
                             title: {
                                 text: false
                             },

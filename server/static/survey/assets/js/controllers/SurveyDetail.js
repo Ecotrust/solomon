@@ -347,7 +347,7 @@ angular.module('askApp')
         } else {
             var blocks = []; //(return false)
         }
-          
+        
         _.each(blocks, function(block) {
             var questionSlug = _.findWhere($scope.survey.questions, {resource_uri: block.skip_question}).slug,
                 answer = $scope.getAnswer(questionSlug),
@@ -366,7 +366,6 @@ angular.module('askApp')
                     answer = [answer.answer ? answer.answer.text : answer.text];    
                 }
             }
-            
             //answer = decodeURIComponent(answer);
             keep = keep && $scope.keepQuestion(op, answer, testCriteria);
         });
@@ -412,7 +411,7 @@ angular.module('askApp')
             if ($scope.question.interger_max && $scope.question.integer_max < answer) {
                 return false;
             }
-            if ($scope.question.integer_min || $scope.question.integer_min > answer) {
+            if ($scope.question.integer_min && $scope.question.integer_min > answer) {
                 return false;
             }
             if ($scope.question.type === 'integer' && _.string.include($scope.answer, '.')) {
@@ -797,7 +796,7 @@ $scope.loadSurvey = function(data) {
                 $scope.answer = null;
             }
         }
-
+        debugger;
         // Fill options list.
         if ($scope.question && $scope.question.options_json && $scope.question.options_json.length > 0 && !$scope.question.options_from_previous_answer) {
             // Using the provided json file to set options.
