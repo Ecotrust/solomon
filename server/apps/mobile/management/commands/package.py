@@ -29,8 +29,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         url = args[0]
+        destDir = args[1]
         print "Packaging for %s" % url
-        dest = settings.PROJECT_ROOT / '../android/app/assets/www'
+        dest = settings.PROJECT_ROOT / destDir
 
         # copy the app html
         app_src = settings.PROJECT_ROOT / 'static/survey/mobile.html'
