@@ -1403,19 +1403,20 @@ $scope.loadSurvey = function(data) {
                _.each($scope.question.grid_cols, function(gridCol, i) {
                     var gridLabel = gridCol.label.replace(/-/g, '');
                     if ($scope.answer !== null && _.has($scope.answer, value.text)) {
-
                         list[key][gridLabel] = $scope.answer[value.text][0][gridLabel];
-                        _.each($scope.answer[value.text][0][gridLabel], function (answer) {
-                            if (! $scope.question.selectedOptions[gridLabel]) {
-                                $scope.question.selectedOptions[gridLabel] = {};
-                                
-                            }
-                            if (! $scope.question.selectedOptions[gridLabel][value.activitySlug]) {
-                                $scope.question.selectedOptions[gridLabel][value.activitySlug] = {};
-                                
-                            }
-                            $scope.question.selectedOptions[gridLabel][value.activitySlug][answer] = true;
-                        });
+                        if (_.isArray($scope.answer[value.text][0][gridLabel])) {
+                            _.each($scope.answer[value.text][0][gridLabel], function (answer) {
+                                if (! $scope.question.selectedOptions[gridLabel]) {
+                                    $scope.question.selectedOptions[gridLabel] = {};
+                                    
+                                }
+                                if (! $scope.question.selectedOptions[gridLabel][value.activitySlug]) {
+                                    $scope.question.selectedOptions[gridLabel][value.activitySlug] = {};
+                                    
+                                }
+                                $scope.question.selectedOptions[gridLabel][value.activitySlug][answer] = true;
+                            });    
+                        }
                     }   
                });
            });
@@ -1456,7 +1457,6 @@ $scope.loadSurvey = function(data) {
                     max: gridCol.max,
                     min: gridCol.min
                 };
-                console.log(col);
                 if (gridCol.type === 'integer') {
                     template = integerCellTemplate;
                 } else if (gridCol.type === 'number' || gridCol.type === 'currency') {
