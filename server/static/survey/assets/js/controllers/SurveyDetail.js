@@ -796,7 +796,6 @@ $scope.loadSurvey = function(data) {
                 $scope.answer = null;
             }
         }
-        debugger;
         // Fill options list.
         if ($scope.question && $scope.question.options_json && $scope.question.options_json.length > 0 && !$scope.question.options_from_previous_answer) {
             // Using the provided json file to set options.
@@ -1347,7 +1346,7 @@ $scope.loadSurvey = function(data) {
         if ($scope.question && $scope.question.rows) {
             $scope.question.options = [];
             _.each($scope.question.rows.split('\n'), function (row, index) {
-                var matches = _.filter($scope.answer, function (answer) {
+                var matches = _.filter($scope.answer || [], function (answer) {
                     return answer.text === row;
                 });
                 
@@ -1362,7 +1361,7 @@ $scope.loadSurvey = function(data) {
             $scope.question.groupedOptions = [];
             var groupName = "";
             _.each($scope.question.rows.split('\n'), function (row, index) {
-                var matches = _.filter($scope.answer, function (answer) {
+                var matches = _.filter($scope.answer || [], function (answer) {
                     return answer.text === row;
                 });
                 var isGroupName = _.string.startsWith(row, '*');
@@ -1422,14 +1421,14 @@ $scope.loadSurvey = function(data) {
            });
             // Configure grid.
             var gridCellTemplateDefault = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text>{{COL_FIELD CUSTOM_FILTERS}}</span></div>';
-            var costCellTemplate = '<input class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]"  max="{{col.colDef.max}}" min="{{col.colDef.min}}" required="{{col.colDef.required}}" style="height: 100%;" type="number" step="any" }" value="{{row.getProperty(col.field)}}" onFocus="this.select();" onClick="this.select();"/>';
-            var integerCellTemplate = '<input class="colt{{$index}} input-block-level" required="{{col.colDef.required}}" max="{{col.colDef.max}}" min="{{col.colDef.min}}" ng-model="row.entity[col.field]" style="height: 100%;" type="number" step="1" }" value="{{row.getProperty(col.field)}}" onFocus="this.select();" onClick="this.select();"/>';
-            var nameTemplate = '<input class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]" style="height: 100%;" type="text"   required="col.colDef.required" value="{{row.getProperty(col.field)}}"  }" />';
-            var checkboxTemplate = '<input class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]" style="height: 100%;" type="checkbox"  required="col.colDef.required" value="{{row.getProperty(col.field)}}" />';
+            var costCellTemplate = '{{col.colDef.required}}<input class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]"  max="{{col.colDef.max}}" min="{{col.colDef.min}}" ng-required="col.colDef.required" style="height: 100%;" type="number" step="any" }" value="{{row.getProperty(col.field)}}" onFocus="this.select();" onClick="this.select();"/>';
+            var integerCellTemplate = '<input class="colt{{$index}} input-block-level" ng-required="col.colDef.required" max="{{col.colDef.max}}" min="{{col.colDef.min}}" ng-model="row.entity[col.field]" style="height: 100%;" type="number" step="1" }" value="{{row.getProperty(col.field)}}" onFocus="this.select();" onClick="this.select();"/>';
+            var nameTemplate = '<input class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]" style="height: 100%;" type="text"   ng-required="col.colDef.required" value="{{row.getProperty(col.field)}}"  }" />';
+            var checkboxTemplate = '<input class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]" style="height: 100%;" type="checkbox"  ng-required="col.colDef.required" value="{{row.getProperty(col.field)}}" />';
             //var selectTemplate = '<select class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]" style="height: 100%;" value="{{row.getProperty(col.field)}}"  }"><option ng-repeat="option in row.entity[\'rows\']">{{option}}</option></select>';
             // var selectTemplate = '<div style="height:100%">{{col.field}}</div>'
-            var selectTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text><select class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]"  required="{{col.colDef.required}}" style="height: 100%;" value="{{row.getProperty(col.field)}}"  }"><option ng-repeat="option in col.colDef.options">{{option}}</option></select></span></div>';
-            var multiSelectTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text><select multiple="true" class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]"  required="{{col.colDef.required}}" style="height: 100%;" value="{{row.getProperty(col.field)}}"  }"><option ng-repeat="option in col.colDef.options" ng-selected="question.selectedOptions[col.colDef.field][row.entity.activitySlug][option]" value="{{option}}">{{option}}</option></select></span></div>';
+            var selectTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text><select class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]"  ng-required="col.colDef.required" style="height: 100%;" value="{{row.getProperty(col.field)}}"  }"><option ng-repeat="option in col.colDef.options">{{option}}</option></select></span></div>';
+            var multiSelectTemplate = '<div class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text><select multiple="true" class="colt{{$index}} input-block-level" ng-model="row.entity[col.field]"  ng-required="{{col.colDef.required}}" style="height: 100%;" value="{{row.getProperty(col.field)}}"  }"><option ng-repeat="option in col.colDef.options" ng-selected="question.selectedOptions[col.colDef.field][row.entity.activitySlug][option]" value="{{option}}">{{option}}</option></select></span></div>';
             
             $scope.gridOptions = {
                 data: 'question.options',
@@ -1453,7 +1452,7 @@ $scope.loadSurvey = function(data) {
                     field: gridCol.label.replace(/-/g, ''),
                     displayName: gridCol.text,
                     slug: gridCol.label.replace(/-/g, ''),
-                    required: gridCol.required || 'false',
+                    required: gridCol.required || false,
                     max: gridCol.max,
                     min: gridCol.min
                 };
