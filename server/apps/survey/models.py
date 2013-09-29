@@ -286,7 +286,10 @@ class Response(caching.base.CachingMixin, models.Model):
             if self.question.type in ['datepicker']:
                 self.answer_date = datetime.datetime.strptime(self.answer, '%Y-%m-%d')
             if self.question.type in ['currency', 'integer', 'number']:
-                self.answer_number = self.answer
+                if isinstance(self.answer, (int, long, float, complex)):
+                    self.answer_number = self.answer
+                else:
+                    self.answer = None
             if self.question.type in ['auto-single-select', 'single-select']:
                 answer = simplejson.loads(self.answer_raw)
                 if answer.get('text'):
