@@ -9,7 +9,9 @@
         </span>
         <span ng-show="question.noBlocks"><h4>Always Shown</h4></span>
         <strong>{{ question.label}}:</strong>
+
         <span ng-hide="question.response" class="label">No Answer</span>
+        
         <span ng-switch on="question.type">
             <span ng-switch-default>{{question.response}}</span>
             <span ng-switch-when="single-select">{{question.response.text}}</span>

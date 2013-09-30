@@ -20,8 +20,11 @@ angular.module('askApp')
         if ($routeParams.uuidSlug) {
             $scope.respondent = $scope.respondentIndex[$routeParams.uuidSlug];
             $scope.survey = angular.copy(_.findWhere(app.surveys, { slug: $scope.respondent.survey}));
+            $scope.responseIndex = _.indexBy($scope.respondent.responses, function (response) {
+                return response.question.slug;
+            });
             _.each($scope.survey.questions, function (question, index, questions) {
-                var response = $scope.respondent.responses[index];
+                var response = $scope.responseIndex[question.slug];
                 if (question.grid_cols) {
                     _.each(question.grid_cols, function (grid_col) {
                         grid_col.label = grid_col.label.replace(/-/g, '');
@@ -41,7 +44,7 @@ angular.module('askApp')
                 }
                 if (response) {
                     question.response = response.answer;    
-                }
+                } 
             });
 
         }
