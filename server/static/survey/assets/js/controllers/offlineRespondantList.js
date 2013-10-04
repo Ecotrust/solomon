@@ -4,7 +4,21 @@ angular.module('askApp')
     .controller('offlineRespondantListCtrl', function($scope, $http, $routeParams, $location) {
         $http.defaults.headers.post['Content-Type'] = 'application/json';
 
-        $scope.respondents = _.toArray(app.respondents);
+        $scope.saveState = function () {
+            app.respondents = {};
+            _.each($scope.respondents, function (respondent) {
+                app.respondents[respondent.uuid] = respondent;
+            });
+            localStorage.setItem('hapifish', JSON.stringify(app));
+        }
+
+        // load the respondents and remove ghosts
+        $scope.respondents = _.filter(_.toArray(app.respondents), function (respondent) {
+            return respondent.responses.length > 0;
+        });
+        $scope.saveState();
+
+
         $scope.respondentIndex = app.respondents;        
         if (app.user) {
             $scope.user = app.user;    
@@ -108,7 +122,8 @@ angular.module('askApp')
                     } else {
                         $scope.busy = false;
                         _.each($scope.synchronized, function (synced) {
-                            var original = _.findWhere($scope.respondents, { uuid: synced.uuid})
+                            debugger;
+                            var original = _.findWhere($scope.respondents, { uuid: synced.uuid});
                             $scope.respondents.splice(_.indexOf($scope.respondents, original));
                             $scope.saveState();
                         })
@@ -119,15 +134,6 @@ angular.module('askApp')
                 });    
             }
             
-        }
-
-
-        $scope.saveState = function () {
-            app.respondents = {};
-            _.each($scope.respondents, function (respondent) {
-                app.respondents[respondent.uuid] = respondent;
-            });
-            localStorage.setItem('hapifish', JSON.stringify(app));
         }
 
 

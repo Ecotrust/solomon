@@ -78,7 +78,7 @@ class OfflineRespondantResource(SurveyModelResource):
     responses = fields.ToManyField(OfflineResponseResource, 'responses', null=True, blank=True)
     survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True)
     class Meta:
-        # always_return_data = True
+        always_return_data = True
         queryset = Respondant.objects.all()
         authorization = StaffUserOnlyAuthorization()
         authentication = Authentication()
