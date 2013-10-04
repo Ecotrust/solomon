@@ -1,5 +1,6 @@
 <!-- This question actually submits the entire question.options object since 
 	the grid binds to that object. -->
+
 <form id="gridQuestion" class="question" ng-submit="answerQuestion(question.options)">
 	<div class="row-fluid">
 	    <div class="span12">
@@ -9,9 +10,11 @@
 	    </div>
 	</div>
 	<div class="row-fluid user-controls">
+		
 	    <button 
 	    	type="submit"
-			ng-class="{'btn-primary': isAnswerValid, disabled: !isAnswerValid }"
+			ng-disabled="! gridValidated"
+			ng-class="{'btn-danger': ! gridValidated, 'btn-primary': gridValidated }"
 	    	class="btn btn-block btn-large btn-primary">continue</button>
 	</div>
 </form>

@@ -715,6 +715,21 @@ angular.module('askApp')
         $scope.answerQuestion(locations);
     };
 
+    $scope.validateGrid = function (question) {
+        // validate grid questions
+
+        var gridValidated = true;
+        _.each($scope.question.grid_cols, function (col) {
+            _.each($scope.question.options, function (gridAnswer) {
+                if (col.required && (gridAnswer[col.label.replace(/-/g, '')] === undefined || gridAnswer[col.label.replace(/-/g, '')] === null)) {
+                    gridValidated = false;
+                }    
+            });
+        });
+        console.log(gridValidated);
+        return gridValidated;
+    }
+
 $scope.loadSurvey = function(data) {
         $scope.survey = data.survey;
         $scope.survey.status = data.status;
@@ -1494,6 +1509,15 @@ $scope.loadSurvey = function(data) {
         // }
         $scope.nextQuestionPath = $scope.getNextQuestionPath();
         $scope.loading = false;
+        $scope.gridValidated = false;
+        if ($scope.question.type === 'grid') {
+            // validate grid questions
+            $scope.$watch('question', function (newValue) {
+                $scope.gridValidated = $scope.validateGrid($scope.question);
+            }, true);
+            $scope.gridValidated = $scope.validateGrid($scope.question);
+        }
+
     };
     $scope.viewPath = app.viewPath;
     if ($routeParams.uuidSlug && ! _.string.startsWith($routeParams.uuidSlug, 'offline') && app.offline) {
