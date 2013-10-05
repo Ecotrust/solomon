@@ -6,8 +6,9 @@ import datetime
 
 
 class Command(BaseCommand):
-    help = 'Generate Test Data'
+    help = 'Delete Test Data'
     
     def handle(self, *args, **options):
-		r = Respondant.objects.filter(test_data=True)
-		r.delete()
+		respondents = Respondant.objects.filter(test_data=True)
+		for r in respondents:
+			r.delete()
