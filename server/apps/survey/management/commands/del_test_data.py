@@ -13,6 +13,6 @@ class Command(BaseCommand):
 		for r in respondents:
 			r.delete()
 
-		respondents = Respondant.objects.filter(surveyor__username="trainer"))
+		respondents = Respondant.objects.filter(surveyor__username="trainer")
 		for r in respondents:
 			r.delete()
