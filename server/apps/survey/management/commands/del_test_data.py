@@ -12,3 +12,7 @@ class Command(BaseCommand):
 		respondents = Respondant.objects.filter(test_data=True)
 		for r in respondents:
 			r.delete()
+
+		respondents = surveyor__username="trainer"))
+		for r in respondents:
+			r.delete()
