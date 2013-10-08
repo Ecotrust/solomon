@@ -89,8 +89,15 @@ angular.module('askApp')
                         return {
                             name: name,
                             data: _.map(scope.chart.data, function (item) {
-                                console.log(item.name + _.findWhere(item.value, {row_text: name}).average);
-                                return _.findWhere(item.value, {row_text: name}).average;
+                                var found = _.findWhere(item.value, {row_text: name});
+                                if (found) {
+                                    return _.findWhere(item.value, {row_text: name}).average;    
+                                }
+                                else {
+                                    return 0;
+                                }
+                                
+                                
                             })
                         }
                     });
