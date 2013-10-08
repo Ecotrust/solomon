@@ -122,9 +122,8 @@ angular.module('askApp')
                     } else {
                         $scope.busy = false;
                         _.each($scope.synchronized, function (synced) {
-                            debugger;
-                            var original = _.findWhere($scope.respondents, { uuid: synced.uuid});
-                            $scope.respondents.splice(_.indexOf($scope.respondents, original));
+                            $scope.respondents = _.without($scope.respondents,
+                                _.findWhere($scope.respondents, { uuid: synced.uuid }));
                             $scope.saveState();
                         })
                         $scope.synchronized = [];
