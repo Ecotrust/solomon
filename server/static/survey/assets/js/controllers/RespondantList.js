@@ -91,7 +91,7 @@ angular.module('askApp')
         
 
     }).success(function() {
-        $http.get('/api/v1/reportrespondant/?format=json&limit=30&survey__slug__exact=' + $routeParams.surveySlug).success(function(data) {
+        $http.get('/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug).success(function(data) {
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
         });
