@@ -70,7 +70,7 @@ angular.module('askApp')
 angular.module('askApp')
     .directive('stackedColumn', function($http) {
         return {
-            template: '<div style="height: 400px"></div>',
+            template: '<div style="height: 750px"></div>',
             restrict: 'EA',
             replace: true,
             transclude: true,
@@ -93,10 +93,10 @@ angular.module('askApp')
                                 data: _.map(scope.chart.data, function (item) {
                                     var found = _.findWhere(item.value, {row_text: name});
                                     if (found) {
-                                        return _.findWhere(item.value, {row_text: name}).average;    
+                                        return found.average === 0? null: found.average;    
                                     }
                                     else {
-                                        return 0;
+                                        return null;
                                     }
                                     
                                     
