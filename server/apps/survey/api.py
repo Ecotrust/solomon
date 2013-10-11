@@ -102,7 +102,8 @@ class ReportRespondantResource(SurveyModelResource):
         queryset = Respondant.objects.all().order_by('-ts')
         filtering = {
             'survey': ALL_WITH_RELATIONS,
-            'responses': ALL_WITH_RELATIONS
+            'responses': ALL_WITH_RELATIONS,
+            'ts': ['gte','lte']
         }
         ordering = ['-ts']
         authorization = StaffUserOnlyAuthorization()

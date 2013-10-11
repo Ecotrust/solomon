@@ -75,33 +75,41 @@ def get_distribution(request, survey_slug, question_slug):
 def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
     start_date = request.GET.get('startdate', None)
     end_date = request.GET.get('enddate', None)
+    print "cross tab"
     try:
         if start_date is not None:
-            start_date = datetime.datetime.strptime(start_date, '%Y%m%d')# - datetime.timedelta(days=1)
+            start_date = datetime.datetime.strptime(start_date, '%Y%m%d') - datetime.timedelta(days=1)
 
         if end_date is not None:
-            end_date = datetime.datetime.strptime(end_date, '%Y%m%d')# + datetime.timedelta(days=1)
-
+            end_date = datetime.datetime.strptime(end_date, '%Y%m%d') + datetime.timedelta(days=1)
+        print start_date
+        print end_date
         survey = Survey.objects.get(slug = survey_slug)
 
         question_a = Question.objects.get(slug = question_a_slug, survey=survey)
         question_b = Question.objects.get(slug = question_b_slug, survey=survey)
         date_question = Question.objects.get(slug = 'survey-date', survey=survey)
-        question_a_responses = Response.objects.filter(question=question_a).order_by('answer')
+        question_a_responses = Response.objects.filter(question=question_a)
+
+        if start_date is not None and end_date is not None:
+            question_a_responses = question_a_responses.filter(respondant__ts__lte=end_date, respondant__ts__gte=start_date)
         crosstab = []
         obj = {}
         values_count = 0
 
-        for question_a_answer in question_a_responses.values('answer').distinct():
-            respondants = Respondant.objects.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
-
-            if start_date is not None:
+        for question_a_answer in question_a_responses.order_by('answer').values('answer').distinct():
+            respondants = Respondant.objects.all()
+            print "total respondents ", respondants.count()
+            if start_date is not None and end_date is not None:
                 #respondants = respondants.filter(responses__in=date_question.response_set.filter(answer_date__gte=start_date))
-                respondants = respondants.filter(ts__gte=start_date)
-            if end_date is not None:
-                #respondants = respondants.filter(respondantsesponses__in=date_question.response_set.filter(answer_date__lte=end_date))
-                respondants = respondants.filter(ts__lte=end_date)
-
+                respondants = respondants.filter(ts__lte=end_date, ts__gte=start_date)
+            print "total respondents after date ", respondants.count()
+            respondants = respondants.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
+            print "total after question filter", respondants.count()
+            # if end_date is not None:
+            #     #respondants = respondants.filter(respondantsesponses__in=date_question.response_set.filter(answer_date__lte=end_date))
+                
+            
             if question_b.type in ['grid']:
                 obj['type'] = 'stacked-column'
                 rows = Response.objects.filter(respondant__in=respondants, question=question_b)[0].gridanswer_set.all().values('row_text','row_label').order_by('row_label')
@@ -124,6 +132,7 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
             obj['crosstab'] = crosstab
             obj['success'] = 'true'
         return HttpResponse(simplejson.dumps(obj))
-    except:
+    except Exception, err:
+        print Exception, err
         return HttpResponse(simplejson.dumps({'success': False, 'message': "No records for this date range." }))    
     

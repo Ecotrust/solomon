@@ -12,6 +12,8 @@ angular.module('askApp')
                 url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
                 url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
+            $scope.getRespondents();
+
             $http.get(url).success(function(data) {
                 $scope.charts.push({
                     title: "Total Fish Weight by Market",
@@ -103,13 +105,20 @@ angular.module('askApp')
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
 
+        if ($scope.filter.startDate) {
+            url = url + '&ts__gte=' + $scope.filter.startDate.toString('yyyy-MM-dd')
+        }
+        if ($scope.filter.endDate) {
+            url = url + '&ts__lte=' + $scope.filter.endDate.toString('yyyy-MM-dd')
+        }
+
         $http.get(url).success(function(data) {
             $scope.respondentsLoading = false;
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
         });
     }
-    $scope.getRespondents();
+    
 
     $scope.getQuestionByUri = function (uri) {
         return _.findWhere($scope.survey.questions, {'resource_uri': uri});
