@@ -347,7 +347,6 @@ angular.module('askApp')
         } else {
             var blocks = []; //(return false)
         }
-        
         _.each(blocks, function(block) {
             var questionSlug = _.findWhere($scope.survey.questions, {resource_uri: block.skip_question}).slug,
                 answer = $scope.getAnswer(questionSlug),
