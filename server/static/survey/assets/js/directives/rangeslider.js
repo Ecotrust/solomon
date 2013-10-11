@@ -19,7 +19,7 @@ angular.module('askApp')
                         var days = val.getDate(),
                             month = val.getMonth() + 1,
                             year = val.getFullYear();
-                        return month + "/" + days + "/" + year;
+                        return days + "/" + month + "/" + year;
                     },
                     bounds:{
                         min: scope.start,
