@@ -94,7 +94,7 @@ class OfflineRespondantResource(SurveyModelResource):
 
 
 class ReportRespondantResource(SurveyModelResource):
-    responses = fields.ToManyField(ResponseResource, 'responses', full=True, null=True, blank=True)
+    responses = fields.ToManyField(ResponseResource, 'responses', full=False, null=True, blank=True)
     survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True, readonly=True)
     user = fields.ToOneField('apps.account.api.UserResource', 'surveyor', null=True, blank=True, full=True, readonly=True)
 
@@ -107,6 +107,10 @@ class ReportRespondantResource(SurveyModelResource):
         ordering = ['-ts']
         authorization = StaffUserOnlyAuthorization()
         authentication = Authentication()
+
+
+class ReportRespondantDetailsResource(ReportRespondantResource):
+    responses = fields.ToManyField(ResponseResource, 'responses', full=True, null=True, blank=True)
 
 
 class RespondantResource(SurveyModelResource):

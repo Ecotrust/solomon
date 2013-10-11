@@ -331,3 +331,11 @@ def package_test():
         run("cd %s && %s/bin/python manage.py package hapifis-test.herokuapp.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-test.apk")
+
+@task
+def transfer_db():
+    date = datetime.datetime.now().strftime("%Y-%m-%d:%H%M")
+    db_url = local("heroku pgbackups:url", capture=True)
+    local("heroku pgbackups:capture --expire")
+    run("curl -o /tmp/%s.dump \"%s\"" % (date, db_url))
+    run("pg_restore --verbose --clean --no-acl --no-owner -U vagrant -d geosurvey /tmp/%s.dump" % date)

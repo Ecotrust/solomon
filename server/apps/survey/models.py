@@ -93,12 +93,12 @@ class Survey(caching.base.CachingMixin, models.Model):
 
     @property
     def response_date_start(self):
-        return self.questions.filter(slug='survey-date').aggregate(date=Min('response__answer_date')).get('date', None)
-
+        #return self.questions.filter(slug='survey-date').aggregate(date=Min('response__answer_date')).get('date', None)
+        return self.respondant_set.all().aggregate(lowest=Min('ts'), highest=Max('ts'))['lowest'] 
     @property
     def response_date_end(self):
-        return self.questions.filter(slug='survey-date').aggregate(date=Max('response__answer_date')).get('date', None)
-
+        #return self.questions.filter(slug='survey-date').aggregate(date=Max('response__answer_date')).get('date', None)
+        return self.respondant_set.all().aggregate(lowest=Min('ts'), highest=Max('ts'))['highest']
     def __str__(self):
         return "%s" % self.name
 

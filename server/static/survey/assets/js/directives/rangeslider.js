@@ -15,6 +15,12 @@ angular.module('askApp')
             // initialize slider
             scope.initializeSlider = _.once(function () {
                 element.dateRangeSlider({
+                    formatter:function(val){
+                        var days = val.getDate(),
+                            month = val.getMonth() + 1,
+                            year = val.getFullYear();
+                        return month + "/" + days + "/" + year;
+                    },
                     bounds:{
                         min: scope.start,
                         max: scope.end
@@ -51,10 +57,10 @@ angular.module('askApp')
             element.bind("userValuesChanged", function(e, data){
                 scope.$apply(function(s) {
                     if (attrs.start) {
-                        s.start = data.values.min.clearTime();
+                        s.start = data.values.min;//.clearTime();
                     }
                     if (attrs.end) {                    
-                        s.end = data.values.max.clearTime();
+                        s.end = data.values.max;//.clearTime();
                     }
                 });
             });

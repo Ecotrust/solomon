@@ -9,7 +9,7 @@ angular.module('askApp')
         if (newValue) {
             $scope.charts = [];
             var url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
-                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');;
+                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
                 url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
             $http.get(url).success(function(data) {
@@ -20,7 +20,8 @@ angular.module('askApp')
                     data: _.pluck(data.crosstab, 'value'),
                     xLabel: 'Market',
                     yLabel: 'Total Weight (kg)',
-                    order: 2
+                    order: 2,
+                    message: data.message
                 });
                 $scope.charts.sort(function (a,b) { return a-b;})
             });
@@ -37,7 +38,8 @@ angular.module('askApp')
                     data: _.pluck(data.crosstab, 'value'),
                     xLabel: 'Province',
                     yLabel: 'Total Weight (kg)',
-                    order: 3
+                    order: 3,
+                    message: data.message
                 });
                 $scope.charts.sort(function (a,b) { return a-b;})
             });    
@@ -47,17 +49,19 @@ angular.module('askApp')
                 url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
 
             $http.get(url).success(function(data) {
-                console.log(data.type);
                 $scope.charts.push({
+                    title: "Average Trip Costs by Market",
                     labels: _.pluck(data.crosstab, 'name'),
                     seriesNames: data.seriesNames,
                     type: data.type,
                     data: data.crosstab,
                     xLabel: 'Market',
                     yLabel: 'Average Trip Costs',
-                    order: 1
+                    order: 1,
+                    message: data.message
                 });
-                $scope.charts.sort(function (a,b) { return a-b;})
+                $scope.charts.sort(function (a,b) { return a-b;})    
+                
             });    
 
         }
@@ -69,10 +73,8 @@ angular.module('askApp')
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
-        console.log($scope.survey);
-
         $scope.filter = {
-            startDate: new Date($scope.survey.response_date_start),
+            startDate: new Date($scope.survey.response_date_start).add(-1).day(),
             endDate: new Date($scope.survey.response_date_end).add(1).day(),
         }
 
@@ -91,12 +93,23 @@ angular.module('askApp')
         
 
     }).success(function() {
-        $http.get('/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug).success(function(data) {
+
+         
+    });
+
+    $scope.getRespondents = function (url) {
+        $scope.respondentsLoading = true;
+        if (! url) {
+            url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
+        }
+
+        $http.get(url).success(function(data) {
+            $scope.respondentsLoading = false;
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
         });
-         
-    });
+    }
+    $scope.getRespondents();
 
     $scope.getQuestionByUri = function (uri) {
         return _.findWhere($scope.survey.questions, {'resource_uri': uri});

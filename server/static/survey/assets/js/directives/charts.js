@@ -17,7 +17,7 @@ angular.module('askApp')
                     // Draw the graph
                     var labels, data;
 
-                    if (newValue) {
+                    if (newValue && ! newValue.message) {
                         labels = _.map(scope.chart.labels, function(item, index) {
                             return [index, item];
                         });
@@ -84,25 +84,26 @@ angular.module('askApp')
 
                 scope.$watch('chart', function(newValue) {
                     // Draw the graph
-                    var chart;
-                    var series = _.map(scope.chart.seriesNames, function (name) {
-                        return {
-                            name: name,
-                            data: _.map(scope.chart.data, function (item) {
-                                var found = _.findWhere(item.value, {row_text: name});
-                                if (found) {
-                                    return _.findWhere(item.value, {row_text: name}).average;    
-                                }
-                                else {
-                                    return 0;
-                                }
-                                
-                                
-                            })
-                        }
-                    });
-                    console.log(series);
-                    if (newValue) {
+                    console.log(newValue);
+                    if (newValue && ! newValue.message) {
+                        var chart;
+                        var series = _.map(scope.chart.seriesNames, function (name) {
+                            return {
+                                name: name,
+                                data: _.map(scope.chart.data, function (item) {
+                                    var found = _.findWhere(item.value, {row_text: name});
+                                    if (found) {
+                                        return _.findWhere(item.value, {row_text: name}).average;    
+                                    }
+                                    else {
+                                        return 0;
+                                    }
+                                    
+                                    
+                                })
+                            }
+                        });
+                        console.log(series);
                         chart = element.highcharts({
                             chart: {
                                 type: 'column'
