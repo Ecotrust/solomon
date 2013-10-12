@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg, Max, Min, Count
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Sum
-import simplejson, datetime
-
+import json, datetime
+from django.core.serializers.json import DjangoJSONEncoder
 from apps.survey.models import Survey, Question, Response, Respondant, Location, LocationAnswer
 from apps.reports.models import QuestionReport
 
@@ -75,6 +75,7 @@ def get_distribution(request, survey_slug, question_slug):
 def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
     start_date = request.GET.get('startdate', None)
     end_date = request.GET.get('enddate', None)
+    group = request.GET.get('group', None)
     print "cross tab"
     try:
         if start_date is not None:
@@ -82,8 +83,7 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
 
         if end_date is not None:
             end_date = datetime.datetime.strptime(end_date, '%Y%m%d') + datetime.timedelta(days=1)
-        print start_date
-        print end_date
+
         survey = Survey.objects.get(slug = survey_slug)
 
         question_a = Question.objects.get(slug = question_a_slug, survey=survey)
@@ -99,13 +99,13 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
 
         for question_a_answer in question_a_responses.order_by('answer').values('answer').distinct():
             respondants = Respondant.objects.all()
-            print "total respondents ", respondants.count()
+
             if start_date is not None and end_date is not None:
                 #respondants = respondants.filter(responses__in=date_question.response_set.filter(answer_date__gte=start_date))
                 respondants = respondants.filter(ts__lte=end_date, ts__gte=start_date)
-            print "total respondents after date ", respondants.count()
+
             respondants = respondants.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
-            print "total after question filter", respondants.count()
+
             # if end_date is not None:
             #     #respondants = respondants.filter(respondantsesponses__in=date_question.response_set.filter(answer_date__lte=end_date))
                 
@@ -119,19 +119,26 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
                     'value': list(rows.annotate(average=Avg('answer_number')))
                 })
             elif question_b.type in ['currency', 'integer', 'number']:
-                obj['type'] = 'bar-chart'
-                d = {
-                    'name': question_a_answer['answer'],
-                    'value': Response.objects.filter(respondant__in=respondants, question=question_b).aggregate(sum=Sum('answer_number'))['sum']
-                }
-                
-                values_count += d['value']
+                if group is None:
+                    obj['type'] = 'bar-chart'
+                    d = {
+                        'name': question_a_answer['answer'],
+                        'value': Response.objects.filter(respondant__in=respondants, question=question_b).aggregate(sum=Sum('answer_number'))['sum']
+                    }
+                else:
+                    obj['type'] = 'time-series'
+                    values = Response.objects.filter(respondant__in=respondants, question=question_b).extra(select={ 'date': "date_trunc('%s', ts)" % group}).values('date').annotate(sum=Sum('answer_number'))
+                    
+                    d = {
+                        'name': question_a_answer['answer'],
+                        'value': list(values)
+                    }
         
                 crosstab.append(d)
 
             obj['crosstab'] = crosstab
             obj['success'] = 'true'
-        return HttpResponse(simplejson.dumps(obj))
+        return HttpResponse(json.dumps(obj, cls=DjangoJSONEncoder))
     except Exception, err:
         print Exception, err
         return HttpResponse(simplejson.dumps({'success': False, 'message': "No records for this date range." }))    

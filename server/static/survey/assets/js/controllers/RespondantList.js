@@ -65,7 +65,6 @@ angular.module('askApp')
                 $scope.charts.sort(function (a,b) { return a-b;})    
                 
             });    
-
         }
         
     }, true);
