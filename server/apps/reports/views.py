@@ -21,7 +21,7 @@ def get_geojson(request, survey_slug, question_slug):
         filters = request.GET.get('filters', None)
 
     if filters is not None:
-        filter_list = simplejson.loads(filters)
+        filter_list = json.loads(filters)
 
     if filters is not None:    
         for filter in filter_list:
@@ -46,7 +46,7 @@ def get_geojson(request, survey_slug, question_slug):
         geojson.append(d)
 
     
-    return HttpResponse(simplejson.dumps({'success': "true", 'geojson': geojson}))
+    return HttpResponse(json.dumps({'success': "true", 'geojson': geojson}))
 
 @staff_member_required
 def get_distribution(request, survey_slug, question_slug):
@@ -64,12 +64,12 @@ def get_distribution(request, survey_slug, question_slug):
         filters = request.GET.get('filters', None)
 
     if filters is not None:
-        filter_list = simplejson.loads(filters)
+        filter_list = json.loads(filters)
         
     else:
         filter_question = None
     answer_domain = question.get_answer_domain(survey, filter_list)
-    return HttpResponse(simplejson.dumps({'success': "true", "answer_domain": list(answer_domain)}))
+    return HttpResponse(json.dumps({'success': "true", "answer_domain": list(answer_domain)}))
 
 @staff_member_required
 def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
@@ -127,7 +127,7 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
                     }
                 else:
                     obj['type'] = 'time-series'
-                    values = Response.objects.filter(respondant__in=respondants, question=question_b).extra(select={ 'date': "date_trunc('%s', ts)" % group}).values('date').annotate(sum=Sum('answer_number'))
+                    values = Response.objects.filter(respondant__in=respondants, question=question_b).extra(select={ 'date': "date_trunc('%s', ts)" % group}).order_by('date').values('date').annotate(sum=Sum('answer_number'))
                     
                     d = {
                         'name': question_a_answer['answer'],
@@ -141,5 +141,5 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         return HttpResponse(json.dumps(obj, cls=DjangoJSONEncoder))
     except Exception, err:
         print Exception, err
-        return HttpResponse(simplejson.dumps({'success': False, 'message': "No records for this date range." }))    
+        return HttpResponse(json.dumps({'success': False, 'message': "No records for this date range." }))    
     

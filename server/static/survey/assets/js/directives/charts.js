@@ -17,7 +17,7 @@ angular.module('askApp')
                     // Draw the graph
                     var labels, data;
 
-                    if (newValue && ! newValue.message) {
+                    if (newValue && !newValue.message) {
                         labels = _.map(scope.chart.labels, function(item, index) {
                             return [index, item];
                         });
@@ -85,21 +85,22 @@ angular.module('askApp')
                 scope.$watch('chart', function(newValue) {
                     // Draw the graph
                     console.log(newValue);
-                    if (newValue && ! newValue.message) {
+                    if (newValue && !newValue.message) {
                         var chart;
-                        var series = _.map(scope.chart.seriesNames, function (name) {
+                        var series = _.map(scope.chart.seriesNames, function(name) {
                             return {
                                 name: name,
-                                data: _.map(scope.chart.data, function (item) {
-                                    var found = _.findWhere(item.value, {row_text: name});
+                                data: _.map(scope.chart.data, function(item) {
+                                    var found = _.findWhere(item.value, {
+                                        row_text: name
+                                    });
                                     if (found) {
-                                        return found.average === 0? null: found.average;    
-                                    }
-                                    else {
+                                        return found.average === 0 ? null : found.average;
+                                    } else {
                                         return null;
                                     }
-                                    
-                                    
+
+
                                 })
                             }
                         });
@@ -108,7 +109,7 @@ angular.module('askApp')
                             chart: {
                                 type: 'column'
                             },
-                            backgroundColor:'rgba(255, 255, 255, 0)',
+                            backgroundColor: 'rgba(255, 255, 255, 0)',
                             title: {
                                 text: false
                             },
@@ -132,8 +133,8 @@ angular.module('askApp')
                                 }
                             },
                             credits: {
-                                  enabled: false
-                              },
+                                enabled: false
+                            },
                             legend: {
                                 align: 'right',
                                 x: -70,
@@ -162,6 +163,89 @@ angular.module('askApp')
                                 }
                             },
                             series: series
+                        });
+                    }
+                });
+
+            }
+        }
+    });
+
+
+angular.module('askApp')
+    .directive('timeSeries', function($http) {
+        return {
+            template: '<div style="height: 400px"></div>',
+            restrict: 'EA',
+            replace: true,
+            transclude: true,
+            scope: {
+                chart: "=chart",
+                filter: "=filter"
+            },
+
+            link: function postLink(scope, element, attrs) {
+
+
+
+                scope.$watch('chart', function(newValue) {
+                    // Draw the graph
+                    if (newValue && !newValue.message) {
+                        var chart;
+
+                        var data = _.map(scope.chart.data, function (item) {
+                            return {
+                                name: item.name,
+                                data: _.map(item.value, function (value) {
+                                    var current = parseFloat(value.sum);
+                                    if (_.isNumber(current) && ! _.isNaN(current)) {
+                                        return [
+                                            new Date(value.date).getTime(),
+                                            parseFloat(current)
+                                        ]    
+                                    } else {
+                                        return [
+                                            new Date(value.date).getTime(),
+                                            null
+                                        ]    
+                                    }         
+                                })
+                            }
+                        });
+                        
+                        element.highcharts({
+                            chart: {
+                                type: 'spline'
+                            },
+                            title: false,
+                            subtitle: false,
+                            xAxis: {
+                                type: 'datetime',
+                                dateTimeLabelFormats: { // don't display the dummy year
+                                    month: '%d/%m/%y',
+                                    year: '%d/%m/%y'
+                                },
+                                labels: {
+                                    formatter: function() {
+                                        return Highcharts.dateFormat('%d/%m/%y', this.value);
+                                        
+                                    }
+                                }
+                            },
+                            yAxis: {
+                                title: {
+                                    text: scope.chart.yLabel
+                                },
+                                min: 0
+                            },
+                            tooltip: {
+                                formatter: function() {
+                                    return '<b>' + this.series.name + '</b><br/>' +
+                                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' kg';
+                                }
+                            },
+
+                            series: data
                         });
                     }
                 });

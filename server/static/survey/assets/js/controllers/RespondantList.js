@@ -64,6 +64,28 @@ angular.module('askApp')
                 });
                 $scope.charts.sort(function (a,b) { return a-b;})    
                 
+            });
+
+            url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
+            url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
+            url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
+            url = url + '&group=week';
+            $http.get(url).success(function(data) {
+                $scope.charts.push({
+                    title: "Total Weight for Week by Market",
+                    labels: _.pluck(data.crosstab, 'name'),
+                    seriesNames: data.seriesNames,
+                    type: data.type,
+                    data: data.crosstab,
+                    xLabel: 'Market',
+                    yLabel: 'Total Weight (kg)',
+                    order: 4,
+                    startDate: $scope.filter.startDate,
+                    endDate: $scope.filter.endDate,
+                    message: data.message
+                });
+                $scope.charts.sort(function (a,b) { return a-b;})    
+                
             });    
         }
         
