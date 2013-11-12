@@ -1,6 +1,8 @@
 # Server
 ```bash
 vagrant up
+easy_install pip (if you don't already have)
+pip install fabric (if you don't already have)
 fab vagrant bootstrap
 fab vagrant createsuperuser
 fab vagrant runserver
