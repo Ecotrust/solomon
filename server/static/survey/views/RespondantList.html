@@ -13,6 +13,7 @@
             <tbody>
                 <tr ng-repeat="respondent in respondents">
                     <td>{{ respondent.user.username }}</td>
+                    <td>TODO: MARKET NAME GOES HERE</td>
                     <td>{{ respondent.ts|validDate: 'dd-MM-yyyy HH:mm' }}</td>
                     <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}">Responses ({{respondent.responses.length}})</a></td>
                 </tr>
