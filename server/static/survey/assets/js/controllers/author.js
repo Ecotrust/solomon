@@ -85,7 +85,9 @@ angular.module('askApp')
             });
         }
 
-        $scope.delete = function (question) {
+        // IE6 parses delete as a reserve keyword and removes it from this
+        // statement, so it needs to be named delete_question. -QWP
+        $scope.delete_question = function (question) {
             var questionToBeDeleted = question;
             $http({
                 method: 'DELETE',
