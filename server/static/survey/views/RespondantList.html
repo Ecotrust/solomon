@@ -37,7 +37,7 @@
         <!-- <div class="row-fluid">
             <div heatmap question="question.slug"></div>
         </div> -->
-        
+
         <div ng-repeat="chart in charts" class="dash-chart">
             <h2>{{ chart.title }}</h2>
             <div class="error">{{ chart.message }}</div>
@@ -47,8 +47,8 @@
                 <div ng-switch-when="time-series" time-series chart="chart"></div>
             </div>
         </div>
-        
-  
+
+
         <div class="row-fluid" ng-repeat="question in survey.questions">
 
             <div  ui-if="question.visualize">
