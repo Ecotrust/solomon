@@ -84,13 +84,10 @@ angular.module('askApp')
                     endDate: $scope.filter.endDate,
                     message: data.message
                 });
-                $scope.charts.sort(function (a,b) { return a-b;})    
-                
-            });    
+                $scope.charts.sort(function (a,b) { return a-b;})
+            });
         }
-        
     }, true);
-    
 
 
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
@@ -98,9 +95,8 @@ angular.module('askApp')
         $scope.survey = data;
         $scope.filter = {
             startDate: new Date($scope.survey.response_date_start).add(-1).day(),
-            endDate: new Date($scope.survey.response_date_end).add(1).day(),
+            endDate: new Date($scope.survey.response_date_end).add(1).day()
         }
-
 
         _.each($scope.survey.questions, function (question) {
             // save a reference to filter questions which are specified by uri
@@ -113,11 +109,7 @@ angular.module('askApp')
 
             }
         });
-        
-
     }).success(function() {
-
-         
     });
 
     $scope.getRespondents = function (url) {

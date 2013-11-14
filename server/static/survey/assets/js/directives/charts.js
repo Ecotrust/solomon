@@ -117,7 +117,7 @@ angular.module('askApp')
                                 categories: scope.chart.labels,
                                 title: {
                                     text: 'Market'
-                                },
+                                }
                             },
                             yAxis: {
                                 min: 0,
