@@ -13,6 +13,7 @@ easy_install pip (if you do not already have)
 pip install fabric (if you do not already have)
 fab vagrant bootstrap
 fab vagrant createsuperuser
+fab vagrant loaddata
 fab vagrant runserver
 ```
 

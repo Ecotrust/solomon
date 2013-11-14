@@ -9,6 +9,8 @@ import uuid
 import simplejson
 import caching.base
 import ast
+import decimal
+
 def make_uuid():
     return str(uuid.uuid4())
 
@@ -25,8 +27,12 @@ class Respondant(caching.base.CachingMixin, models.Model):
     status = models.CharField(max_length=20, choices=STATE_CHOICES, default=None, null=True, blank=True)
     last_question = models.CharField(max_length=240, null=True, blank=True)
 
-    county = models.CharField(max_length=240, null=True, blank=True)
-    state = models.CharField(max_length=240, null=True, blank=True)
+    vendor = models.CharField(max_length=240, null=True, blank=True)
+    survey_site = models.CharField(max_length=240, null=True, blank=True)
+    buy_or_catch = models.CharField(max_length=240, null=True, blank=True)
+    how_sold = models.CharField(max_length=240, null=True, blank=True)
+
+
     locations = models.IntegerField(null=True, blank=True)
 
     ts = models.DateTimeField(default=datetime.datetime.now())
@@ -263,7 +269,7 @@ class GridAnswer(caching.base.CachingMixin, models.Model):
     col_text = models.TextField(null=True, blank=True)
     col_label = models.TextField(null=True, blank=True)
     answer_text = models.TextField(null=True, blank=True)
-    answer_number = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    answer_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def __str__(self):
         return "%s: %s" % (self.row_text, self.col_text)
@@ -273,7 +279,7 @@ class Response(caching.base.CachingMixin, models.Model):
     question = models.ForeignKey(Question)
     respondant = models.ForeignKey(Respondant, null=True, blank=True)
     answer = models.TextField(null=True, blank=True)
-    answer_number = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    answer_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     answer_raw = models.TextField(null=True, blank=True)
     answer_date = models.DateTimeField(null=True, blank=True)
     ts = models.DateTimeField(default=datetime.datetime.now())
@@ -281,7 +287,6 @@ class Response(caching.base.CachingMixin, models.Model):
 
     def save_related(self):
         if self.answer_raw:
-            
             self.answer = simplejson.loads(self.answer_raw)
             if self.question.type in ['datepicker']:
                 self.answer_date = datetime.datetime.strptime(self.answer, '%Y-%m-%d')
@@ -353,12 +358,11 @@ class Response(caching.base.CachingMixin, models.Model):
                         else:
                             print grid_col.type
                             print answer
-                    
-            if hasattr(self.respondant, self.question.slug):
-                setattr(self.respondant, self.question.slug, self.answer)
+            question_slug = self.question.slug.replace('-', '_')                
+            if hasattr(self.respondant, question_slug):
+                setattr(self.respondant, question_slug, self.answer)
                 self.respondant.save()
             self.save()
-            print self.answer
 
     def __unicode__(self):
         if self.respondant and self.question:
