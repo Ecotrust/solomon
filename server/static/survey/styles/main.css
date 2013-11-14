@@ -45,6 +45,9 @@ border: 1px solid #e5e5e5;
 .respondent-table {
   min-height: 370px;
 }
+.respondent-table th {
+    border-top: 0px;
+}
 
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
