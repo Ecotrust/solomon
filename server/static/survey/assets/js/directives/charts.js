@@ -13,11 +13,17 @@ angular.module('askApp')
 
                 scope.$watch('chart', function(newValue) {
                     // Draw the graph
-                    var labels, data;
+                    var labels, data, series;
 
                     if (newValue && !newValue.message) {
-                        data = _.map(scope.chart.data, function(item, index) {
-                            return parseFloat(item);
+                        series = _.map(scope.chart.data, function(item, index) {
+                            return {
+                                name: scope.chart.labels[index],
+                                data: [parseFloat(item)],
+                                dataLabels: {
+                                    enabled: true,
+                                }
+                            };
                         });
 
                         $(element[0]).highcharts({
@@ -29,7 +35,6 @@ angular.module('askApp')
                                 text: false
                             },
                             xAxis: {
-                                categories: scope.chart.labels,
                                 title: {
                                     text: scope.chart.xLabel
                                 }
@@ -39,13 +44,7 @@ angular.module('askApp')
                                     text: scope.chart.yLabel
                                 }
                             },
-                            series: [{
-                                name: "test",
-                                data: data,
-                                dataLabels: {
-                                    enabled: true,
-                                }
-                            }]
+                            series: series
                         });
                     }
                 })
