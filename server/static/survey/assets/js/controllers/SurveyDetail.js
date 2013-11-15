@@ -186,7 +186,6 @@ angular.module('askApp')
         } else {
             slug = questionSlug;
         }
-        
         if ($scope.answers[slug]) {
             if (gridSlug) {
                 return _.flatten(_.map($scope.answers[slug], function (answer) {
