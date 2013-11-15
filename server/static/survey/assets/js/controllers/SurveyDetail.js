@@ -166,6 +166,9 @@ angular.module('askApp')
 
     $scope.answers = {};
 
+    // Only show the progress bar if we're ie9 and above
+    $scope.showProgressBar = $("html").is(".lt-ie9");
+
     $scope.isAuthenticated = isAuthenticated;
 
     // landing page view
