@@ -76,20 +76,20 @@
                   <a>
                     Edit Survey
                   </a>
-                  <ul class="survey-list"> 
+                  <ul class="survey-list">
                     <li ng-repeat="survey in surveys">
                       <a href="#/author/{{ survey.slug }}">{{ survey.name }}</a>
-                    </li>  
+                    </li>
                   </ul>
                 </li>
                 <li>
                   <a>
                     Take Survey
                   </a>
-                  <ul class="survey-list"> 
+                  <ul class="survey-list">
                     <li ng-repeat="survey in surveys">
-                      <a target="_blank" href="/respond/{{survey.slug}}">{{ survey.name }}</a>
-                    </li>  
+                      <a target="_blank" href="#/respond/{{survey.slug}}">{{ survey.name }}</a>
+                    </li>
                   </ul>
                 </li>
                 <li>
@@ -100,29 +100,10 @@
                   <ul class="survey-list"> 
                     <li ng-repeat="survey in surveys">
                       <a href="#/RespondantList/{{ survey.slug }}">{{ survey.name }}</a>
-                    </li>  
+                    </li>
                   </ul>
                 </li>
               </ul>
-             <!-- <ul class="nav pull-right">
-                <li>
-                  <a href="#">
-                    User
-                  </a>
-                  <ul>
-                    <li><a href="#">Element One</a></li>
-                    <li>
-                      <a href="#">Sub menu</a>
-                      <ul>
-                        <li><a href="#">Element One</a></li>
-                        <li><a href="#">Element Two</a></li>
-                        <li><a href="#">Element Three</a></li>
-                      </ul> 
-                    </li>
-                    <li><a href="#">Element Three</a></li>
-                  </ul> 
-                </li>
-              </ul>-->
               {% endverbatim %}
             </div><!--/.nav-collapse -->
           </div>
@@ -141,9 +122,9 @@
     <script src="{{ STATIC_URL }}survey/assets/lib/js/flotr2.min.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/underscore.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/underscore.string.js"></script>
-    
+
     <script src="{{ STATIC_URL }}survey/assets/lib/js/highcharts.js"></script>
-    <script src="{{ STATIC_URL }}survey/assets/lib/js/jQDateRangeSlider-min.js"></script>    
+    <script src="{{ STATIC_URL }}survey/assets/lib/js/jQDateRangeSlider-min.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/leaflet-src.js"></script>
     <script src="{{ STATIC_URL }}survey/lib/js/Bing.js"></script>
     <script src="{{ STATIC_URL }}survey/lib/js/leaflet.awesome-markers.min.js"></script>
@@ -158,7 +139,7 @@
      <script src="https://raw.github.com/gist/2197042/2b90c41b39b7d5b3a851d8f256de2ebd3fe1fb74/leaflet-google.js"></script>-->
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.js"></script>
     <!-- build:js scripts/scripts.js -->
-    
+
     <script src="{{ STATIC_URL }}survey/assets/js/dash-app.js"></script>
 
     <script src="{{ STATIC_URL }}survey/assets/js/filters/filters.js"></script>
