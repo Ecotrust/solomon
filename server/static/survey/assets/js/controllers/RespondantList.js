@@ -94,8 +94,8 @@ angular.module('askApp')
         data.questions.reverse();
         $scope.survey = data;
         $scope.filter = {
-            startDate: new Date($scope.survey.response_date_start).add(-1).day(),
-            endDate: new Date($scope.survey.response_date_end).add(1).day()
+            startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day(),
+            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(1).day()
         }
 
         _.each($scope.survey.questions, function (question) {
@@ -131,13 +131,22 @@ angular.module('askApp')
             $scope.meta = data.meta;
         });
     }
-    
 
     $scope.getQuestionByUri = function (uri) {
         return _.findWhere($scope.survey.questions, {'resource_uri': uri});
     };
 
     $scope.getQuestionBySlug = function (slug) {
-		return _.findWhere($scope.survey.questions, {'slug': slug});
+        return _.findWhere($scope.survey.questions, {'slug': slug});
+    };
+
+    $scope.dateFromISO = function (iso_str) {
+        // IE8 and lower can't parse ISO strings into dates. See this
+        // Stack Overflow question: http://stackoverflow.com/a/17593482
+        if ($("html").is(".lt-ie9")) {
+            var s = iso_str.split(/\D/);
+            return new Date(Date.UTC(s[0], --s[1]||'', s[2]||'', s[3]||'', s[4]||'', s[5]||'', s[6]||''));
+        }
+        return new Date(iso_str);
     };
 });
