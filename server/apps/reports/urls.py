@@ -1,5 +1,5 @@
-from django.conf.urls.defaults import *
-from reports.views import *
+from django.conf.urls.defaults import patterns
+from reports.views import get_crosstab, get_distribution, get_geojson
 
 
 urlpatterns = patterns('',
