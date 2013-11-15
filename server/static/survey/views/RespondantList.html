@@ -11,8 +11,21 @@
     <div class="respondent-table">
         <table class="table" ng-class="{ 'loading': respondentsLoading }">
             <tbody>
+                <tr>
+                    <th>Username</th>
+                    <th>Vendor Name</th>
+                    <th>Market</th>
+                    <th>Bought or Caught</th>
+                    <th>How was it sold?</th>
+                    <th>Timestamp</th>
+                    <th>Detail</th>
+                </tr>
                 <tr ng-repeat="respondent in respondents">
                     <td>{{ respondent.user.username }}</td>
+                    <td>{{ respondent.vendor }}</td>
+                    <td>{{ respondent.survey_site }}</td>
+                    <td>{{ respondent.buy_or_catch }}</td>
+                    <td>{{ respondent.how_sold }}</td>
                     <td>{{ respondent.ts|validDate: 'dd-MM-yyyy HH:mm' }}</td>
                     <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}">Responses ({{respondent.responses.length}})</a></td>
                 </tr>

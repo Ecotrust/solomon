@@ -11,8 +11,7 @@ angular.module('askApp')
         });
         $scope.respondent = data;
     });
-        
-    
+
     $scope.uuid = $routeParams.uuidSlug;
     $scope.surveySlug = $routeParams.surveySlug;
 
