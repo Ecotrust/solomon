@@ -44,7 +44,7 @@ angular.module('askApp')
                     message: data.message
                 });
                 $scope.charts.sort(function (a,b) { return a-b;})
-            });    
+            });
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'cost'].join('/');
                 url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
@@ -62,8 +62,8 @@ angular.module('askApp')
                     order: 1,
                     message: data.message
                 });
-                $scope.charts.sort(function (a,b) { return a-b;})    
-                
+                $scope.charts.sort(function (a,b) { return a-b;})
+
             });
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
@@ -88,7 +88,6 @@ angular.module('askApp')
             });
         }
     }, true);
-
 
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
