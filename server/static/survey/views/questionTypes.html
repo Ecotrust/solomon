@@ -85,7 +85,13 @@
             <script type="text/javascript">
                 $(function() {
                     if ($("html").is(".lt-ie9")) {
-                        $("input[type=date]").datepicker();
+                        $("input[type=date]").datepicker({
+                            onSelect: function(date) {
+                                // For some reason the datepicker doesn't
+                                // actually do anything in IE8.
+                                $("input[type=date]").val(date);
+                            }
+                        });
                     }
                 });
             </script>
