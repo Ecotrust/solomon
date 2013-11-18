@@ -3,6 +3,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.http import HttpResponseRedirect
 
 from tastypie.api import Api
 
@@ -54,6 +55,8 @@ urlpatterns = patterns('',
     #other survey urls
     url(r'^dash', include(survey_urls)),
 
+    # Redirect / to /dash
+    url(r'^$', lambda r: HttpResponseRedirect('/dash')),
     # (r'^register', survey_urls.register),
     #(r'^survey/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.SURVEY_ROOT}),
     # (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
