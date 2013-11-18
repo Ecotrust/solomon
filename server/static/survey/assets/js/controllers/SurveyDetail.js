@@ -1511,7 +1511,7 @@ $scope.loadSurvey = function(data) {
         $scope.nextQuestionPath = $scope.getNextQuestionPath();
         $scope.loading = false;
         $scope.gridValidated = false;
-        if ($scope.question.type === 'grid') {
+        if ($scope.question && $scope.question.type === 'grid') {
             // validate grid questions
             $scope.$watch('question', function (newValue) {
                 $scope.gridValidated = $scope.validateGrid($scope.question);
