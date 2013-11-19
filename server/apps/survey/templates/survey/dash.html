@@ -61,8 +61,8 @@
         <div class="navbar-header">
             <a href="/dash" class="navbar-brand">Fish Logo Here</a>
         </div>
-        <button type="button" class="navbar-btn navbar-right btn btn-info">Admin</button>
-        <button type="button" class="navbar-btn navbar-right btn btn-default">Sign Out</button>
+        <a href="{% url "admin:index" %}"><button type="button" class="navbar-btn navbar-right btn btn-info">Admin</button></a>
+        <a href="{% url "admin:logout" %}"><button type="button" class="navbar-btn navbar-right btn btn-default">Sign Out</button></a>
         <p class="navbar-text navbar-right">Signed in as {{user.username}}</p>
         {# {% endverbatim %} #}
       </div>
