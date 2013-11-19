@@ -22,7 +22,7 @@ input {
     </div>
 </div>
 <div class="row-fluid" ng-hide="questionsToBeUpdated.length">
-    <div class="span2">
+    <div class="col-md-2">
         <div class="row-fluid controls">
             <button class="btn" ng-click="newQuestion()">New Question</button>
         </div>
@@ -36,11 +36,11 @@ input {
         </ul>
         <p ng-hide="survey.questions.length">No Questions, yet.</p>
     </div>
-    <div class="span10">
+    <div class="col-md-10">
         <div class="well" ng-show="newSurvey">
             <h1>New Survey</h1>
             <label>Name</label>
-            <input ng-model="survey.name" class="span12" placeholder="Survey Name"/>
+            <input ng-model="survey.name" class="col-md-12" placeholder="Survey Name"/>
             <div class="buttons pull-right">
                 <button class="btn btn-primary btn-large" ng-click="createSurvey(survey)">
                     save
@@ -66,20 +66,20 @@ input {
             <form ng-submit="saveQuestion(activeQuestion)">
                 <div class="row-fluid">
                     <label>Title</label>
-                    <input class="span12" ng-model="activeQuestion.title" />
+                    <input class="col-md-12" ng-model="activeQuestion.title" />
                 </div>
                 <div class="row-fluid">
-                    <div class="span6">
+                    <div class="col-md-6">
                         <label>Label</label>
-                        <input class="span12" ng-model="activeQuestion.label" />
+                        <input class="col-md-12" ng-model="activeQuestion.label" />
                     </div>
-                    <div class="span6">
+                    <div class="col-md-6">
                         <label>Slug</label>
-                        <input class="span12" ng-model="activeQuestion.slug" />
+                        <input class="col-md-12" ng-model="activeQuestion.slug" />
                     </div>
                 </div>
                 <div class="row-fluid" ng-show="activeQuestion.id">
-                    <div class="span6">
+                    <div class="col-md-6">
                         <label>Question Type</label>
                         <select ng-model="activeQuestion.type">
                             <option ng-repeat="(key, val) in activeQuestion.question_types" value="{{key}}" ng-selected="activeQuestion.type == key">{{val}}</option>
@@ -102,12 +102,12 @@ input {
                             Filter By
                         </label> -->
                     </div>
-                    <div class="span6">
+                    <div class="col-md-6">
                         <a class="btn" ng-click="newBlock = {}" ng-hide="newBlock">New Block</a>
                         <div ng-show="newBlock">
                             <h4>New Conditional Block</h4>
                             <label>Block Name</label>
-                            <input class="span6" ng-model="newBlock.name"/>
+                            <input class="col-md-6" ng-model="newBlock.name"/>
                             <label>Skip Question</label>
                             <select ng-model="newBlock.question">
                                 <option value="">None</option>
@@ -117,7 +117,7 @@ input {
                                     value="{{question.resource_uri}}">{{question.slug}}</option>
                             </select>
                             <label>Skip Condition</label>
-                            <input class="span6" ng-model="newBlock.condition"/>
+                            <input class="col-md-6" ng-model="newBlock.condition"/>
                             <div>
                                 <a class="btn btn-danger" ng-click="newBlock = false">Cancel</a>
                                 <a class="btn" ng-click="addBlock(activeQuestion, newBlock)">Save</a>
@@ -143,7 +143,7 @@ input {
                                 </select>
                                 <div ng-show="activeQuestion.skip_question">
                                     <label>Skip Condition</label>
-                                    <input class="span12" ng-model="activeQuestion.skip_condition" />
+                                    <input class="col-md-12" ng-model="activeQuestion.skip_condition" />
                                 </div>
                             </div>
                         </div>
@@ -152,18 +152,18 @@ input {
                         <div ng-show="activeQuestion.type == 'integer' || activeQuestion.type == 'number'">
                             <h3>Validation Options</h3>
                             <label>Minimum Value</label>
-                            <input class="span12" ng-model="activeQuestion.integer_min" />
+                            <input class="col-md-12" ng-model="activeQuestion.integer_min" />
                             <label>Maximum Value</label>
-                            <input class="span12" ng-model="activeQuestion.integer_max" />
+                            <input class="col-md-12" ng-model="activeQuestion.integer_max" />
                         </div>
                     </div>
                 </div>
                 <div class="row-fluid" ng-show="activeQuestion.type == 'single-select' || activeQuestion.type == 'multi-select'">
-                    <div class="span4">
+                    <div class="col-md-4">
                         <label>Options</label>
                         <textarea class="input-block-level" rows="6" ng-model="activeQuestion.rows"></textarea>
                     </div>
-                    <div class="span6" ng-show="activeQuestion.type == 'single-select' || activeQuestion.type == 'multi-select'">
+                    <div class="col-md-6" ng-show="activeQuestion.type == 'single-select' || activeQuestion.type == 'multi-select'">
                         <label>
                             <input type="checkbox" ng-model="activeQuestion.allow_other"/>
                             Allow Other
@@ -173,7 +173,7 @@ input {
                     </div>
                 </div>
                 <div class="row-fluid" ng-show="activeQuestion.type == 'grid'">
-                    <div class="span3">
+                    <div class="col-md-3">
                         <h3>Row Options</h3>
                         <label>Options from previous answer</label>
                         <input type="text" ng-model="activeQuestion.options_from_previous_answer">
@@ -181,10 +181,10 @@ input {
                         <label>Or Specify Options</label>
                         <textarea class="input-block-level" rows="6" ng-model="activeQuestion.rows"></textarea>
                     </div>    
-                    <div class="span9">
+                    <div class="col-md-9">
                         <h3>Column Options</h3>
                         <div class="row-fluid">
-                            <div class="span4">
+                            <div class="col-md-4">
                                 <ul class="nav nav-pills nav-stacked" ng-model="activeQuestion.grid_cols" ui-sortable="{axis: 'y'}">
                                     <li
                                         ng-class="{'active': grid_col == activeQuestion.activeOption }"
@@ -194,16 +194,16 @@ input {
                                 </ul>
                                 <a class="btn" ng-click="activeQuestion.newOption = true" ng-class="{ 'disabled': activeQuestion.newOption }">new grid col</a>
                             </div>
-                            <div class="span4" ng-show="activeQuestion.newOption">
+                            <div class="col-md-4" ng-show="activeQuestion.newOption">
                                 <label>New Option Name</label>
                                 <input type="text" ng-model="activeQuestion.newOptionText"/>
                                 <a class="btn btn-primary" ng-click="newGridColumn(activeQuestion)">save new option</a>
                             </div>  
-                            <div class="span6" ng-show="activeQuestion.activeOption && ! activeQuestion.newOption">
+                            <div class="col-md-6" ng-show="activeQuestion.activeOption && ! activeQuestion.newOption">
                                 <label>Column Name</label>
-                                <input type="text" class="span8" rows=5 ng-model="activeQuestion.activeOption.text"></textarea>
+                                <input type="text" class="col-md-8" rows=5 ng-model="activeQuestion.activeOption.text"></textarea>
                                 <label>Column Label (should not contain a dash)</label>
-                                <input type="text" class="span8" rows=5 ng-model="activeQuestion.activeOption.label"></textarea>
+                                <input type="text" class="col-md-8" rows=5 ng-model="activeQuestion.activeOption.label"></textarea>
                                 <label>Question Type</label>
                                 <select ng-model="activeQuestion.activeOption.type">
                                     <option ng-repeat="(key, val) in activeQuestion.question_types" value="{{key}}" ng-selected="activeQuestion.activeOption.type == key">{{val}}</option>
@@ -214,13 +214,13 @@ input {
                                 </label>
                                 <div ng-show="activeQuestion.activeOption && activeQuestion.activeOption.type == 'integer' || activeQuestion.activeOption.type == 'number'">
                                     <label>Min</label>
-                                    <input class="span12" type="text" ng-model="activeQuestion.activeOption.min"></textarea>
+                                    <input class="col-md-12" type="text" ng-model="activeQuestion.activeOption.min"></textarea>
                                     <label>Max</label>
-                                    <input class="span12" type="text" ng-model="activeQuestion.activeOption.max"></textarea>
+                                    <input class="col-md-12" type="text" ng-model="activeQuestion.activeOption.max"></textarea>
                                 </div>
                                 <div ng-show="activeQuestion.activeOption && activeQuestion.activeOption.type == 'single-select' || activeQuestion.activeOption.type == 'multi-select'">
                                     <label>{{ activeQuestion.activeOption.text }} Options</label>
-                                    <textarea class="span12" rows=5 ng-model="activeQuestion.activeOption.rows"></textarea>
+                                    <textarea class="col-md-12" rows=5 ng-model="activeQuestion.activeOption.rows"></textarea>
                                 </div>
                                 <a class="btn btn-danger" ng-click="deleteOption(activeQuestion.activeOption)">delete column</a>
                             </div>
