@@ -28,12 +28,13 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/lib/css/leaflet.awesome-markers.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/jquery-ui-bootstrap/jquery.ui.theme.font-awesome.css">
 
-      <link rel="stylesheet" href="{{ STATIC_URL }}survey/assets/lib/css/iThing.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}survey/assets/lib/css/iThing.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}survey/lib/css/main.css">
 
     <!--[if lt IE 9]>
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/leaflet/dist/leaflet.ie.css">
     <![endif]-->
-    
+
     <!--[if lt IE 8]>
       <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome-ie7.min.css" rel="stylesheet">
       <link rel="stylesheet" href="{{ STATIC_URL }}survey/styles/main.ie7.css">
@@ -54,41 +55,15 @@
 
     <!-- Add your site or application content here -->
     {% if user.is_authenticated %}
-    <nav class="navbar navbar-static-top" role="navigation" ng-controller="SurveyListMenuCtrl" ng-cloak>
+    <nav id="global-navbar" class="navbar navbar-static-top" role="navigation" ng-controller="SurveyListMenuCtrl" ng-cloak>
       <div>
         {% verbatim %}
         <div class="navbar-header">
             <a class="navbar-brand">Fish Logo Here</a>
         </div>
-
-        <ul class="nav navbar-nav">
-          <li><a href="#/">Home</a></li>
-          <li><a href="#/author">Create Survey</a></li>
-          <li>
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit Survey <b class="caret"></b></a>
-            <ul class="dropdown-menu survey-list">
-              <li ng-repeat="survey in surveys">
-                <a href="#/author/{{ survey.slug }}">{{ survey.name }}</a>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Take Survey <b class="caret"></b></a>
-            <ul class="dropdown-menu survey-list">
-              <li ng-repeat="survey in surveys">
-                <a target="_blank" href="/respond/{{survey.slug}}">{{ survey.name }}</a>
-              </li>
-            </ul>
-          </li>
-          <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Survey Dashboard <b class="caret"></b></a>
-            <ul class="dropdown-menu survey-list">
-              <li ng-repeat="survey in surveys">
-                <a href="#/RespondantList/{{ survey.slug }}">{{ survey.name }}</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        <button type="button" class="navbar-btn navbar-right btn btn-info">Admin</button>
+        <button type="button" class="navbar-btn navbar-right btn btn-default">Sign Out</button>
+        <p class="navbar-text navbar-right">Signed in as Dr. Octavius</p>
         {% endverbatim %}
       </div>
     </nav>
