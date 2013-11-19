@@ -1,4 +1,4 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from places.models import Place
 
@@ -6,15 +6,16 @@ from places.models import Place
 import csv
 
 excluded_types = ["Airport", "Building", "Cemetery", "Crossing", "Locale",
-                    "Census", "Church", "Civil", "Hospital", "Summit", "Tower",
-                    "Military", "Mine", "School", "Post Office", "Tunnel", "Well"]
+                  "Census", "Church", "Civil", "Hospital", "Summit", "Tower",
+                  "Military", "Mine", "School", "Post Office", "Tunnel", "Well"]
+
 
 class Command(BaseCommand):
     args = '<gnis text file>'
     help = 'Load places data'
 
     def handle(self, *args, **options):
-        reader = csv.DictReader(open(args[0]),delimiter='|')
+        reader = csv.DictReader(open(args[0]), delimiter='|')
         rows = 0
         for row in reader:
             #if rows > 1000:

@@ -1,13 +1,10 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
-from apps.survey.api import *
 
-from subprocess import call
-import os, errno
-import requests
-import simplejson
-import path
+import os
+import errno
 import shutil
+
 
 def copy_dir(src, dst):
     full_src = settings.PROJECT_ROOT / src
@@ -19,10 +16,11 @@ def copy_dir(src, dst):
         except:
             pass
         shutil.copytree(full_src, full_dst)
-    except OSError as exc: # python >2.5
+    except OSError as exc:  # python >2.5
         if exc.errno == errno.ENOTDIR:
             shutil.copy(src, dst)
-        else: raise
+        else:
+            raise
 
 
 class Command(BaseCommand):
@@ -37,7 +35,7 @@ class Command(BaseCommand):
         app_src = settings.PROJECT_ROOT / 'static/survey/mobile.html'
         app_dest = "%s/index.html" % dest
         shutil.copyfile(app_src, app_dest)
-        
+
         # copy app assets
         copy_dir('static/survey/assets', "%s/assets" % dest)
         copy_dir('static/survey/views', "%s/views" % dest)
