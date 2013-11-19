@@ -13,6 +13,11 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
         controller: 'AuthorCtrl',
         reloadOnSearch: false
     })
+        .when("/", {
+        templateUrl: '/static/survey/views/LandingPage.html',
+        controller: 'LandingCtrl',
+        reloadOnSearch: false
+    })
         .when('/author', {
         templateUrl: '/static/survey/views/author.html',
         controller: 'AuthorCtrl',
