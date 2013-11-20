@@ -1,6 +1,7 @@
 #global-navbar {
     border-bottom: solid 1px #000;
 }
-#global-navbar .navbar-brand {
+#global-navbar img {
     border-right: solid 1px #000;
+    min-height: 50px;
 }
