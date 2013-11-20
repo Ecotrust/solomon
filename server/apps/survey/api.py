@@ -192,6 +192,7 @@ class SurveyResource(SurveyModelResource):
     questions = fields.ToManyField(QuestionResource, 'questions', full=True, null=True, blank=True)
 
     class Meta:
+        detail_uri_name = 'slug'
         queryset = Survey.objects.all()
         always_return_data = True
         authorization = StaffUserOnlyAuthorization()
