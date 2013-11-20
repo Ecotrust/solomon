@@ -4,6 +4,28 @@
             <tbody>
                 <tr ng-repeat="survey in surveys">
                     <td><h4>{{survey.name}}</h4></td>
+                    <td>
+                        <h2>{{survey.survey_responses}}</h2>
+                        <p>Total</p>
+                    </td>
+                    <td>
+                        <h2>0</h2>
+                        <p>Today</p>
+                    </td>
+                    <td>
+                        <h2>0</h2>
+                        <p>Need Review</p>
+                    </td>
+                    <td>
+                        <h2>0</h2>
+                        <p>Flagged</p>
+                    </td>
+                    <td class="btn-group">
+                        <button type="button" class="btn btn-default">+</button>
+                        <button type="button" class="btn btn-default">Phone</button>
+                        <button type="button" class="btn btn-default">Edit</button>
+                        <button type="button" class="btn btn-default">Delete</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
