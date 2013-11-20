@@ -51,6 +51,7 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
         controller: 'CrossTabCtrl'
     })
         .otherwise({
+        templateUrl: '/static/survey/views/LandingPage.html',
         redirectTo: '/'
     });
 });
