@@ -20,15 +20,19 @@
                         <h2 class="survey-num">0</h2>
                         <p>Flagged</p>
                     </td>
-                    <td class="btn-group" ng-hide="confirmDelete">
-                        <a target="_blank"  class="btn btn-default" href="/respond/{{survey.slug}}">+</a>
-                        <a class="btn btn-default" href="/static/survey/mobile.html#/survey/{{survey.slug}}/{{survey.questions[0].slug}}/offline">Phone</a>
-                        <a class="btn btn-default" href="#/author/{{ survey.slug }}">Edit</a>
-                        <a class="btn btn-default" ng-click="confirmDelete = true">Delete</a>
+                    <td ng-hide="confirmDelete">
+                        <div class="btn-group">
+                            <a target="_blank" class="btn btn-default icon-plus" href="/respond/{{survey.slug}}"></a>
+                            <a class="btn btn-default icon-mobile-phone" href="/static/survey/mobile.html#/survey/{{survey.slug}}/{{survey.questions[0].slug}}/offline"></a>
+                            <a class="btn btn-default icon-edit" href="#/author/{{ survey.slug }}"></a>
+                            <a class="btn btn-default icon-trash" ng-click="confirmDelete = true"></a>
+                        </div>
                     </td>
-                    <td class="btn-group" ng-show="confirmDelete">
-                        <a class="btn btn-default btn-danger" ng-click="deleteSurvey(survey)">Delete</a>
-                        <a class="btn btn-default" ng-click="confirmDelete = false">Cancel</a>
+                    <td ng-show="confirmDelete">
+                        <div class="btn-group">
+                            <a class="btn btn-default btn-danger" ng-click="deleteSurvey(survey)">Delete</a>
+                            <a class="btn btn-default" ng-click="confirmDelete = false">Cancel</a>
+                        </div>
                     </td>
                 </tr>
             </tbody>

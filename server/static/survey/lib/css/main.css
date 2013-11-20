@@ -5,7 +5,16 @@
     border-right: solid 1px #000;
     min-height: 50px;
 }
+#survey-landing-table td {
+    vertical-align: middle;
+}
 #survey-landing-table .survey-num, #survey-landing-table p {
     text-align: center;
     margin: auto;
+}
+#survey-landing-table .icon-plus,
+#survey-landing-table .icon-mobile-phone,
+#survey-landing-table .icon-trash,
+#survey-landing-table .icon-edit {
+    font-size: 32px;
 }
