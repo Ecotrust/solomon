@@ -52,6 +52,7 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
     })
         .otherwise({
         templateUrl: '/static/survey/views/LandingPage.html',
+        controller: 'SurveyListMenuCtrl',
         redirectTo: '/'
     });
 });
