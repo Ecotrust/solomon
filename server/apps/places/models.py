@@ -14,6 +14,5 @@ class Place(caching.base.CachingMixin, models.Model):
 
     objects = caching.base.CachingManager()
 
-
     def __str__(self):
         return "%s: %s, %s (%s)" % (self.name, self.state, self.county, self.type)

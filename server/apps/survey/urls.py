@@ -1,5 +1,5 @@
-from django.conf.urls.defaults import *
-from survey.views import *
+from django.conf.urls.defaults import patterns
+from survey.views import answer, complete, delete_responses
 
 
 urlpatterns = patterns('',

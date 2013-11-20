@@ -1,14 +1,13 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.db.models import Sum
+from django.core.management.base import BaseCommand
 
-from survey.models import Respondant, Response, Question, Survey
+from survey.models import Survey
 
 
 class Command(BaseCommand):
     help = 'Generate Test Data'
 
     def handle(self, *args, **options):
-        survey = Survey.objects.get(slug = 'volume-and-origin')
+        survey = Survey.objects.get(slug='volume-and-origin')
         print survey.response_date_start
         print survey.response_date_end
     # market_question = Question.objects.get(slug = 'market', survey=survey)

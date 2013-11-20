@@ -2,28 +2,28 @@ from django.contrib import admin
 from survey.models import Survey, Question, Option, Response, Respondant, Page, Location, LocationAnswer, MultiAnswer, GridAnswer, Block
 
 
-
 class ResponseAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'ts',)
 
 
-
 class RespondantAdmin(admin.ModelAdmin):
-    readonly_fields=('uuid','responses', )
+    readonly_fields = ('uuid', 'responses', )
     list_display = ('uuid', 'ts', 'complete',)
+
 
 class PageInline(admin.TabularInline):
     model = Page
 
 
 class SurveyAdmin(admin.ModelAdmin):
-    list_display = ('name','slug',)
-    prepopulated_fields = {'slug':('name',),}
+    list_display = ('name', 'slug',)
+    prepopulated_fields = {'slug': ('name',)}
+
 
 class QuestionAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug':('label',),'info':('label',),}
-    list_display = ('survey_slug','slug','type', 'title',  )
-    
+    prepopulated_fields = {'slug': ('label',), 'info': ('label',)}
+    list_display = ('survey_slug', 'slug', 'type', 'title')
+
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         if db_field.name == "blocks":
             kwargs["queryset"] = Block.objects.all().order_by('name')
@@ -31,13 +31,12 @@ class QuestionAdmin(admin.ModelAdmin):
 
     class Media:
         js = [
-           '/static/grappelli/tinymce/jscripts/tiny_mce/tiny_mce.js'
+            '/static/grappelli/tinymce/jscripts/tiny_mce/tiny_mce.js'
         ]
 
+
 class OptionAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'label':('text',),}
-
-
+    prepopulated_fields = {'label': ('text',)}
 
 
 admin.site.register(Respondant, RespondantAdmin)
