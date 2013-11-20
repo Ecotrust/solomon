@@ -1,5 +1,11 @@
 <div class="row">
-    <p>It works!</p>
+    <div class="col-md-12">
+        <ul>
+            <li ng-repeat="survey in surveys">
+                <h4>{{survey.name}}</h4>
+            </li>
+        </ul>
+    </div>
 </div>
 <div class="row">
     <button class="btn btn-success">New Survey</button>

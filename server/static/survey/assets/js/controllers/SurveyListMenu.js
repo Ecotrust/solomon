@@ -35,7 +35,7 @@ angular.module('askApp')
     } else {
         $location.path('/');
     }
-    
+
     if (app.surveys) {
         $scope.surveys = app.surveys;
     } else {
