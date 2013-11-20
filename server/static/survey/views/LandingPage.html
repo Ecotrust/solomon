@@ -1,23 +1,23 @@
 <div class="row">
     <div class="col-md-12">
-        <table class="table table-striped">
+        <table id="survey-landing-table" class="table table-striped">
             <tbody>
                 <tr ng-repeat="survey in surveys">
                     <td><h4>{{survey.name}}</h4></td>
                     <td>
-                        <h2>{{survey.survey_responses}}</h2>
+                        <h2 class="survey-num">{{survey.survey_responses}}</h2>
                         <p>Total</p>
                     </td>
                     <td>
-                        <h2>0</h2>
+                        <h2 class="survey-num">0</h2>
                         <p>Today</p>
                     </td>
                     <td>
-                        <h2>0</h2>
+                        <h2 class="survey-num">0</h2>
                         <p>Need Review</p>
                     </td>
                     <td>
-                        <h2>0</h2>
+                        <h2 class="survey-num">0</h2>
                         <p>Flagged</p>
                     </td>
                     <td class="btn-group">

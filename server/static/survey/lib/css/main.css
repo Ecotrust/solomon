@@ -5,3 +5,7 @@
     border-right: solid 1px #000;
     min-height: 50px;
 }
+#survey-landing-table .survey-num, #survey-landing-table p {
+    text-align: center;
+    margin: auto;
+}
