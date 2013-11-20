@@ -21,9 +21,9 @@
                         <p>Flagged</p>
                     </td>
                     <td class="btn-group">
-                        <button type="button" class="btn btn-default">+</button>
-                        <button type="button" class="btn btn-default">Phone</button>
-                        <button type="button" class="btn btn-default">Edit</button>
+                        <a target="_blank"  class="btn btn-default" href="/respond/{{survey.slug}}">+</a>
+                        <a class="btn btn-default" href="/static/survey/mobile.html#/survey/{{survey.slug}}/{{survey.questions[0].slug}}/offline">Phone</a>
+                        <a class="btn btn-default" href="#/author/{{ survey.slug }}">Edit</a>
                         <button type="button" class="btn btn-default">Delete</button>
                     </td>
                 </tr>
@@ -31,6 +31,6 @@
         </table>
     </div>
     <div class="col-md-2">
-        <button class="btn btn-success">New Survey</button>
+        <a href="#/author"><button class="btn btn-success">New Survey</button></a>
     </div>
 </div>
