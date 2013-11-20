@@ -8,9 +8,10 @@ cd into the source directory with your terminal
 
 # Server Setup
 ```bash
+vagrant plugin install vagrant-omnibus # for chef
 vagrant up
-easy_install pip (if you do not already have)
-pip install fabric (if you do not already have)
+easy_install pip #(if you do not already have)
+pip install fabric #(if you do not already have)
 fab vagrant bootstrap
 fab vagrant createsuperuser
 fab vagrant loaddata

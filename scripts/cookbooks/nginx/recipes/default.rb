@@ -43,12 +43,24 @@ template "nginx.conf" do
   mode 0644
 end
 
-template "#{node[:nginx][:dir]}/sites-available/default" do
-  source "default-site.erb"
-  owner "root"
-  group "root"
-  mode 0644
+case node["platform"]
+  when "debian", "ubuntu"
+    template "#{node[:nginx][:dir]}/sites-available/default" do
+    source "default-site.erb"
+    owner "root"
+    group "root"
+    mode 0644
+  end
+when "redhat", "centos", "fedora"
+  when "debian", "ubuntu"
+    template "#{node[:nginx][:dir]}/conf.d/default.conf" do
+    source "default-site.erb"
+    owner "root"
+    group "root"
+    mode 0644
+  end
 end
+
 
 service "nginx" do
   supports :status => true, :restart => true, :reload => true
