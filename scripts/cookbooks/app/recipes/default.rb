@@ -43,9 +43,9 @@ if node[:user] == "vagrant"
         owner "vagrant"
     end
 else
-    # user $user do
-    #     group "deploy"
-    # end
+    user $user do
+        group "deploy"
+    end
     node[:users].each do |u|
         user u[:name] do
             username u[:name]
@@ -88,10 +88,10 @@ else
         mode 0440
     end
     
-    package "dos2unix"
-    execute "authorized keys" do
-        command "dos2unix /etc/sudoers"
-    end
+    # package "dos2unix"
+    # execute "authorized keys" do
+    #     command "dos2unix /etc/sudoers"
+    # end
 end
 
 directory "/usr/local/apps" do
@@ -127,16 +127,20 @@ end
 
 # ssh  ------------------------------------------------------------------------
 
-cookbook_file "/etc/ssh/sshd_config" do
-    source "sshd_config"
-end
 
 
 if platform?("debian", "ubuntu")
+    cookbook_file "/etc/ssh/sshd_config" do
+        source "sshd_config"
+    end
     execute "restart ssh" do
         command "service ssh restart"
     end
 else platform?("centos", "rhel")
+    cookbook_file "/etc/ssh/sshd_config_centos" do
+        source "sshd_config"
+    end
+
     execute "restart ssh" do
         command "service sshd restart"
     end
@@ -145,7 +149,6 @@ end
 package "wget"
 
 if platform?("centos", "rhel")
-    $user = "apache"
     
     bash "install epel" do
         user "root"
@@ -162,8 +165,8 @@ end
 
 packages = value_for_platform_family(
     ["centos","redhat","fedora"] => {'default' => ["python-devel", "mailx", "postgresql-libs"]},    
-    "ubuntu" => {'default' => ["python-software-properties", "htop", "csstidy", "python-dev", "mailutils", "postgresql-#{node[:postgresql][:version]}-postgis"]},
-    "default" => ["vim", "ntp", "curl", "postfix",
+    "ubuntu" => {'default' => ["python-software-properties", "htop", "csstidy", "python-dev", "mailutils", "postgresql-#{node[:postgresql][:version]}-postgis", "vim"]},
+    "default" => ["ntp", "curl", "postfix",
         "mercurial", "subversion", "unzip", "python-pip", "supervisor",
         ]
 )
@@ -174,13 +177,13 @@ end
 
 if platform?("ubuntu")
     include_recipe "apt"
+    include_recipe "build-essential"
 end
 
 
 include_recipe "openssl"
-include_recipe "build-essential"
 include_recipe "git"
-include_recipe "python"
+#include_recipe "python"
 include_recipe "nginx"
 include_recipe "postgresql::server"
 
@@ -205,7 +208,7 @@ when "debian"
   package "python-psycopg2"
   package "python-numpy"
   package "redis-server"
-  package "postgis"
+
   template "/etc/supervisor/conf.d/app.conf" do
       source "app.conf.erb"
   end
@@ -242,7 +245,7 @@ when "rhel"
       user "root"
       cwd "/tmp"
       code <<-EOH    
-          pip install psycopg2
+          CFLAGS=/usr/include/python2.6 pip install psycopg2
       EOH
     end
 
@@ -288,6 +291,8 @@ when "debian"
         not_if "psql -U postgres #{node[:dbname]} -P pager -t --command='SELECT srid FROM  spatial_ref_sys' |grep 900913"
     end
 when "rhel"
+    package "postgis"
+
     execute "load plpgsql" do
         command "createlang -U postgres -d #{node[:dbname]} plpgsql"
         not_if "psql -U postgres #{node[:dbname]} -P pager -t --command='select * from pg_language'|grep plpgsql"
@@ -302,6 +307,9 @@ when "rhel"
     end
     execute "start redis" do
         command "sudo /etc/init.d/redis start"
+    end
+    execute "install virtualenv" do
+        command "sudo pip install virtualenv"
     end
 
 end
