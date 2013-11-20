@@ -1,9 +1,11 @@
-<div ng-show="loaded" class="row">
+<div class="row" ng-cloak>
     <div class="col-md-12">
         <table id="survey-landing-table" class="table table-striped">
             <tbody>
                 <tr ng-repeat="survey in surveys">
-                    <td><h4>{{survey.name}}</h4></td>
+                    <td>
+                        <a href="#/RespondantList/{{survey.slug}}"><h4>{{survey.name}}</h4></a>
+                    </td>
                     <td>
                         <h2 class="survey-num">{{survey.survey_responses}}</h2>
                         <p>Total</p>

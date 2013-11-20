@@ -18,6 +18,11 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
         controller: 'AuthorCtrl',
         reloadOnSearch: false
     })
+        .when('/', {
+        templateUrl: '/static/survey/views/LandingPage.html',
+        controller: 'SurveyListMenuCtrl',
+        reloadOnSearch: false
+    })
         .when('/surveys', {
         templateUrl: '/static/survey/views/SurveyList.html',
         controller: 'SurveyListCtrl'
