@@ -3,6 +3,7 @@
 angular.module('askApp')
     .controller('SurveyListMenuCtrl', function($scope, $http, $routeParams, $location) {
 
+    $scope.confirmDelete = false;
     $scope.path = $location.path().slice(1,5);
     $scope.loaded=false;
     $scope.width = 0;

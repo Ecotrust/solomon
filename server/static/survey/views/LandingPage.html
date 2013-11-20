@@ -20,11 +20,15 @@
                         <h2 class="survey-num">0</h2>
                         <p>Flagged</p>
                     </td>
-                    <td class="btn-group">
+                    <td class="btn-group" ng-hide="confirmDelete">
                         <a target="_blank"  class="btn btn-default" href="/respond/{{survey.slug}}">+</a>
                         <a class="btn btn-default" href="/static/survey/mobile.html#/survey/{{survey.slug}}/{{survey.questions[0].slug}}/offline">Phone</a>
                         <a class="btn btn-default" href="#/author/{{ survey.slug }}">Edit</a>
-                        <button type="button" class="btn btn-default">Delete</button>
+                        <a class="btn btn-default" ng-click="confirmDelete = true">Delete</a>
+                    </td>
+                    <td class="btn-group" ng-show="confirmDelete">
+                        <a class="btn btn-default btn-danger" ng-click="deleteSurvey(survey)">Delete</a>
+                        <a class="btn btn-default" ng-click="confirmDelete = false">Cancel</a>
                     </td>
                 </tr>
             </tbody>
