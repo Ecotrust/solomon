@@ -1,8 +1,8 @@
-from django.core.management.base import BaseCommand, CommandError
-from places.models import Place, ShoreLine
+from django.core.management.base import BaseCommand
 from django.contrib.gis.gdal import DataSource
 
 import os
+
 
 class Command(BaseCommand):
     args = '<gnis text file>'

@@ -1,6 +1,5 @@
 from django.db import models
-from django.db.models import Avg, Max, Min, Count
-from django.db.models import Avg, Max, Min, Count, Sum
+from django.db.models import Max, Min, Count, Sum
 from django.contrib.auth.models import User
 from django.db.models import signals
 
@@ -8,8 +7,7 @@ import datetime
 import uuid
 import simplejson
 import caching.base
-import ast
-import decimal
+
 
 def make_uuid():
     return str(uuid.uuid4())
@@ -19,6 +17,8 @@ STATE_CHOICES = (
     ('terminate', 'Terminate'),
 
 )
+
+
 class Respondant(caching.base.CachingMixin, models.Model):
     uuid = models.CharField(max_length=36, primary_key=True, default=make_uuid, editable=False)
     survey = models.ForeignKey('Survey')
@@ -31,7 +31,6 @@ class Respondant(caching.base.CachingMixin, models.Model):
     survey_site = models.CharField(max_length=240, null=True, blank=True)
     buy_or_catch = models.CharField(max_length=240, null=True, blank=True)
     how_sold = models.CharField(max_length=240, null=True, blank=True)
-
 
     locations = models.IntegerField(null=True, blank=True)
 
@@ -95,16 +94,17 @@ class Survey(caching.base.CachingMixin, models.Model):
     @property
     def activity_points(self):
         return Location.objects.filter(response__respondant__in=self.respondant_set.filter(complete=True)).count()
-        
 
     @property
     def response_date_start(self):
         #return self.questions.filter(slug='survey-date').aggregate(date=Min('response__answer_date')).get('date', None)
-        return self.respondant_set.all().aggregate(lowest=Min('ts'), highest=Max('ts'))['lowest'] 
+        return self.respondant_set.all().aggregate(lowest=Min('ts'), highest=Max('ts'))['lowest']
+
     @property
     def response_date_end(self):
         #return self.questions.filter(slug='survey-date').aggregate(date=Max('response__answer_date')).get('date', None)
         return self.respondant_set.all().aggregate(lowest=Min('ts'), highest=Max('ts'))['highest']
+
     def __str__(self):
         return "%s" % self.name
 
@@ -128,41 +128,43 @@ QUESTION_TYPE_CHOICES = (
     ('yes-no', 'Yes/No'),
 )
 
+
 class Option(caching.base.CachingMixin, models.Model):
     text = models.CharField(max_length=254)
     label = models.SlugField(max_length=64)
-    type = models.CharField(max_length=20,choices=QUESTION_TYPE_CHOICES,default='integer')
+    type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='integer')
     rows = models.TextField(null=True, blank=True)
     required = models.BooleanField(default=True)
     order = models.IntegerField(null=True, blank=True)
     min = models.IntegerField(default=None, null=True, blank=True)
-    max = models.IntegerField(default=None, null=True, blank=True)    
+    max = models.IntegerField(default=None, null=True, blank=True)
     objects = caching.base.CachingManager()
-
 
     def __str__(self):
         return "%s" % self.text
 
 REPORT_TYPE_CHOICES = (
-        ('distribution', 'Distribution'),
-        ('heatmap', 'Heatmap'),
-        ('heatmap-distribution', 'Heatmap & Distribution'),
-    )
+    ('distribution', 'Distribution'),
+    ('heatmap', 'Heatmap'),
+    ('heatmap-distribution', 'Heatmap & Distribution'),
+)
+
 
 class Block(caching.base.CachingMixin, models.Model):
     name = models.CharField(max_length=254, null=True, blank=True)
     skip_question = models.ForeignKey('Question', null=True, blank=True)
     skip_condition = models.CharField(max_length=254, null=True, blank=True)
-    
+
     def __str__(self):
         return "%s" % self.name
+
 
 class Question(caching.base.CachingMixin, models.Model):
     title = models.TextField()
     label = models.CharField(max_length=254)
     order = models.IntegerField(default=0)
     slug = models.SlugField(max_length=64)
-    type = models.CharField(max_length=20,choices=QUESTION_TYPE_CHOICES,default='text')
+    type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='text')
     options = models.ManyToManyField(Option, null=True, blank=True)
     options_json = models.TextField(null=True, blank=True)
     rows = models.TextField(null=True, blank=True)
@@ -180,7 +182,7 @@ class Question(caching.base.CachingMixin, models.Model):
     skip_question = models.ForeignKey('self', null=True, blank=True)
     skip_condition = models.CharField(max_length=254, null=True, blank=True)
 
-    blocks = models.ManyToManyField('Block', null=True, blank=True)    
+    blocks = models.ManyToManyField('Block', null=True, blank=True)
 
     randomize_groups = models.BooleanField(default=False)
     options_from_previous_answer = models.CharField(max_length=254, null=True, blank=True)
@@ -190,26 +192,22 @@ class Question(caching.base.CachingMixin, models.Model):
     hoist_answers = models.ForeignKey('self', null=True, blank=True, related_name="hoisted")
     foreach_question = models.ForeignKey('self', null=True, blank=True, related_name="foreach")
 
-
-
-
     # backend stuff
     filterBy = models.BooleanField(default=False)
     visualize = models.BooleanField(default=False)
-    report_type = models.CharField(max_length=20,choices=REPORT_TYPE_CHOICES,null=True, default=None)
+    report_type = models.CharField(max_length=20, choices=REPORT_TYPE_CHOICES, null=True, default=None)
     filter_questions = models.ManyToManyField('self', null=True, blank=True)
 
     @property
     def answer_domain(self):
         if self.visualize or self.filterBy:
-            answers = self.response_set.all()#self.response_set.filter(respondant__complete=True)
+            answers = self.response_set.all()  # self.response_set.filter(respondant__complete=True)
             if self.type in ['map-multipoint']:
                 return LocationAnswer.objects.filter(location__response__in=answers).values('answer').annotate(locations=Count('answer'), surveys=Count('location__respondant', distinct=True))
             else:
                 return answers.values('answer').annotate(locations=Sum('respondant__locations'), surveys=Count('answer'))
         else:
             return None
-        
 
     objects = caching.base.CachingManager()
 
@@ -240,10 +238,12 @@ class Question(caching.base.CachingMixin, models.Model):
         return "%s/%s/%s (%d)" % (self.survey_slug, self.title, self.type, self.order)
         #return "%s/%s" % (self.survey_set.all()[0].slug, self.label)
 
+
 class LocationAnswer(caching.base.CachingMixin, models.Model):
     answer = models.TextField(null=True, blank=True, default=None)
     label = models.TextField(null=True, blank=True, default=None)
     location = models.ForeignKey('Location')
+
     def __str__(self):
         return "%s/%s" % (self.location.response.respondant.uuid, self.answer)
 
@@ -257,10 +257,12 @@ class Location(caching.base.CachingMixin, models.Model):
     def __str__(self):
         return "%s/%s/%s" % (self.response.respondant.survey.slug, self.response.question.slug, self.response.respondant.uuid)
 
+
 class MultiAnswer(caching.base.CachingMixin, models.Model):
     response = models.ForeignKey('Response')
     answer_text = models.TextField()
     answer_label = models.TextField(null=True, blank=True)
+
 
 class GridAnswer(caching.base.CachingMixin, models.Model):
     response = models.ForeignKey('Response')
@@ -318,7 +320,7 @@ class Response(caching.base.CachingMixin, models.Model):
                 answers = []
                 self.location_set.all().delete()
                 for point in simplejson.loads(simplejson.loads(self.answer_raw)):
-                        answers.append("%s,%s: %s" % (point['lat'], point['lng'] , point['answers']))
+                        answers.append("%s,%s: %s" % (point['lat'], point['lng'], point['answers']))
                         location = Location(lat=point['lat'], lng=point['lng'], response=self, respondant=self.respondant)
                         location.save()
                         for answer in point['answers']:
@@ -342,7 +344,7 @@ class Response(caching.base.CachingMixin, models.Model):
                                 print "problem with ", grid_col.label
                                 print "not found in", self.answer_raw
                                 print e
-                            
+
                         elif grid_col.type == 'multi-select':
                             try:
                                 for this_answer in answer[grid_col.label.replace('-', '')]:
@@ -358,7 +360,7 @@ class Response(caching.base.CachingMixin, models.Model):
                         else:
                             print grid_col.type
                             print answer
-            question_slug = self.question.slug.replace('-', '_')                
+            question_slug = self.question.slug.replace('-', '_')
             if hasattr(self.respondant, question_slug):
                 setattr(self.respondant, question_slug, self.answer)
                 self.respondant.save()
@@ -366,7 +368,7 @@ class Response(caching.base.CachingMixin, models.Model):
 
     def __unicode__(self):
         if self.respondant and self.question:
-            return "%s/%s (%s)" %(self.respondant.survey.slug, self.question.slug, self.respondant.uuid)
+            return "%s/%s (%s)" % (self.respondant.survey.slug, self.question.slug, self.respondant.uuid)
         else:
             return "No Respondant"
 
@@ -375,6 +377,7 @@ class Response(caching.base.CachingMixin, models.Model):
         if not self.id:
             self.ts = datetime.datetime.now()
         super(Response, self).save(*args, **kwargs)
+
 
 def save_related(sender, instance, created, **kwargs):
     # save the related objects on initial creation

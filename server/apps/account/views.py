@@ -1,12 +1,7 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User, check_password
-from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import simplejson
 
@@ -24,7 +19,6 @@ def authenticateUser(request):
             return HttpResponse("auth-error", status=500)
 
         if user:
-            profile = user.profile
             user_dict = {
                 'username': user.username,
                 'name': ' '.join([user.first_name, user.last_name]),
@@ -63,13 +57,10 @@ def createUser(request):
     else:
         return HttpResponse("error", status=500)
 
+
 @csrf_exempt
 def forgotPassword(request):
     if request.POST:
-        param = simplejson.loads(request.POST.keys()[0])
-        # email = param.get('email', None)
-        # form = PasswordResetForm({'email': email})
-        # form.save(from_email='eknuth@ecotrust.org', email_template_name='registration/password_reset_email.html')
         return HttpResponse(simplejson.dumps({'success': True}))
     else:
         return HttpResponse("error", status=500)

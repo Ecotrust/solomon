@@ -5,7 +5,6 @@ from django.template import RequestContext, Context
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
 from django.core.mail import EmailMultiAlternatives
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
@@ -15,6 +14,7 @@ import simplejson
 
 from apps.survey.models import Survey, Question, Response, Respondant
 
+
 @staff_member_required
 def delete_responses(request, uuid, template='survey/delete.html'):
     respondant = get_object_or_404(Respondant, uuid=uuid)
@@ -23,6 +23,7 @@ def delete_responses(request, uuid, template='survey/delete.html'):
     respondant.responses.clear()
     respondant.save()
     return render_to_response(template, RequestContext(request, {}))
+
 
 def survey(request, survey_slug=None, template='survey/survey.html'):
     if survey_slug is not None:
@@ -34,6 +35,7 @@ def survey(request, survey_slug=None, template='survey/survey.html'):
         return redirect("/respond#/survey/%s/%s" % (survey.slug, respondant.uuid))
     context = {'ANALYTICS_ID': settings.ANALYTICS_ID}
     return render_to_response(template, RequestContext(request, context))
+
 
 @staff_member_required
 def dash(request, survey_slug=None, template='survey/dash.html'):
@@ -47,8 +49,7 @@ def dash(request, survey_slug=None, template='survey/dash.html'):
     return render_to_response(template, RequestContext(request, {}))
 
 
-
-def answer(request, survey_slug, question_slug, uuid): #, survey_slug, question_slug, uuid):
+def answer(request, survey_slug, question_slug, uuid):  # , survey_slug, question_slug, uuid):
     if request.method == 'POST':
 
         survey = get_object_or_404(Survey, slug=survey_slug)
@@ -57,7 +58,7 @@ def answer(request, survey_slug, question_slug, uuid): #, survey_slug, question_
         if respondant.complete is True and not request.user.is_staff:
             return HttpResponse(simplejson.dumps({'success': False, 'complete': True}))
 
-        response, created = Response.objects.get_or_create(question=question,respondant=respondant)
+        response, created = Response.objects.get_or_create(question=question, respondant=respondant)
         response.answer_raw = simplejson.dumps(simplejson.loads(request.POST.keys()[0]).get('answer', None))
         response.save_related()
 
@@ -88,18 +89,20 @@ def complete(request, survey_slug, uuid, action=None, question_slug=None):
         respondant.save()
         return HttpResponse(simplejson.dumps({'success': True}))
     return HttpResponse(simplejson.dumps({'success': False}))
+
+
 def send_email(email, uuid):
     from django.contrib.sites.models import Site
 
     current_site = Site.objects.get_current()
-    
+
     plaintext = get_template('survey/email.txt')
     htmly = get_template('survey/email.html')
 
     d = Context({
         'uuid': uuid,
         'SITE_URL': current_site.domain
-        })
+    })
 
     subject, from_email, to = 'Take The Survey', 'Coastal Recreation Survey <surveysupport@surfrider.org>', email
     text_content = plaintext.render(d)
@@ -108,6 +111,7 @@ def send_email(email, uuid):
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
+
 
 @csrf_exempt
 def register(request, template='survey/register.html'):

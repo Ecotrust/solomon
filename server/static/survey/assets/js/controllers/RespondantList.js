@@ -44,7 +44,7 @@ angular.module('askApp')
                     message: data.message
                 });
                 $scope.charts.sort(function (a,b) { return a-b;})
-            });    
+            });
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'cost'].join('/');
                 url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
@@ -62,8 +62,8 @@ angular.module('askApp')
                     order: 1,
                     message: data.message
                 });
-                $scope.charts.sort(function (a,b) { return a-b;})    
-                
+                $scope.charts.sort(function (a,b) { return a-b;})
+
             });
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
@@ -84,13 +84,12 @@ angular.module('askApp')
                     endDate: $scope.filter.endDate,
                     message: data.message
                 });
-                $scope.charts.sort(function (a,b) { return a-b;})    
-                
-            });    
+                $scope.charts.sort(function (a,b) { return a-b;})
+            });
         }
-        
+
     }, true);
-    
+
 
 
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
@@ -113,11 +112,10 @@ angular.module('askApp')
 
             }
         });
-        
+
 
     }).success(function() {
 
-         
     });
 
     $scope.getRespondents = function (url) {
@@ -139,13 +137,13 @@ angular.module('askApp')
             $scope.meta = data.meta;
         });
     }
-    
+
 
     $scope.getQuestionByUri = function (uri) {
         return _.findWhere($scope.survey.questions, {'resource_uri': uri});
     };
 
     $scope.getQuestionBySlug = function (slug) {
-		return _.findWhere($scope.survey.questions, {'slug': slug});
+        return _.findWhere($scope.survey.questions, {'slug': slug});
     };
 });

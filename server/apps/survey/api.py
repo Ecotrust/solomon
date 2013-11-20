@@ -1,12 +1,12 @@
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
-from tastypie import fields, utils
+from tastypie import fields
 
-from tastypie.authentication import SessionAuthentication, Authentication
-from tastypie.authorization import DjangoAuthorization, Authorization
+from tastypie.authentication import Authentication
+from tastypie.authorization import Authorization
 from django.conf.urls import url
-from django.db.models import Avg, Max, Min, Count
 
 from survey.models import Survey, Question, Option, Respondant, Response, Page, Block
+
 
 class SurveyModelResource(ModelResource):
     def obj_update(self, bundle, request=None, **kwargs):
@@ -22,6 +22,7 @@ class SurveyModelResource(ModelResource):
         bundle.obj.save()
 
         return bundle
+
 
 class StaffUserOnlyAuthorization(Authorization):
 
@@ -66,24 +67,28 @@ class ResponseResource(SurveyModelResource):
         }
         ordering = ['question__order']
 
+
 class OfflineResponseResource(SurveyModelResource):
     question = fields.ToOneField('apps.survey.api.QuestionResource', 'question', null=True, blank=True)
     respondant = fields.ToOneField('apps.survey.api.OfflineRespondantResource', 'respondant')
+
     class Meta:
         queryset = Response.objects.all()
         authorization = StaffUserOnlyAuthorization()
         authentication = Authentication()
 
+
 class OfflineRespondantResource(SurveyModelResource):
     responses = fields.ToManyField(OfflineResponseResource, 'responses', null=True, blank=True)
     survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True)
+
     class Meta:
         always_return_data = True
         queryset = Respondant.objects.all()
         authorization = StaffUserOnlyAuthorization()
         authentication = Authentication()
         ordering = ['-ts']
-    
+
     def obj_create(self, bundle, **kwargs):
         return super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
 
@@ -103,7 +108,7 @@ class ReportRespondantResource(SurveyModelResource):
         filtering = {
             'survey': ALL_WITH_RELATIONS,
             'responses': ALL_WITH_RELATIONS,
-            'ts': ['gte','lte']
+            'ts': ['gte', 'lte']
         }
         ordering = ['-ts']
         authorization = StaffUserOnlyAuthorization()
@@ -118,6 +123,7 @@ class RespondantResource(SurveyModelResource):
     responses = fields.ToManyField(ResponseResource, 'responses', full=True, null=True, blank=True)
     survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True, full=True, readonly=True)
     user = fields.ToOneField('apps.account.api.UserResource', 'surveyor', null=True, blank=True, full=True, readonly=True)
+
     class Meta:
         queryset = Respondant.objects.all().order_by('-ts')
         filtering = {
@@ -132,18 +138,18 @@ class RespondantResource(SurveyModelResource):
 class OptionResource(SurveyModelResource):
     class Meta:
         always_return_data = True
-        queryset = Option.objects.all().order_by('order');
+        queryset = Option.objects.all().order_by('order')
         authorization = StaffUserOnlyAuthorization()
         authentication = Authentication()
-
 
     def save_m2m(self, bundle):
         pass
 
 
 class PageResource(SurveyModelResource):
-    question = fields.ForeignKey('apps.survey.api.QuestionResource', 'question', related_name='question',full=True, null=True, blank=True)
+    question = fields.ForeignKey('apps.survey.api.QuestionResource', 'question', related_name='question', full=True, null=True, blank=True)
     survey = fields.ForeignKey('apps.survey.api.SurveyResource', 'survey', related_name='survey', full=True, null=True, blank=True)
+
     class Meta:
         queryset = Page.objects.all()
         always_return_data = True
@@ -152,7 +158,6 @@ class PageResource(SurveyModelResource):
 
     def save_m2m(self, bundle):
         pass
-
 
 
 class BlockResource(SurveyModelResource):
@@ -188,6 +193,7 @@ class QuestionResource(SurveyModelResource):
             'surveys': ALL_WITH_RELATIONS
         }
 
+
 class SurveyResource(SurveyModelResource):
     questions = fields.ToManyField(QuestionResource, 'questions', full=True, null=True, blank=True)
 
@@ -201,15 +207,14 @@ class SurveyResource(SurveyModelResource):
             'slug': ['exact']
         }
 
-
     def save_m2m(self, bundle):
         pass
-
 
     def prepend_urls(self):
         return [
             url(r"^(?P<resource_name>%s)/(?P<slug>[\w\d_.-]+)/$" % self._meta.resource_name, self.wrap_view('dispatch_detail'), name="api_dispatch_detail"),
         ]
+
 
 class SurveyReportResource(SurveyResource):
     questions = fields.ToManyField(QuestionResource, 'questions', null=True, blank=True, full=True)
