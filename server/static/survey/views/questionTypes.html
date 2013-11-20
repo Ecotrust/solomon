@@ -101,28 +101,19 @@
     </div>
     <div ng-switch-when="single-select">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerSingleSelect(question.options, question.otherAnswer)">
-            <div class="todo mrm">
-                <ul>
-                  <li 
+            <div class="">
+                <ul class="nav nav-pills nav-stacked">
+                  <li
                     ng-tap="$parent.onSingleSelectClicked(option, $parent.question)"
                     ng-repeat="option in question.options"
-                    ng-class="{'todo-done': option.checked }">
-                    <div class="todo-content">
-                      <h4 class="todo-name">
-                        {{ option.text || option.name }}
-                      </h4>
-                      
-                    </div>
+                    ng-class="{'active': option.checked }">
+                    <a><h4 class="todo-name">{{ option.text || option.name }}</h4></a>
                   </li>
-                  <li 
+                  <li
                     ng-show="question.allow_other"
                     ng-tap="$parent.onSingleSelectClicked($parent.question.otherOption, $parent.question)"
                     ng-class="{'todo-done': $parent.question.otherOption.checked }">
-                    <div class="todo-content">
-                      <h4 class="todo-name">
-                        Other
-                      </h4>
-                    </div>
+                    <a><h4 class="todo-name">Other</h4></a>
                   </li>
                 </ul>
             </div>

@@ -1,12 +1,12 @@
 <h1>{{ survey.name }}</h1>
-<div class="row-fluid">
-    <div class="span12">
+<div class="row">
+    <div class="col-md-12">
         <h3>Filter by Date Range</h3>
         <div start="filter.startDate" end="filter.endDate" range-slider></div>
         <p ng-show="message">{{message}}</p>
     </div>
 </div>
-<div class="row-fluid">
+<div class="row">
     <h3>Most Recent Responses <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i></h3>
     <div class="respondent-table">
         <table class="table" ng-class="{ 'loading': respondentsLoading }">
@@ -45,9 +45,9 @@
 
     </div>
 </div>
-<div class="row-fluid">
-    <div class="span10 offset1">
-        <!-- <div class="row-fluid">
+<div class="row">
+    <div class="col-md-10 offset1">
+        <!-- <div class="row">
             <div heatmap question="question.slug"></div>
         </div> -->
 
@@ -62,7 +62,7 @@
         </div>
 
 
-        <div class="row-fluid" ng-repeat="question in survey.questions">
+        <div class="row" ng-repeat="question in survey.questions">
 
             <div  ui-if="question.visualize">
                 <div class="clearfix">

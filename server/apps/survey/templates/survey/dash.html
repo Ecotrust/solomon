@@ -18,9 +18,8 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-    <link href="{{ STATIC_URL }}survey/components/flatui/css/bootstrap.css" rel="stylesheet">
+    <link href="{{ STATIC_URL }}survey/lib/css/bootstrap.css" rel="stylesheet">
     <link href="https://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/flatui/css/flat-ui.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/select2/select2.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/angular-grid/ng-grid.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/styles/main.css">
@@ -29,12 +28,13 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/lib/css/leaflet.awesome-markers.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/jquery-ui-bootstrap/jquery.ui.theme.font-awesome.css">
 
-      <link rel="stylesheet" href="{{ STATIC_URL }}survey/assets/lib/css/iThing.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}survey/assets/lib/css/iThing.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}survey/lib/css/main.css">
 
     <!--[if lt IE 9]>
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/leaflet/dist/leaflet.ie.css">
     <![endif]-->
-    
+
     <!--[if lt IE 8]>
       <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome-ie7.min.css" rel="stylesheet">
       <link rel="stylesheet" href="{{ STATIC_URL }}survey/styles/main.ie7.css">
@@ -55,82 +55,22 @@
 
     <!-- Add your site or application content here -->
     {% if user.is_authenticated %}
-    <div class="navbar .navbar-static-top navbar-inverse hidden"  ng-controller="SurveyListMenuCtrl" ng-cloak>
-      <div class="container-fluid" ng-show="loaded">
-        <div class="navbar-inner">
-          <div class="container"> 
-            <div>
-              {% verbatim %}
-              <ul class="nav">
-                <li>
-                  <a href="#/">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="#/author">
-                    Create Survey
-                  </a>
-                </li>
-                <li>
-                  <a>
-                    Edit Survey
-                  </a>
-                  <ul class="survey-list"> 
-                    <li ng-repeat="survey in surveys">
-                      <a href="#/author/{{ survey.slug }}">{{ survey.name }}</a>
-                    </li>  
-                  </ul>
-                </li>
-                <li>
-                  <a>
-                    Take Survey
-                  </a>
-                  <ul class="survey-list"> 
-                    <li ng-repeat="survey in surveys">
-                      <a target="_blank" href="/respond/{{survey.slug}}">{{ survey.name }}</a>
-                    </li>  
-                  </ul>
-                </li>
-                <li>
-                  <a>
-                    Survey Dashboard
-                    <!--<span class="navbar-unread">1</span>-->
-                  </a>
-                  <ul class="survey-list"> 
-                    <li ng-repeat="survey in surveys">
-                      <a href="#/RespondantList/{{ survey.slug }}">{{ survey.name }}</a>
-                    </li>  
-                  </ul>
-                </li>
-              </ul>
-             <!-- <ul class="nav pull-right">
-                <li>
-                  <a href="#">
-                    User
-                  </a>
-                  <ul>
-                    <li><a href="#">Element One</a></li>
-                    <li>
-                      <a href="#">Sub menu</a>
-                      <ul>
-                        <li><a href="#">Element One</a></li>
-                        <li><a href="#">Element Two</a></li>
-                        <li><a href="#">Element Three</a></li>
-                      </ul> 
-                    </li>
-                    <li><a href="#">Element Three</a></li>
-                  </ul> 
-                </li>
-              </ul>-->
-              {% endverbatim %}
-            </div><!--/.nav-collapse -->
-          </div>
+    <nav id="global-navbar" class="navbar navbar-static-top" role="navigation" ng-controller="SurveyListMenuCtrl" ng-cloak>
+      <div>
+      {# {% verbatim %} #}
+        <div class="navbar-header">
+            <a href="/dash" class="navbar-brand">Fish Logo Here</a>
         </div>
+        {% if user.is_staff %}
+        <a href="{% url "admin:index" %}"><button type="button" class="navbar-btn navbar-right btn btn-info">Admin</button></a>
+        {% endif %}
+        <a href="{% url "admin:logout" %}"><button type="button" class="navbar-btn navbar-right btn btn-default">Sign Out</button></a>
+        <p class="navbar-text navbar-right">Signed in as {{user.username}}</p>
+        {# {% endverbatim %} #}
       </div>
-    </div>
+    </nav>
     {% endif %}
-    <div class="container-fluid" ng-view></div>
+    <div class="container" ng-view></div>
     <script src="{{ STATIC_URL }}survey/components/flatui/js/jquery-1.8.2.min.js"></script>
     <script src="{{ STATIC_URL }}survey/components/jquery-ui/ui/jquery-ui.js"></script>
     <script src="{{ STATIC_URL }}survey/components/angular/angular.js"></script>
@@ -141,7 +81,7 @@
     <script src="{{ STATIC_URL }}survey/assets/lib/js/flotr2.min.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/underscore.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/underscore.string.js"></script>
-    
+
     <script src="{{ STATIC_URL }}survey/assets/lib/js/highcharts.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/jQDateRangeSlider-min.js"></script>    
     <script src="{{ STATIC_URL }}survey/assets/lib/js/leaflet-src.js"></script>
@@ -156,9 +96,9 @@
     <script src="{{ STATIC_URL }}survey/components/angular-grid/plugins/ng-grid-flexible-height.js"></script>
     <!--<script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
      <script src="https://raw.github.com/gist/2197042/2b90c41b39b7d5b3a851d8f256de2ebd3fe1fb74/leaflet-google.js"></script>-->
-    <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.js"></script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <!-- build:js scripts/scripts.js -->
-    
+
     <script src="{{ STATIC_URL }}survey/assets/js/dash-app.js"></script>
 
     <script src="{{ STATIC_URL }}survey/assets/js/filters/filters.js"></script>

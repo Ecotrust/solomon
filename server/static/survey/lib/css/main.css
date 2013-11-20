@@ -1,0 +1,6 @@
+#global-navbar {
+    border-bottom: solid 1px #000;
+}
+#global-navbar .navbar-brand {
+    border-right: solid 1px #000;
+}

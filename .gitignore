@@ -43,6 +43,8 @@ app/components
 *.pyo
 .DS_Store
 *~
+#VIM swap files
+*.swp
 server/config/environments/local.py
 server/media
 server/public/static
