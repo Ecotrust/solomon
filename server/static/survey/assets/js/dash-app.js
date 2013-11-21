@@ -7,7 +7,6 @@ app.viewPath = app.server + '/static/survey/';
 
 angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
     .config(function($routeProvider, $httpProvider) {
-    console.log("View path: ", app.viewPath);
 
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
 
