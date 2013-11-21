@@ -3,19 +3,23 @@
 
 {% block stylesheets %}
 <style>
-#header {
-    border: 0px;
-}
 #grp-admin-title {
     display: none;
 }
 #grp-content-container {
     background: white;
-    width: 28em;
+    width: 392px;
     min-width: 300px;
     margin-left: auto;
     margin-right: auto;
     margin-top: 100px;
+}
+#content-main img {
+    margin: 0 auto;
+}
+#login-form input {
+    float: right;
+    clear: right;
 }
 </style>
 {% endblock %}
@@ -48,11 +52,11 @@
 <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
   <div class="form-row">
     {% if not form.this_is_the_login_form.errors %}{{ form.username.errors }}{% endif %}
-    <label for="id_username" class="required">{{ form.username.label }}:</label> {{ form.username }}
+    {{ form.username }}
   </div>
   <div class="form-row">
     {% if not form.this_is_the_login_form.errors %}{{ form.password.errors }}{% endif %}
-    <label for="id_password" class="required">{% trans 'Password:' %}</label> {{ form.password }}
+    {{ form.password }}
     <input type="hidden" name="this_is_the_login_form" value="1" />
     <input type="hidden" name="next" value="{{ next }}" />
   </div>
@@ -69,6 +73,8 @@
 
 <script type="text/javascript">
 document.getElementById('id_username').focus()
+document.getElementById('id_username').setAttribute('placeholder', 'Username')
+document.getElementById('id_password').setAttribute('placeholder', 'Password')
 </script>
 </div>
 {% endblock %}
