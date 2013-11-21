@@ -57,10 +57,9 @@
     {% if user.is_authenticated %}
         <!-- FIXME: Angular scoping means I don't know how to include this without
              hardcoding the /static/survey part -->
-        <div ng-include="'/static/survey/views/top_nav.html'"></div>
+        <div ng-include="'/static/survey/views/topNav.html'"></div>
     {% endif %}
-    <div class="container" ng-view>
-    </div>
+    <div ng-view></div>
     <script src="{{ STATIC_URL }}survey/components/flatui/js/jquery-1.8.2.min.js"></script>
     <script src="{{ STATIC_URL }}survey/components/jquery-ui/ui/jquery-ui.js"></script>
     <script src="{{ STATIC_URL }}survey/components/angular/angular.js"></script>

@@ -2,8 +2,9 @@
 
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
-  
+
     $scope.filter = null;
+    $scope.viewPath = app.viewPath;
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {

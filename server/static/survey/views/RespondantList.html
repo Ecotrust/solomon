@@ -1,94 +1,97 @@
-<h1>{{ survey.name }}</h1>
-<div class="row">
-    <div class="col-md-12">
-        <h3>Filter by Date Range</h3>
-        <div start="filter.startDate" end="filter.endDate" range-slider></div>
-        <p ng-show="message">{{message}}</p>
-    </div>
-</div>
-<div class="row">
-    <h3>Most Recent Responses <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i></h3>
-    <div class="respondent-table">
-        <table class="table" ng-class="{ 'loading': respondentsLoading }">
-            <tbody>
-                <tr>
-                    <th>Username</th>
-                    <th>Vendor Name</th>
-                    <th>Market</th>
-                    <th>Bought or Caught</th>
-                    <th>How was it sold?</th>
-                    <th>Timestamp</th>
-                    <th>Detail</th>
-                </tr>
-                <tr ng-repeat="respondent in respondents">
-                    <td>{{ respondent.user.username }}</td>
-                    <td>{{ respondent.vendor }}</td>
-                    <td>{{ respondent.survey_site }}</td>
-                    <td>{{ respondent.buy_or_catch }}</td>
-                    <td>{{ respondent.how_sold }}</td>
-                    <td>{{ respondent.ts|validDate: 'dd-MM-yyyy HH:mm' }}</td>
-                    <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}">Responses ({{respondent.responses.length}})</a></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="pull-right">
-        <span  ng-hide="respondentsLoading">
-            Records {{meta.offset}} to 
-            <span ng-show="(meta.offset+meta.limit) <= meta.total_count">{{meta.offset+meta.limit}}</span>
-            <span ng-hide="(meta.offset+meta.limit) <= meta.total_count">{{meta.total_count}}</span> of {{ meta.total_count }}
-        </span>
-        <div class="btn-group">
-            <button class="btn" ng-disabled="! meta.previous" ng-click="getRespondents(meta.previous)">Previous</button>
-            <button class="btn" ng-disabled="! meta.next" ng-click="getRespondents(meta.next)">Next</button>
+<div ng-include="viewPath + 'views/sideNav.html'"></div>
+<div class="container">
+    <h1>{{ survey.name }}</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Filter by Date Range</h3>
+            <div start="filter.startDate" end="filter.endDate" range-slider></div>
+            <p ng-show="message">{{message}}</p>
         </div>
-
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12 offset1">
-        <!-- <div class="row">
-            <div heatmap question="question.slug"></div>
-        </div> -->
-
-        <div ng-repeat="chart in charts" class="dash-chart">
-            <h2>{{ chart.title }}</h2>
-            <div class="error">{{ chart.message }}</div>
-            <div ng-switch on="chart.type">
-                <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
-                <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
-                <div ng-switch-when="time-series" time-series chart="chart"></div>
+    <div class="row">
+        <h3>Most Recent Responses <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i></h3>
+        <div class="respondent-table">
+            <table class="table" ng-class="{ 'loading': respondentsLoading }">
+                <tbody>
+                    <tr>
+                        <th>Username</th>
+                        <th>Vendor Name</th>
+                        <th>Market</th>
+                        <th>Bought or Caught</th>
+                        <th>How was it sold?</th>
+                        <th>Timestamp</th>
+                        <th>Detail</th>
+                    </tr>
+                    <tr ng-repeat="respondent in respondents">
+                        <td>{{ respondent.user.username }}</td>
+                        <td>{{ respondent.vendor }}</td>
+                        <td>{{ respondent.survey_site }}</td>
+                        <td>{{ respondent.buy_or_catch }}</td>
+                        <td>{{ respondent.how_sold }}</td>
+                        <td>{{ respondent.ts|validDate: 'dd-MM-yyyy HH:mm' }}</td>
+                        <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}">Responses ({{respondent.responses.length}})</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pull-right">
+            <span  ng-hide="respondentsLoading">
+                Records {{meta.offset}} to 
+                <span ng-show="(meta.offset+meta.limit) <= meta.total_count">{{meta.offset+meta.limit}}</span>
+                <span ng-hide="(meta.offset+meta.limit) <= meta.total_count">{{meta.total_count}}</span> of {{ meta.total_count }}
+            </span>
+            <div class="btn-group">
+                <button class="btn" ng-disabled="! meta.previous" ng-click="getRespondents(meta.previous)">Previous</button>
+                <button class="btn" ng-disabled="! meta.next" ng-click="getRespondents(meta.next)">Next</button>
             </div>
+
         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 offset1">
+            <!-- <div class="row">
+                <div heatmap question="question.slug"></div>
+            </div> -->
+
+            <div ng-repeat="chart in charts" class="dash-chart">
+                <h2>{{ chart.title }}</h2>
+                <div class="error">{{ chart.message }}</div>
+                <div ng-switch on="chart.type">
+                    <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
+                    <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
+                    <div ng-switch-when="time-series" time-series chart="chart"></div>
+                </div>
+            </div>
 
 
-        <div class="row" ng-repeat="question in survey.questions">
+            <div class="row" ng-repeat="question in survey.questions">
 
-            <div  ui-if="question.visualize">
-                <div class="clearfix">
-                <!--     <select class="pull-right" placeholder="filter by {{ question.slug }}" multiple=true ng-model="question.filters[question.slug]" ng-show="question.type == 'map-multipoint'" ui-select2 style="width: 200px">
-                        <option value="{{answer.answer}}" ng-repeat="answer in question.answer_domain">
-                            <strong>{{answer.answer}}</strong>
-                        </option>
-                    </select> -->
-                    <div ng-repeat="filterQuestion in question.filterQuestions">
-                        <select class="pull-right" placeholder="filter by {{ filterQuestion.slug }}" multiple=true ng-model="question.filters[filterQuestion.slug]" ui-select2 ng-hide="filterQuestion.slug == question.slug" style="width: 200px">
-                            <option value="{{answer.answer}}" ng-repeat="answer in filterQuestion.answer_domain">
+                <div  ui-if="question.visualize">
+                    <div class="clearfix">
+                    <!--     <select class="pull-right" placeholder="filter by {{ question.slug }}" multiple=true ng-model="question.filters[question.slug]" ng-show="question.type == 'map-multipoint'" ui-select2 style="width: 200px">
+                            <option value="{{answer.answer}}" ng-repeat="answer in question.answer_domain">
                                 <strong>{{answer.answer}}</strong>
                             </option>
-                        </select>
+                        </select> -->
+                        <div ng-repeat="filterQuestion in question.filterQuestions">
+                            <select class="pull-right" placeholder="filter by {{ filterQuestion.slug }}" multiple=true ng-model="question.filters[filterQuestion.slug]" ui-select2 ng-hide="filterQuestion.slug == question.slug" style="width: 200px">
+                                <option value="{{answer.answer}}" ng-repeat="answer in filterQuestion.answer_domain">
+                                    <strong>{{answer.answer}}</strong>
+                                </option>
+                            </select>
+                        </div>
+                        <dl ng-repeat="(slug, filter) in question.filters">
+                            <dt>{{ slug }}:</dt>                           
+                            <dd ng-show="filter.length" ng-repeat="filterItem in filter">{{filterItem}}</dd>
+                            <dd ng-hide="filter.length">all</dd>
+                        </dl>
                     </div>
-                    <dl ng-repeat="(slug, filter) in question.filters">
-                        <dt>{{ slug }}:</dt>                           
-                        <dd ng-show="filter.length" ng-repeat="filterItem in filter">{{filterItem}}</dd>
-                        <dd ng-hide="filter.length">all</dd>
-                    </dl>
-                </div>
-                <div ui-if="question.report_type == 'heatmap' || question.report_type == 'heatmap-distribution'">
-                    <div heatmap question="question" filteritems="question.filters" class="heatmap"></div>
-                </div>
-                <div ui-if="question.report_type == 'distribution' || question.report_type == 'heatmap-distribution'">
-                    <distribution filter="question.filters" question="question" survey-slug="survey.slug"></distribution>
+                    <div ui-if="question.report_type == 'heatmap' || question.report_type == 'heatmap-distribution'">
+                        <div heatmap question="question" filteritems="question.filters" class="heatmap"></div>
+                    </div>
+                    <div ui-if="question.report_type == 'distribution' || question.report_type == 'heatmap-distribution'">
+                        <distribution filter="question.filters" question="question" survey-slug="survey.slug"></distribution>
+                    </div>
                 </div>
             </div>
         </div>
