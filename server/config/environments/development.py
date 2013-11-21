@@ -1,4 +1,3 @@
-from path import path
 from config.settings import *
 
 
@@ -7,8 +6,6 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'geosurvey',
         'USER': 'vagrant',
-#        'HOST': 'localhost',
-#        'PORT': '5432'
     }
 }
 

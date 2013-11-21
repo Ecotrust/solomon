@@ -134,6 +134,7 @@ INSTALLED_APPS = (
     'south',
     'django_extensions',
     'compressor',
+    'discover_runner',
 
     # Project specific apps go here
     'apps.account',
@@ -194,3 +195,5 @@ HEROKU = False
 ANALYTICS_ID = ""
 
 SHOW_ACTIVITY_POINTS = False
+
+TEST_RUNNER = 'discover_runner.DiscoverRunner'
