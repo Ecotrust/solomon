@@ -55,20 +55,12 @@
 
     <!-- Add your site or application content here -->
     {% if user.is_authenticated %}
-    <nav id="global-navbar" class="navbar navbar-static-top" role="navigation" ng-controller="SurveyListMenuCtrl" ng-cloak>
-      <div>
-        <div class="navbar-header">
-            <a href="#/"><img src="{{STATIC_URL}}survey/assets/img/hapifis-small.jpg"></img></a>
-        </div>
-        {% verbatim %}
-        <a ng-show="user.is_staff" href="{{user.admin_url}}"><button type="button" class="navbar-btn navbar-right btn btn-info">Admin</button></a>
-        <a href="{{user.logout_url}}"><button type="button" class="navbar-btn navbar-right btn btn-default">Sign Out</button></a>
-        <p class="navbar-text navbar-right">Signed in as {{user.username}}</p>
-        {% endverbatim %}
-      </div>
-    </nav>
+        <!-- FIXME: Angular scoping means I don't know how to include this without
+             hardcoding the /static/survey part -->
+        <div ng-include="'/static/survey/views/top_nav.html'"></div>
     {% endif %}
-    <div class="container" ng-view></div>
+    <div class="container" ng-view>
+    </div>
     <script src="{{ STATIC_URL }}survey/components/flatui/js/jquery-1.8.2.min.js"></script>
     <script src="{{ STATIC_URL }}survey/components/jquery-ui/ui/jquery-ui.js"></script>
     <script src="{{ STATIC_URL }}survey/components/angular/angular.js"></script>
@@ -129,7 +121,8 @@
         username: "{{user.username}}",
         is_staff: {{user.is_staff|lower}},
         admin_url: "{% url "admin:index" %}",
-        logout_url: "{% url "admin:logout" %}"
+        logout_url: "{% url "admin:logout" %}",
+        static_url: "{{STATIC_URL}}"
       }
     {% else %}
     var isAuthenticated = false;
