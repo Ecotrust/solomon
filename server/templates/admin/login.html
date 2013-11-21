@@ -10,6 +10,9 @@
 img {
     margin-top: 2em;
 }
+h1 {
+    text-align: center;
+}
 #login-form input,
 #login-form li
 #login-form p {
@@ -41,6 +44,7 @@ img {
 <div class="container">
     <div id="login-row" class="row">
       <img src="{{STATIC_URL}}survey/assets/img/hapifis.jpg"></img>
+      <!-- <h1>ADMINISTRATIVE DASHBOARD</h1> -->
       {% if form.errors and not form.non_field_errors and not form.this_is_the_login_form.errors %}
           <p class="errornote">
           {% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
