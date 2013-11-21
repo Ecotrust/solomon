@@ -166,6 +166,9 @@ angular.module('askApp')
 
     $scope.answers = {};
 
+    // Only show the progress bar if we're ie9 and above
+    $scope.showProgressBar = $("html").is(".lt-ie9");
+
     $scope.isAuthenticated = isAuthenticated;
 
     // landing page view
@@ -183,7 +186,6 @@ angular.module('askApp')
         } else {
             slug = questionSlug;
         }
-        
         if ($scope.answers[slug]) {
             if (gridSlug) {
                 return _.flatten(_.map($scope.answers[slug], function (answer) {
@@ -1509,7 +1511,7 @@ $scope.loadSurvey = function(data) {
         $scope.nextQuestionPath = $scope.getNextQuestionPath();
         $scope.loading = false;
         $scope.gridValidated = false;
-        if ($scope.question.type === 'grid') {
+        if ($scope.question && $scope.question.type === 'grid') {
             // validate grid questions
             $scope.$watch('question', function (newValue) {
                 $scope.gridValidated = $scope.validateGrid($scope.question);
