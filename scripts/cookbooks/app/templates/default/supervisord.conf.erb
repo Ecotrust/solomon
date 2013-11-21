@@ -15,16 +15,7 @@ serverurl=unix:///var/tmp/supervisor.sock ; use a unix:// URL  for a unix socket
 
 [program:app]
 command=/usr/local/venv/<%= node[:project] %>/bin/gunicorn -b 0.0.0.0:8888 wsgi
-user=www-data
-directory=/usr/local/apps/<%= node[:project] %>/<%= node[:app] %>
-autostart=true
-autorestart=true
-killasgroup=true
-
-
-[program:app]
-command=/usr/local/venv/<%= node[:project] %>/bin/gunicorn -b 0.0.0.0:8888 wsgi
-user=www-data
+user=nginx
 directory=/usr/local/apps/<%= node[:project] %>/<%= node[:app] %>
 autostart=true
 autorestart=true

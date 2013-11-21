@@ -51,8 +51,7 @@ case node["platform"]
     group "root"
     mode 0644
   end
-when "redhat", "centos", "fedora"
-  when "debian", "ubuntu"
+  when "redhat", "centos", "fedora"
     template "#{node[:nginx][:dir]}/conf.d/default.conf" do
     source "default-site.erb"
     owner "root"

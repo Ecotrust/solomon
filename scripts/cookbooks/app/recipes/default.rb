@@ -209,17 +209,17 @@ when "debian"
   package "python-numpy"
   package "redis-server"
 
-  template "/etc/supervisor/conf.d/app.conf" do
+  template "/etc/init/app.conf" do
       source "app.conf.erb"
   end
 
-  service "supervisor" do
-      action :stop
-  end
+  # service "supervisor" do
+  #     action :stop
+  # end
 
-  service "supervisor" do
-      action :start
-  end
+  # service "supervisor" do
+  #     action :start
+  # end
 
   cookbook_file "/etc/postgresql/#{node[:postgresql][:version]}/main/pg_hba.conf" do
       source "pg_hba.conf"
@@ -233,11 +233,19 @@ when "rhel"
     end
 
 
-    service "supervisord" do
+    # service "supervisord" do
+    #     action :stop
+    # end
+
+    # service "supervisord" do
+    #     action :start
+    # end
+
+    service "app" do
         action :stop
     end
 
-    service "supervisord" do
+    service "app" do
         action :start
     end
 

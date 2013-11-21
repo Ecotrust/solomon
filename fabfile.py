@@ -360,3 +360,23 @@ def transfer_db():
     local("heroku pgbackups:capture --expire")
     run("curl -o /tmp/%s.dump \"%s\"" % (date, db_url))
     run("pg_restore --verbose --clean --no-acl --no-owner -U vagrant -d geosurvey /tmp/%s.dump" % date)
+
+    
+@task
+def migrate_db():
+    with cd(env.code_dir):
+        with _virtualenv():
+            _manage_py('migrate --settings=config.environments.staging')
+
+@task
+def backup_db():
+    date = datetime.datetime.now().strftime("%Y-%m-%d%H%M")
+    dump_name = "%s-geosurvey.dump" % date
+    run("pg_dump geosurvey -n public -c -f /tmp/%s -Fc -O -no-acl -U postgres" % dump_name)
+    get("/tmp/%s" % dump_name, "backups/%s" % dump_name)
+
+@task
+def restore_db(dump_name):
+    put(dump_name, "/tmp/%s" % dump_name.split('/')[-1])
+    run("pg_restore --verbose --clean --no-acl --no-owner -U postgres -d geosurvey /tmp/%s" % dump_name.split('/')[-1])
+    #run("cd %s && %s/bin/python manage.py migrate --settings=config.environments.staging" % (env.app_dir, env.venv))
