@@ -22,8 +22,17 @@
     font-size: 24px;
 }
 
+.center-text {
+    text-align: center;
+}
+
+.ui-rangeSlider-label {
+    font-size: 12px;
+    padding: 2px 3px;
+    bottom: 10px;
+}
+
 #sidenav_respondants {
-    float: left;
     border-right: solid 1px #000;
 }
 #sidenav_respondants .stats {

@@ -11,7 +11,7 @@ angular.module('askApp')
             start: "=start",
             end: "=end"
         },
-        link: function (scope, element, attrs) {            
+        link: function (scope, element, attrs) {
             // initialize slider
             scope.initializeSlider = _.once(function () {
                 element.dateRangeSlider({
@@ -30,27 +30,23 @@ angular.module('askApp')
                     }
                 });
             });
-            
 
             // listen from updates for the controller
             if (attrs.start) {
                 scope.$watch('start', function (newStart) {
                     if (newStart) {
                         scope.initializeSlider();
-                        element.dateRangeSlider("min", newStart);    
+                        element.dateRangeSlider("min", newStart);
                     }
-                    
                 });
             }
             if (attrs.end) {
                 scope.$watch('end', function (newEnd) {
                     if (newEnd) {
                         scope.initializeSlider();
-                        element.dateRangeSlider("max", newEnd);      
+                        element.dateRangeSlider("max", newEnd);
                     }
-                    
                 });
-                
             }
 
             // bind change event
@@ -59,7 +55,7 @@ angular.module('askApp')
                     if (attrs.start) {
                         s.start = data.values.min;//.clearTime();
                     }
-                    if (attrs.end) {                    
+                    if (attrs.end) {
                         s.end = data.values.max;//.clearTime();
                     }
                 });
