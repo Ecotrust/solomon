@@ -37,7 +37,6 @@ angular.module('askApp')
             $scope.surveys.splice(_.indexOf($scope.surveys,
                 _.findWhere(
                     $scope.surveys,
-                    // FIXME: Backend issue, resource_uri uses IDs but the API expects a slug. -QWP
                     { resource_uri: survey_to_be_deleted.resource_uri
                     }
                 )
