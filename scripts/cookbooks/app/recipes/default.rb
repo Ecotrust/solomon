@@ -149,56 +149,58 @@ end
 package "wget"
 
 if platform?("centos", "rhel")
-    
-    bash "install epel" do
+    cookbook_file "/etc/yum.repos.d/CentOS-Base.repo" do
+        source "CentOS-Base.repo"
+    end
+    bash "install other repos" do
         user "root"
         cwd "/tmp"
         not_if do ::File.exists?('/etc/yum.repos.d/epel.repo') end
         code <<-EOH    
             wget http://ftp.osuosl.org/pub/fedora-epel/6/i386/epel-release-6-8.noarch.rpm
             wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-            wget http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-centos93-9.3-1.noarch.rpm
-            rpm -ivh epel-release-6-8.noarch.rpm remi-release-6.rpm
+            wget http://yum.postgresql.org/9.1/redhat/rhel-6-x86_64/pgdg-centos91-9.1-4.noarch.rpm
+            rpm -ivh epel-release-6-8.noarch.rpm remi-release-6.rpm pgdg-centos91-9.1-4.noarch.rpm
         EOH
     end
 end
 
-packages = value_for_platform_family(
-    ["centos","redhat","fedora"] => {'default' => ["python-devel", "mailx", "postgresql-libs"]},    
-    "ubuntu" => {'default' => ["python-software-properties", "htop", "csstidy", "python-dev", "mailutils", "postgresql-#{node[:postgresql][:version]}-postgis", "vim"]},
-    "default" => ["ntp", "curl", "postfix",
-        "mercurial", "subversion", "unzip", "python-pip", "supervisor",
-        ]
-)
+package "mercurial"
+package "subversion"
+package "unzip"
+package "python-pip"
+package "supervisor"
+package "ntp"
+package "curl"
+package "postfix"
 
-packages.each do |dev_pkg|
-  package dev_pkg
-end
-
-if platform?("ubuntu")
+case node["platform_family"]
+when "debian"
+    package "python-software-properties"
+    package "htop"
+    package "csstidy"
+    package "python-dev"
+    package "mailutils"
+    package "postgresql-#{node[:postgresql][:version]}-postgis"
+    package "vim"
     include_recipe "apt"
     include_recipe "build-essential"
+when "rhel"
+    package "python-devel"
+    package "mailx"
+    package "postgresql91"
+    package "postgresql91-server"
+    package "postgresql91-contrib"
+    package "postgresql91-libs"
+    package "postgresql91-devel"
+    package "postgis2_91"
 end
+
 
 
 include_recipe "openssl"
 include_recipe "git"
-#include_recipe "python"
 include_recipe "nginx"
-include_recipe "postgresql::server"
-
-# # marine planner specific
-
-
-# execute "add mapnik ppa" do
-#     command "/usr/bin/add-apt-repository -y ppa:mapnik/nightly-2.0 && /usr/bin/apt-get update"
-#     not_if "test -x /etc/apt/sources.list.d/mapnik-nightly-2_0-*.list"
-# end
-
-# package "libmapnik"
-# package "mapnik-utils"
-# package "python-mapnik"
-# package "python-gdal"
 package "python-kombu"
 package "python-imaging"
 
@@ -213,68 +215,56 @@ when "debian"
       source "app.conf.erb"
   end
 
-  # service "supervisor" do
-  #     action :stop
-  # end
-
-  # service "supervisor" do
-  #     action :start
-  # end
-
   cookbook_file "/etc/postgresql/#{node[:postgresql][:version]}/main/pg_hba.conf" do
       source "pg_hba.conf"
       owner "postgres"
   end
+  execute "restart postgres" do
+      command "sudo /etc/init.d/postgresql restart"
+  end
 
 when "rhel"
     package "redis"
-    template "/etc/supervisord.conf" do
-        source "supervisord.conf.erb"
+
+    template "/etc/init/app.conf" do
+        source "app.conf.erb"
     end
 
 
-    # service "supervisord" do
-    #     action :stop
+
+    # execute "start app" do
+    #     command "sudo initctl start app"
     # end
 
-    # service "supervisord" do
-    #     action :start
-    # end
-
-    service "app" do
-        action :stop
+    execute "install dev tools" do
+        command "yum -y groupinstall 'Development Tools'"
     end
 
-    service "app" do
-        action :start
+    execute "initialize db" do
+        command "sudo -u postgres /usr/pgsql-9.1/bin/initdb -D /var/lib/pgsql/9.1/data"
+        not_if do ::File.exists?("/var/lib/pgsql/9.1/data/PG_VERSION") end
     end
 
-    bash "install psycopg2" do
-      user "root"
-      cwd "/tmp"
-      code <<-EOH    
-          CFLAGS=/usr/include/python2.6 pip install psycopg2
-      EOH
-    end
 
-    cookbook_file "/var/lib/pgsql/data/pg_hba.conf" do
+    cookbook_file "/var/lib/pgsql/9.1/data/pg_hba.conf" do
         source "pg_hba.conf"
         owner "postgres"
     end
 
+
+    execute "start postgres on boot" do
+        command "chkconfig postgresql-9.1 on"
+    end
+    execute "restart postgres" do
+        command "sudo /etc/init.d/postgresql-9.1 start"
+    end
+    execute "create database user" do
+        command "createuser -U postgres -s vagrant"
+        not_if "psql -U postgres -c '\\du' |grep vagrant", :user => 'postgres'
+    end
 end
 
 
-
-
-
-
-
-
-
-execute "restart postgres" do
-    command "sudo /etc/init.d/postgresql restart"
-end
 
 if node[:user] == "vagrant"
     execute "create database user" do
@@ -299,18 +289,16 @@ when "debian"
         not_if "psql -U postgres #{node[:dbname]} -P pager -t --command='SELECT srid FROM  spatial_ref_sys' |grep 900913"
     end
 when "rhel"
-    package "postgis"
-
     execute "load plpgsql" do
         command "createlang -U postgres -d #{node[:dbname]} plpgsql"
         not_if "psql -U postgres #{node[:dbname]} -P pager -t --command='select * from pg_language'|grep plpgsql"
     end
     execute "load postgis" do
-        command "psql  -U postgres -d #{node[:dbname]} -f /usr/share/pgsql/contrib/spatial_ref_sys.sql"
+        command "psql  -U postgres -d #{node[:dbname]} -f /usr/pgsql-9.1/share/contrib/postgis-2.0/spatial_ref_sys.sql"
         not_if "psql -U postgres #{node[:dbname]} -P pager -t --command='SELECT tablename FROM pg_catalog.pg_tables'|grep spatial_ref_sys"
     end
     execute "load spatial references" do
-        command "psql -U postgres  -d #{node[:dbname]} -f /usr/share/pgsql/contrib/postgis-64.sql"
+        command "psql -U postgres  -d #{node[:dbname]} -f /usr/pgsql-9.1/share/contrib/postgis-2.0/postgis.sql"
         not_if "psql -U postgres #{node[:dbname]} -P pager -t --command='SELECT srid FROM  spatial_ref_sys' |grep 900913"
     end
     execute "start redis" do
@@ -333,4 +321,8 @@ python_virtualenv "/usr/local/venv/#{node[:project]}" do
 end
 link "/usr/venv" do
   to "/usr/local/venv"
+end
+
+link "/usr/include/Python.h" do
+    to "/usr/include/python2.6/Python.h"
 end

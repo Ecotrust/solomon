@@ -204,7 +204,6 @@ def deploy(branch="master"):
 
     with cd(env.code_dir):
         with _virtualenv():
-            print env.code_dir
             run('pip install -r requirements.txt')
             _manage_py('collectstatic --noinput --settings=config.environments.staging')
             _manage_py('syncdb --noinput --settings=config.environments.staging')
@@ -227,7 +226,8 @@ def restart():
     Reload nginx/gunicorn
     """
     with settings(warn_only=True):
-        sudo('supervisorctl restart app')
+        sudo('initctl stop app')
+        sudo('initctl start app')
         sudo('/etc/init.d/nginx reload')
 @task
 def restore(file=None):
