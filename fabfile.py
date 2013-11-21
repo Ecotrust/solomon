@@ -185,6 +185,7 @@ def push():
 
     with cd(env.root_dir):
         # Really, git?  Really?
+        run('git reset HEAD --hard')
         run('git checkout %s' % env.branch)
         run('git reset HEAD')
         run('git checkout .')
