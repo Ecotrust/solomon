@@ -19,7 +19,7 @@ angular.module('askApp')
                         series = _.map(scope.chart.data, function(item, index) {
                             return {
                                 name: scope.chart.labels[index],
-                                data: [parseFloat(item)],
+                                data: [parseFloat(item) || 0],
                                 dataLabels: {
                                     enabled: true,
                                 }
@@ -102,7 +102,7 @@ angular.module('askApp')
                                 categories: scope.chart.labels,
                                 title: {
                                     text: 'Market'
-                                },
+                                }
                             },
                             yAxis: {
                                 min: 0,

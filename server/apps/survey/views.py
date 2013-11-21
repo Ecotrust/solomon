@@ -1,14 +1,11 @@
-# Create your views here.
-from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.template import RequestContext, Context
-from django.shortcuts import get_object_or_404
-from django.template.loader import get_template
-from django.core.mail import EmailMultiAlternatives
-from django.shortcuts import redirect
-from django.contrib.admin.views.decorators import staff_member_required
-from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.mail import EmailMultiAlternatives
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.template import RequestContext, Context
+from django.template.loader import get_template
+from django.views.decorators.csrf import csrf_exempt
 
 import simplejson
 
@@ -49,7 +46,7 @@ def dash(request, survey_slug=None, template='survey/dash.html'):
     return render_to_response(template, RequestContext(request, {}))
 
 
-def answer(request, survey_slug, question_slug, uuid):  # , survey_slug, question_slug, uuid):
+def answer(request, survey_slug, question_slug, uuid):
     if request.method == 'POST':
 
         survey = get_object_or_404(Survey, slug=survey_slug)
@@ -65,7 +62,7 @@ def answer(request, survey_slug, question_slug, uuid):  # , survey_slug, questio
         if created:
             respondant.responses.add(response)
 
-        if request.user:
+        if request.user and not respondant.surveyor:
             respondant.surveyor = request.user
         respondant.last_question = question_slug
         respondant.save()
