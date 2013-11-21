@@ -65,7 +65,7 @@ def answer(request, survey_slug, question_slug, uuid):  # , survey_slug, questio
         if created:
             respondant.responses.add(response)
 
-        if request.user:
+        if request.user and not respondant.surveyor:
             respondant.surveyor = request.user
         respondant.last_question = question_slug
         respondant.save()
