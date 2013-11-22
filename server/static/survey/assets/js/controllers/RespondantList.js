@@ -85,6 +85,23 @@ function total_weight_for_market($http, charts, start_date, end_date, slug) {
     });
 }
 
+function setup_market_dropdown($http, $scope, market_site_id) {
+    var url = '/api/v1/response?format=json&question=' + market_site_id;
+
+    $http.get(url).success(function(data) {
+        $scope.markets = [];
+        var markets_with_dupes = _.map(data.objects,
+            function(x) { return x.answer; });
+
+        _.each(markets_with_dupes, function (x) {
+            if (_.indexOf($scope.markets, x) === -1) {
+                $scope.markets.push(x);
+            }
+        });
+    });
+
+}
+
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
 
@@ -103,20 +120,7 @@ angular.module('askApp')
                 return x.slug == 'survey-site';
             }).id;
 
-            var url = '/api/v1/response?format=json&question=' + market_site_id;
-
-            $http.get(url).success(function(data) {
-                $scope.markets = [];
-                var markets_with_dupes = _.map(data.objects,
-                    function(x) { return x.answer; });
-
-                _.each(markets_with_dupes, function (x) {
-                    if (_.indexOf($scope.markets, x) === -1) {
-                        $scope.markets.push(x);
-                    }
-                });
-            });
-
+            setup_market_dropdown($http, $scope, market_site_id);
             fish_weight_by_market($http, $scope.charts, start_date, end_date,
                 $routeParams.surveySlug)
 
@@ -128,6 +132,11 @@ angular.module('askApp')
 
             total_weight_for_market($http, $scope.charts, start_date, end_date,
                 $routeParams.surveySlug);
+
+            // FIXME: When the survey data can be pulled in, put it here.
+            $scope.surveyor_by_time = {
+                xLabel: "Surveys by Date"
+            }
         }
 
     }, true);

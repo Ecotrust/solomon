@@ -19,7 +19,7 @@
                 <option ng-repeat="market in markets">{{market}}</option>
             </select>
             <select class="form-control">
-                <option>All Status</option>
+                <option>All Statuses</option>
                 <option ng-repeat="status in statii"></option>
             </select>
         </div>
@@ -55,21 +55,25 @@
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
                     <tr>
-                        <th>Username</th>
-                        <th>Vendor Name</th>
+                        <th>Surveyor</th>
+                        <th>Date</th>
+                        <th>Time</th>
                         <th>Market</th>
-                        <th>Bought or Caught</th>
-                        <th>How was it sold?</th>
-                        <th>Timestamp</th>
+                        <th>Vendor Name</th>
+                        <th>Buyer/Fisher</th>
+                        <th>Sales Type</th>
+                        <th>Status</th>
                         <th>Detail</th>
                     </tr>
                     <tr ng-repeat="respondent in respondents">
                         <td>{{ respondent.user.username }}</td>
-                        <td>{{ respondent.vendor }}</td>
+                        <td>{{ respondent.ts|validDate: 'dd-MM-yyyy' }}</td>
+                        <td>{{ respondent.ts|validDate: 'HH:mm' }}</td>
                         <td>{{ respondent.survey_site }}</td>
+                        <td>{{ respondent.vendor }}</td>
                         <td>{{ respondent.buy_or_catch }}</td>
                         <td>{{ respondent.how_sold }}</td>
-                        <td>{{ respondent.ts|validDate: 'dd-MM-yyyy HH:mm' }}</td>
+                        <td></td>
                         <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}">Responses ({{respondent.responses.length}})</a></td>
                     </tr>
                 </tbody>
