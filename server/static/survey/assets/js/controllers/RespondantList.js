@@ -98,8 +98,23 @@ angular.module('askApp')
 
             var start_date = $scope.filter.startDate.toString('yyyyMMdd');
             var end_date = $scope.filter.endDate.toString('yyyyMMdd')
+            var market_site_id = _.find($scope.survey.questions, function(x) {
+                return x.slug == 'survey-site';
+            }).id;
 
-            _.find($scope.survey.questions, function(x) { return x.slug == 'survey-site'; });
+            var url = '/api/v1/response?format=json&question=' + market_site_id;
+
+            $http.get(url).success(function(data) {
+                $scope.markets = [];
+                var markets_with_dupes = _.map(data.objects,
+                    function(x) { return x.answer; });
+
+                _.each(markets_with_dupes, function (x) {
+                    if (_.indexOf($scope.markets, x) === -1) {
+                        $scope.markets.push(x);
+                    }
+                });
+            });
 
             fish_weight_by_market($http, $scope.charts, start_date, end_date,
                 $routeParams.surveySlug)
