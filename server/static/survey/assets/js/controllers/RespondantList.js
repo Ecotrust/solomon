@@ -38,7 +38,51 @@ function fish_weight_by_province($http, charts, start_date, end_date, slug) {
         });
         charts.sort(function (a,b) { return a-b;})
     });
+}
 
+function average_trip_costs_by_market($http, charts, start_date, end_date, slug) {
+    var url = ['/reports/crosstab', slug, 'survey-site', 'cost'].join('/');
+        url = url + '?startdate=' + start_date;
+        url = url + '&enddate=' + end_date;
+
+    return $http.get(url).success(function(data) {
+        charts.push({
+            title: "Average Trip Costs by Market",
+            labels: _.pluck(data.crosstab, 'name'),
+            seriesNames: data.seriesNames,
+            type: data.type,
+            data: data.crosstab,
+            xLabel: 'Market',
+            yLabel: 'Average Trip Costs',
+            order: 1,
+            message: data.message
+        });
+        charts.sort(function (a,b) { return a-b;})
+    });
+}
+
+function total_weight_for_market($http, charts, start_date, end_date, slug) {
+    var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
+    url = url + '?startdate=' + start_date;
+    url = url + '&enddate=' + end_date;
+    url = url + '&group=week';
+
+    return $http.get(url).success(function(data) {
+        charts.push({
+            title: "Total Weight for Week by Market",
+            labels: _.pluck(data.crosstab, 'name'),
+            seriesNames: data.seriesNames,
+            type: data.type,
+            data: data.crosstab,
+            xLabel: 'Market',
+            yLabel: 'Total Weight (kg)',
+            order: 4,
+            startDate: start_date,
+            endDate: end_date,
+            message: data.message
+        });
+        charts.sort(function (a,b) { return a-b;})
+    });
 }
 
 angular.module('askApp')
@@ -55,59 +99,22 @@ angular.module('askApp')
             var start_date = $scope.filter.startDate.toString('yyyyMMdd');
             var end_date = $scope.filter.endDate.toString('yyyyMMdd')
 
+            _.find($scope.survey.questions, function(x) { return x.slug == 'survey-site'; });
+
             fish_weight_by_market($http, $scope.charts, start_date, end_date,
                 $routeParams.surveySlug)
 
             fish_weight_by_province($http, $scope.charts, start_date, end_date,
                 $routeParams.surveySlug);
 
-            url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'cost'].join('/');
-                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
-                url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
+            average_trip_costs_by_market($http, $scope.charts, start_date, end_date,
+                $routeParams.surveySlug);
 
-            $http.get(url).success(function(data) {
-                $scope.charts.push({
-                    title: "Average Trip Costs by Market",
-                    labels: _.pluck(data.crosstab, 'name'),
-                    seriesNames: data.seriesNames,
-                    type: data.type,
-                    data: data.crosstab,
-                    xLabel: 'Market',
-                    yLabel: 'Average Trip Costs',
-                    order: 1,
-                    message: data.message
-                });
-                $scope.charts.sort(function (a,b) { return a-b;})
-
-            });
-
-            _.find($scope.survey.questions, function(x) { return x.slug == 'survey-site'; });
-
-            url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
-            url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
-            url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
-            url = url + '&group=week';
-            $http.get(url).success(function(data) {
-                $scope.charts.push({
-                    title: "Total Weight for Week by Market",
-                    labels: _.pluck(data.crosstab, 'name'),
-                    seriesNames: data.seriesNames,
-                    type: data.type,
-                    data: data.crosstab,
-                    xLabel: 'Market',
-                    yLabel: 'Total Weight (kg)',
-                    order: 4,
-                    startDate: $scope.filter.startDate,
-                    endDate: $scope.filter.endDate,
-                    message: data.message
-                });
-                $scope.charts.sort(function (a,b) { return a-b;})
-            });
+            total_weight_for_market($http, $scope.charts, start_date, end_date,
+                $routeParams.surveySlug);
         }
 
     }, true);
-
-
 
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
@@ -129,10 +136,6 @@ angular.module('askApp')
 
             }
         });
-
-
-    }).success(function() {
-
     });
 
     $scope.getRespondents = function (url) {
