@@ -47,6 +47,10 @@ input {
                         save
                     </button>
                 </div>
+                <div class="btn-group pull-right" ng-show="confirmDelete">
+                    <a class="btn btn-danger" target="_blank" ng-click="delete_question(activeQuestion)">delete</a>
+                    <a class="btn" target="_blank" ng-click="confirmDelete = false">cancel</a>
+                </div>
                 <div class="clearfix">
                 </div>
             </div>

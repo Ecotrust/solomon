@@ -53,10 +53,8 @@ angular.module('askApp')
         $http({
             method: 'POST',
             url: url,
-            data: user,
-
-        })
-            .success(function (data) {
+            data: user
+        }).success(function (data) {
                 var next;
                 app.user = data.user;
                 $scope.saveState();
@@ -66,9 +64,8 @@ angular.module('askApp')
                     delete app.next;
                     $location.path(app.next);
                 } else {
-                    $location.path('/surveys');    
+                    $location.path('/surveys');
                 }
-                
             })
             .error(function (data) {
                 $scope.showError = data;

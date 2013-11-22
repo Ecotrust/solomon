@@ -6,8 +6,9 @@ app.server = window.location.protocol + '//' + window.location.host;
 app.viewPath = app.server + '/static/survey/';
 
 angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
-    .config(function($routeProvider, $httpProvider) {
+    .config(function($routeProvider, $httpProvider, $compileProvider) {
 
+    $compileProvider.urlSanitizationWhitelist(/^\s*((https?|ftp|mailto):)|#/);
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
 
     $routeProvider.when('/author/:surveySlug', {

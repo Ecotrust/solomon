@@ -1,3 +1,7 @@
+#travis ci tests
+![travis-ci Tests](https://api.travis-ci.org/Ecotrust/solomon.png)
+
+
 # Server Install Requirements
 ```bash
 Download and install virtualbox

@@ -11,8 +11,8 @@ def authenticateUser(request):
     if request.POST:
         param = simplejson.loads(request.POST.keys()[0])
         # user = User.objects.get(username=param.get('username', None))
-        user = authenticate(username=param.get(
-            'username', None), password=param.get('password'))
+        user = authenticate(username=param.get('username', None),
+                            password=param.get('password'))
         try:
             login(request, user)
         except:

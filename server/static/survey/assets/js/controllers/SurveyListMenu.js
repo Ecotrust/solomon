@@ -45,7 +45,10 @@ angular.module('askApp')
     };
 
     $scope.saveState = function () {
-        localStorage.setItem('hapifish', JSON.stringify(app));
+        // It seems that even referencing localStorage in ie7 kills everything. -QWP
+        if (!$("html").is(".lt-ie8")) {
+            localStorage.setItem('hapifish', JSON.stringify(app));
+        }
     }
 
     if (app.user) {

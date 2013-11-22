@@ -6,13 +6,9 @@
         <div class="respondant" ng-class="{mapRespondant: question.type == 'map-multipoint'}" ng-hide="loading">
             <div ng-hide="question.type == 'map-multipoint'" class="row row-progress-bar" style="height:12px !important;">
                 <div class="offset9 col-md-3" style="height:12px !important; line-height: 5px;">
-                    <div class="progress">
+                    <div ng-hide="showProgressBar" class="progress">
                       <div class="bar" style="width: {{ ((survey.questions.indexOf(question) + 1) / survey.questions.length) * 100 }}%;"></div>
                     </div>
-                    <!-- <div class="pull-right btn-group">
-                        <a class="btn" target="_blank" href="/admin/survey/question/{{question.id}}">admin</a>
-                        <a class="btn" target="_blank" href="/dash#/author/{{survey.slug}}/?question={{question.slug}}">edit</a>
-                    </div> -->
                 </div>
             </div>
             <h2 class="question-title" ng-bind-html-unsafe="question.displayTitle" ng-hide="question.type == 'info' || question.type == 'map-multipoint'" >
@@ -20,5 +16,8 @@
             </h2>
             <div ng-include="viewPath + 'views/questionTypes.html'"></div>
         </div>
+        <h2 class="question-title" ng-bind-html-unsafe="question.displayTitle" ng-hide="question.type == 'info' || question.type == 'map-multipoint'" >
+        </h2>
+        <div ng-include="viewPath + 'views/questionTypes.html'"></div>
     </div>
 </div>
