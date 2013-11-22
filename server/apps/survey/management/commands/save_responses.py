@@ -8,8 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for response in Response.objects.all():
-        	try:
-            	response.save_related()
+            try:
+                response.save_related()
             except:
-            	pass
-
+                pass
