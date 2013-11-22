@@ -90,6 +90,7 @@ angular.module('askApp')
 
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
+    $scope.surveyorTimeFilter = 'week';
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {

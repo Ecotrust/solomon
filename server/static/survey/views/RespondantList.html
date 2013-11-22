@@ -27,7 +27,30 @@
     <div class="col-md-2"></div>
     <div class="col-md-10">
         <p ng-show="message">{{message}}</p>
-        <h3>Most Recent Responses <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i></h3>
+        <div>
+            <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
+            <div class="btn-group">
+                <button ng-class="{'active': surveyorTimeFilter == 'hourly'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='hourly'">Hourly</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'day'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='day'">Day</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'week'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='week'">Week</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'month'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='month'">Month</button>
+            </div>
+            <div>
+                <div time-series chart="surveyor_by_time"></div>
+            </div>
+        </div>
         <div class="respondent-table">
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
