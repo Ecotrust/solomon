@@ -1,5 +1,46 @@
 //'use strict';
 
+function fish_weight_by_market($http, charts, start_date, end_date, slug) {
+    var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
+        url = url + '?startdate=' + start_date;
+        url = url + '&enddate=' + end_date;
+
+    return $http.get(url).success(function(data) {
+        charts.push({
+            title: "Total Fish Weight by Market",
+            type: data.type,
+            labels: _.pluck(data.crosstab, 'name'),
+            data: _.pluck(data.crosstab, 'value'),
+            xLabel: 'Market',
+            yLabel: 'Total Weight (kg)',
+            order: 2,
+            message: data.message
+        });
+        charts.sort(function (a,b) { return a-b;})
+    });
+}
+
+function fish_weight_by_province($http, charts, start_date, end_date, slug) {
+    var url = ['/reports/crosstab', slug, 'province-purchased-caught', 'total-weight'].join('/');
+        url = url + '?startdate=' + start_date;
+        url = url + '&enddate=' + end_date;
+
+    return $http.get(url).success(function(data) {
+        charts.push({
+            title: "Total Fish Weight by Province",
+            type: data.type,
+            labels: _.pluck(data.crosstab, 'name'),
+            data: _.pluck(data.crosstab, 'value'),
+            xLabel: 'Province',
+            yLabel: 'Total Weight (kg)',
+            order: 3,
+            message: data.message
+        });
+        charts.sort(function (a,b) { return a-b;})
+    });
+
+}
+
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
 
@@ -9,43 +50,16 @@ angular.module('askApp')
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
             $scope.charts = [];
-            var url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
-                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
-                url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
-
             $scope.getRespondents();
 
-            $http.get(url).success(function(data) {
-                $scope.charts.push({
-                    title: "Total Fish Weight by Market",
-                    type: data.type,
-                    labels: _.pluck(data.crosstab, 'name'),
-                    data: _.pluck(data.crosstab, 'value'),
-                    xLabel: 'Market',
-                    yLabel: 'Total Weight (kg)',
-                    order: 2,
-                    message: data.message
-                });
-                $scope.charts.sort(function (a,b) { return a-b;})
-            });
+            var start_date = $scope.filter.startDate.toString('yyyyMMdd');
+            var end_date = $scope.filter.endDate.toString('yyyyMMdd')
 
-            url = ['/reports/crosstab', $routeParams.surveySlug, 'province-purchased-caught', 'total-weight'].join('/');
-                url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
-                url = url + '&enddate=' + $scope.filter.endDate.toString('yyyyMMdd');
+            fish_weight_by_market($http, $scope.charts, start_date, end_date,
+                $routeParams.surveySlug)
 
-            $http.get(url).success(function(data) {
-                $scope.charts.push({
-                    title: "Total Fish Weight by Province",
-                    type: data.type,
-                    labels: _.pluck(data.crosstab, 'name'),
-                    data: _.pluck(data.crosstab, 'value'),
-                    xLabel: 'Province',
-                    yLabel: 'Total Weight (kg)',
-                    order: 3,
-                    message: data.message
-                });
-                $scope.charts.sort(function (a,b) { return a-b;})
-            });
+            fish_weight_by_province($http, $scope.charts, start_date, end_date,
+                $routeParams.surveySlug);
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'cost'].join('/');
                 url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
@@ -66,6 +80,8 @@ angular.module('askApp')
                 $scope.charts.sort(function (a,b) { return a-b;})
 
             });
+
+            _.find($scope.survey.questions, function(x) { return x.slug == 'survey-site'; });
 
             url = ['/reports/crosstab', $routeParams.surveySlug, 'survey-site', 'total-weight'].join('/');
             url = url + '?startdate=' + $scope.filter.startDate.toString('yyyyMMdd');
