@@ -3,7 +3,7 @@
         <div ng-include="viewPath + 'views/pennies.html'"></div>
     </div>
     <div ng-switch-when="info">
-        
+
         <div class="info-content" ng-include="viewPath + infoView"></div>
         <button class="btn btn-primary btn-block button-block btn-large" ng-tap="gotoNextQuestion()">continue</button>
     </div>
@@ -70,7 +70,7 @@
     </div>
     <div ng-switch-when="currency">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
-            
+
             <div class="input-prepend">
               <span class="add-on">$</span>
               <input class="input-block-level" type="number" step="any" placeholder="{{ question.label }}" ng-model="answer" autofocus/>
@@ -82,6 +82,19 @@
     </div>
     <div ng-switch-when="datepicker">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
+            <script type="text/javascript">
+                $(function() {
+                    if ($("html").is(".lt-ie9")) {
+                        $("input[type=date]").datepicker({
+                            onSelect: function(date) {
+                                // For some reason the datepicker doesn't
+                                // actually do anything in IE8.
+                                $("input[type=date]").val(date);
+                            }
+                        });
+                    }
+                });
+            </script>
             <input class="input-block-level" type="date" placeholder="{{ question.label }}" ng-model="answer"/>
             <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
         </form>
