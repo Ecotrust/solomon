@@ -2,7 +2,7 @@
     <div class="stats">
         <div class="row">
             <div class="col-md-12">
-                <h1>0</h1>
+                <h1>{{survey.survey_responses || 0}}</h1>
                 <p>Total Respondants</p>
             </div>
         </div>
@@ -21,9 +21,9 @@
         <div class="row">
             <div class="col-md-12">
                 <ul class="nav">
-                    <li><a>Overview</a></li>
+                    <li ng-class="{'active': activePage == 'overview'}"><a href="#/RespondantList/{{survey.slug}}">Overview</a></li>
                     <li>
-                        <a>Reports</a>
+                        <a ng-class="{'active': activePage == 'reports'">Reports</a>
                         <ul>
                             <li><a>Economic</a></li>
                             <li><a>Biological</a></li>

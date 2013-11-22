@@ -108,6 +108,7 @@ angular.module('askApp')
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
+    $scope.activePage = 'overview';
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
@@ -135,7 +136,7 @@ angular.module('askApp')
 
             // FIXME: When the survey data can be pulled in, put it here.
             $scope.surveyor_by_time = {
-                xLabel: "Surveys by Date"
+                yLabel: "Survey Responses"
             }
         }
 

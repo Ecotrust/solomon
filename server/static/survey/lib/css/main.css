@@ -32,6 +32,14 @@
     bottom: 10px;
 }
 
+#surveyor_by_time_chart {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+#sidenav_respondants .active a {
+    background-color: #68A1D6;
+    color: #FFF;
+}
 #sidenav_respondants {
     border-right: solid 1px #000;
 }

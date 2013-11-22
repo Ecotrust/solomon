@@ -6,7 +6,7 @@
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-10">
-        <div class="center-text col-md-1">
+        <div class="center-text col-md-2">
             <h2>{{meta.total_count}}</h2>
             <p>Responses Found</p>
         </div>
@@ -47,7 +47,7 @@
                     class="btn btn-default"
                     ng-click="surveyorTimeFilter='month'">Month</button>
             </div>
-            <div>
+            <div id="surveyor_by_time_chart">
                 <div time-series chart="surveyor_by_time"></div>
             </div>
         </div>
@@ -95,6 +95,7 @@
             <div heatmap question="question.slug"></div>
         </div> -->
 
+        <!--
         <div ng-repeat="chart in charts" class="dash-chart">
             <h2>{{ chart.title }}</h2>
             <div class="error">{{ chart.message }}</div>
@@ -104,6 +105,7 @@
                 <div ng-switch-when="time-series" time-series chart="chart"></div>
             </div>
         </div>
+        -->
 
         <div class="row" ng-repeat="question in survey.questions">
             <div  ui-if="question.visualize">
