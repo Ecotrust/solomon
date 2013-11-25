@@ -58,6 +58,7 @@ angular.module('askApp')
     }
 
     if (app.surveys) {
+        $scope.loaded = true;
         $scope.surveys = app.surveys;
     } else {
         $scope.updateSurveys();
