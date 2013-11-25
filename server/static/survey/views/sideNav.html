@@ -23,14 +23,14 @@
                 <ul class="nav">
                     <li ng-class="{'active': activePage == 'overview'}"><a href="#/RespondantList/{{survey.slug}}">Overview</a></li>
                     <li>
-                        <a ng-class="{'active': activePage == 'reports'">Reports</a>
+                    <a ng-class="{'active': activePage == 'reports'}">Reports</a>
                         <ul>
-                            <li><a>Economic</a></li>
-                            <li><a>Biological</a></li>
+                            <li><a ng-class="{'active': activePage == 'economic'}">Economic</a></li>
+                            <li><a ng-class="{'active': activePage == 'biological'}">Biological</a></li>
                         </ul>
                     </li>
-                    <li><a>Search</a></li>
-                    <li><a>Download</a></li>
+                    <li><a ng-class="{'active': activePage == 'search'}">Search</a></li>
+                    <li><a ng-class="{'active': activePage == 'download'}">Download</a></li>
                 </ul>
             </div>
         </div>
