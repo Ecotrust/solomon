@@ -36,7 +36,7 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
-#sidenav_respondants .active a {
+#sidenav_respondants a.active {
     background-color: #68A1D6;
     color: #FFF;
 }
@@ -56,4 +56,12 @@
     margin-top: 20px;
     margin-bottom: 10px;
 }
+
+#respondant_list_survey_buttons {
+    margin-bottom: 2em;
 }
+#respondant_list_survey_buttons div {
+    display: inline-block;
+    margin-left: 2em;
+}
+

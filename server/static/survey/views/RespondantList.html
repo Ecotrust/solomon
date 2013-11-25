@@ -79,8 +79,8 @@
                 </tbody>
             </table>
         </div>
-        <div class="pull-right">
-            <span  ng-hide="respondentsLoading">
+        <div id="respondant_list_survey_buttons" class="pull-right">
+            <span ng-hide="respondentsLoading">
                 Records {{meta.offset}} to 
                 <span ng-show="(meta.offset+meta.limit) <= meta.total_count">{{meta.offset+meta.limit}}</span>
                 <span ng-hide="(meta.offset+meta.limit) <= meta.total_count">{{meta.total_count}}</span> of {{ meta.total_count }}
@@ -89,7 +89,9 @@
                 <button class="btn" ng-disabled="! meta.previous" ng-click="getRespondents(meta.previous)">Previous</button>
                 <button class="btn" ng-disabled="! meta.next" ng-click="getRespondents(meta.next)">Next</button>
             </div>
-
+            <div>
+                <a href="#/search"><button class="btn"><i class="icon-search"></i> Search</button></a>
+            </div>
         </div>
         <!-- <div class="row">
             <div heatmap question="question.slug"></div>
