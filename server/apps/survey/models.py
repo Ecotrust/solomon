@@ -103,11 +103,11 @@ class Survey(caching.base.CachingMixin, models.Model):
 
     @property
     def reviews_needed(self):
-        return self.respondant_set.filter(review_state=REVIEW_STATE_NEEDED).count()
+        return self.respondant_set.filter(review_status=REVIEW_STATE_NEEDED).count()
 
     @property
     def flagged(self):
-        return self.respondant_set.filter(review_state=REVIEW_STATE_FLAGGED).count()
+        return self.respondant_set.filter(review_status=REVIEW_STATE_FLAGGED).count()
 
     @property
     def activity_points(self):
