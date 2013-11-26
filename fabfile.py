@@ -5,6 +5,11 @@ from contextlib import contextmanager
 from fabric.operations import put
 from fabric.api import env, local, sudo, run, cd, prefix, task, settings
 
+#platform = "ubuntu"
+#deploy_user = "www-data"
+platform = "centos"
+deploy_user = "nginx"
+
 branch = 'master'
 
 CHEF_VERSION = '10.20.0'
@@ -40,13 +45,13 @@ def install_chef(latest=True):
     """
     Install chef-solo on the server
     """
-    sudo('apt-get update', pty=True)
-    sudo('apt-get install -y git-core rubygems ruby ruby-dev', pty=True)
-
-    if latest:
+    if platform == 'ubuntu':
+        sudo('apt-get update', pty=True)
+        sudo('apt-get install -y git-core rubygems ruby ruby-dev', pty=True)
         sudo('gem install chef --no-ri --no-rdoc', pty=True)
     else:
-        sudo('gem install chef --no-ri --no-rdoc --version {0}'.format(CHEF_VERSION), pty=True)
+        sudo('curl -LO https://www.opscode.com/chef/install.sh && sudo bash ./install.sh -v 10.20.0 && rm install.sh')
+    
 
 def parse_ssh_config(text):
     """
@@ -186,27 +191,31 @@ def push():
         run('git checkout .')
         run('git checkout %s' % env.branch)
 
-        sudo('chown -R www-data:deploy *')
-        sudo('chown -R www-data:deploy /usr/local/venv')
+        sudo("chown -R %s:deploy *" % deploy_user)
+        sudo("chown -R %s:deploy /usr/local/venv" % deploy_user)
         sudo('chmod -R 0770 *')
 
 
 @task
-def deploy():
+def deploy(branch="master"):
     set_env_for_user(env.user)
-
+    env.branch = branch
     push()
     sudo('chmod -R 0770 %s' % env.virtualenv)
 
     with cd(env.code_dir):
         with _virtualenv():
             run('pip install -r requirements.txt')
-            _manage_py('collectstatic --noinput')
-            _manage_py('syncdb --noinput')
+            _manage_py('collectstatic --noinput --settings=config.environments.staging')
+            _manage_py('syncdb --noinput --settings=config.environments.staging')
             # _manage_py('add_srid 99996')
-            _manage_py('migrate')
+            _manage_py('migrate --settings=config.environments.staging')
             # _manage_py('enable_sharing')
-            sudo('chown -R www-data:deploy %s/public/static' % env.root_dir)
+            sudo('chown -R %s:deploy %s' % (deploy_user, env.root_dir))
+            sudo('chmod -R g+w %s' % env.root_dir)
+
+
+    restart()
 
 
     restart()
@@ -218,7 +227,8 @@ def restart():
     Reload nginx/gunicorn
     """
     with settings(warn_only=True):
-        sudo('supervisorctl restart app')
+        sudo('initctl stop app')
+        sudo('initctl start app')
         sudo('/etc/init.d/nginx reload')
 @task
 def restore(file=None):
@@ -280,7 +290,10 @@ def upload_project_sudo(local_dir=None, remote_dir=""):
         with cd(remote_dir):
             try:
                 #sudo("tar -xzf %s" % tar_file)
-                sudo("apt-get install -y unzip")
+                if platform == "ubuntu":
+                    sudo("apt-get install -y unzip")
+                else:
+                    sudo("yum install -y unzip")
                 sudo("unzip %s" % zip_file)
             finally:
                 #sudo("rm -f %s" % tar_file)
@@ -320,10 +333,9 @@ def provision():
 
     node_name = "node_%s.json" % (env.role)
 
-    with cd('/etc/chef/cookbooks'):
+    with cd('/etc/chef/cookbooks'):    
         sudo('chef-solo -c /etc/chef/cookbooks/solo.rb -j /etc/chef/cookbooks/%s' % node_name, pty=True)
-
-
+        
 @task
 def prepare():
     install_chef(latest=False)
@@ -349,3 +361,23 @@ def transfer_db():
     local("heroku pgbackups:capture --expire")
     run("curl -o /tmp/%s.dump \"%s\"" % (date, db_url))
     run("pg_restore --verbose --clean --no-acl --no-owner -U vagrant -d geosurvey /tmp/%s.dump" % date)
+
+    
+@task
+def migrate_db():
+    with cd(env.code_dir):
+        with _virtualenv():
+            _manage_py('migrate --settings=config.environments.staging')
+
+@task
+def backup_db():
+    date = datetime.datetime.now().strftime("%Y-%m-%d%H%M")
+    dump_name = "%s-geosurvey.dump" % date
+    run("pg_dump geosurvey -n public -c -f /tmp/%s -Fc -O -no-acl -U postgres" % dump_name)
+    get("/tmp/%s" % dump_name, "backups/%s" % dump_name)
+
+@task
+def restore_db(dump_name):
+    put(dump_name, "/tmp/%s" % dump_name.split('/')[-1])
+    run("pg_restore --verbose --clean --no-acl --no-owner -U postgres -d geosurvey /tmp/%s" % dump_name.split('/')[-1])
+    #run("cd %s && %s/bin/python manage.py migrate --settings=config.environments.staging" % (env.app_dir, env.venv))
