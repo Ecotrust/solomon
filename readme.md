@@ -11,6 +11,7 @@ cd into the source directory with your terminal
 ```
 
 # Server Setup
+## Vagrant
 ```bash
 vagrant plugin install vagrant-omnibus # for chef
 vagrant up
@@ -18,9 +19,21 @@ easy_install pip #(if you do not already have)
 pip install fabric #(if you do not already have)
 fab vagrant bootstrap
 fab vagrant createsuperuser
-fab vagrant loaddata
 fab vagrant runserver
 ```
+
+### Loading Data
+From Fixtures
+```bash
+fab vagrant loaddata
+```
+
+From the currently running instance
+```bash
+fab staging:eknuth@hapifis-dev.pointnineseven.com backup_db
+fab staging:eknuth@hapfis-dev.pointnineseven.com restore_db:backups/2013-11-111755-geosurvey.dump
+fab staging:eknuth@hapifis-dev.pointnineseven.com migrate_db
+
 
 
 ## Provision a fresh Server with Chef and Fabric
@@ -59,65 +72,6 @@ fab staging:username@hostname deploy
 ```
 
 After the prepare command runs you will no longer be able to login as root with a password.  The prepare command creates one or more users with sudo access based on the list of users specified in the json file.
-
-
-# Install Requirements
-From the geosurvey project directory
-```bash
-sudo npm install -g yo grunt-cli bower
-npm install && bower install --dev
-npm install generator-angular generator-karma
-```
-
-# Backing up and restoring databases
-
-```bash
-pg_dump -U vagrant --clean --no-acl -Fc geosurvey> geosurvey.dump
-```
-
-```bash
-pg_restore --verbose --clean --no-acl --no-owner -U vagrant -d geosurvey geosurvey.dump
-```
-# Launching Server
-Run all of these in seperate tabs/windows
-
-The app will be served on port 9000.  A browser window will open automatically.
-```bash
-grunt server
-```
-# Running Tests
-
-With the server running in port 9000, run the following commands for continuous test running.
-
-Unit tests will run whenever you save a file:
-
-```bash
-grunt c-unit
-```
-
-End to end tests will run whenever you save a file:
-
-
-```bash
-grunt c-e2e
-```
-
-
-# Using the angular app generator
-
-Add a new route, view, controller, unit test:
-```bash
-yo angular:route myRoute
-```
-
-Because the app is being served out of the django app we need to specify a path for the controls and templates.  Here is an axample route:
-
-```javascript
-.when('/RespondantDetail', {
-  templateUrl: '/static/survey/views/RespondantDetail.html',
-  controller: 'RespondantDetailCtrl'
-})
-```
 
 #Heroku
 ##requirements
