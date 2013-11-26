@@ -2,6 +2,7 @@
 angular.module('askApp')
     .controller('RespondantDetailCtrl', function($scope, $routeParams, $http) {
 
+    $scope.viewPath = app.viewPath;
     $http.get('/api/v1/reportrespondantdetails/'  + $routeParams.uuidSlug + '/?format=json&survey__slug=' + $routeParams.surveySlug).success(function(data) {
         //order responses to reflect the order in which they were presented in the survey
         data.responses = _.sortBy(data.responses, function(response) { return response.question.order; });
@@ -10,6 +11,10 @@ angular.module('askApp')
             response.answer_parsed = JSON.parse(response.answer_raw);
         });
         $scope.respondent = data;
+    });
+
+    $http.get('/api/v1/surveydash/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
+        $scope.survey = data;
     });
 
     $scope.uuid = $routeParams.uuidSlug;
