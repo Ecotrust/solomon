@@ -1,7 +1,6 @@
 import datetime
 import json
 
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -15,10 +14,11 @@ class TestAnswer(TestCase):
     def setUp(self):
         self.survey = Survey.objects.get(slug='reef-fish-market-survey')
         self.question = self.survey.questions.get(slug='survey-site')
-        self.respondant_user = User.objects.create(username='respondant_user',
-                                                   email='respondant_user@example.com',
-                                                   password=make_password('pass'),
-                                                   is_staff=True)
+        self.respondant_user = User.objects.create_superuser(
+            username='respondant_user',
+            email='respondant_user@example.com',
+            password='pass'
+        )
         self.respondant = Respondant(survey=self.survey,
                                      ts=datetime.datetime.now(),
                                      surveyor=self.respondant_user)
@@ -55,10 +55,9 @@ class TestAnswer(TestCase):
         self.assertEqual(respondant.surveyor, self.respondant_user)
 
     def test_edit_with_new_user(self):
-        self.new_user = User.objects.create(username='new_user',
-                                            email='new_user@example.com',
-                                            password=make_password('pass'),
-                                            is_staff=True)
+        self.new_user = User.objects.create_superuser(
+            username='new_user', email='new_user@example.com',
+            password='pass')
         self.client.login(username='new_user', password='pass')
         res = self.client.post(self.get_url(), data={
             json.dumps({
