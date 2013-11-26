@@ -31,7 +31,7 @@ fab vagrant loaddata
 From the currently running instance
 ```bash
 fab staging:eknuth@hapifis-dev.pointnineseven.com backup_db
-fab staging:eknuth@hapfis-dev.pointnineseven.com restore_db:backups/2013-11-111755-geosurvey.dump
+fab vagrant restore_db:backups/2013-11-261230-geosurvey.dump
 fab staging:eknuth@hapifis-dev.pointnineseven.com migrate_db
 
 

@@ -25,6 +25,9 @@ env.activate = 'source %s/bin/activate ' % env.virtualenv
 env.code_dir = '%s/%s' % (env.root_dir, app)
 env.media_dir = '%s/media' % env.root_dir
 
+env.key_filename = '~/.ssh/id_rsa'
+
+
 vars = {
     'app_dir': '/vagrant/server',
     'venv': '/usr/local/venv/geosurvey'
