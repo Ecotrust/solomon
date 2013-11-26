@@ -11,6 +11,7 @@ angular.module('askApp')
             response.answer_parsed = JSON.parse(response.answer_raw);
         });
         $scope.respondent = data;
+        $scope.statuses = data.meta.statuses;
     });
 
     $http.get('/api/v1/surveydash/' + $routeParams.surveySlug + '/?format=json').success(function(data) {

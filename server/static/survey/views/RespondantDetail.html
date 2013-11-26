@@ -3,14 +3,29 @@
     <div class="col-md-10">
         <h1>{{survey.name}}</h1>
         <h3>Respondent Details</h3>
-        <dl class="dl-horizontal">
-            <dt>surveyor</dt>
-            <dd>{{ respondent.user.username }}</dd>
-            <dt>identity</dt>
-            <dd>{{ respondent.email || respondent.uuid}}</dd>
-            <dt>timestamp</dt>
-            <dd>{{ respondent.ts  |validDate: 'dd-MM-yyyy hh:mm' }}</dd>
-        </dl>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
+        <div class="col-md-3">
+            <dl class="dl-horizontal">
+                <dt>surveyor</dt>
+                <dd>{{ respondent.user.username }}</dd>
+                <dt>identity</dt>
+                <dd>{{ respondent.email || respondent.uuid}}</dd>
+                <dt>timestamp</dt>
+                <dd>{{ respondent.ts  |validDate: 'dd-MM-yyyy hh:mm' }}</dd>
+            </dl>
+        </div>
+        <div class="col-md-7"></div>
+        <div id="market_status_filters" class="col-md-2">
+            <h4>Statuses:</h4>
+            <select class="form-control">
+                <option ng-repeat="status in statuses" data-status_val="{{statuses.status}}">{{status}}</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
         <h3>Responses</h3>
         <table class="table-striped table">
             <tbody>
