@@ -1,20 +1,17 @@
 <!-- This question actually submits the entire question.options object since 
-	the grid binds to that object. -->
+    the grid binds to that object. -->
 
 <form id="gridQuestion" class="question" ng-submit="answerQuestion(question.options)">
-	<div class="row">
-	    <div class="col-md-12">
-	        
-			<div class="gridStyle" ng-grid="gridOptions"></div>
-
-	    </div>
-	</div>
-	<div class="row user-controls">
-		
-	    <button 
-	    	type="submit"
-			ng-disabled="! gridValidated"
-			ng-class="{'btn-danger': ! gridValidated, 'btn-primary': gridValidated }"
-	    	class="btn btn-block btn-large btn-primary">continue</button>
-	</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="gridStyle" ng-grid="gridOptions"></div>
+        </div>
+    </div>
+    <div class="row user-controls">
+        <button
+            type="submit"
+            ng-disabled="! gridValidated"
+            ng-class="{'btn-danger': ! gridValidated, 'btn-primary': gridValidated }"
+            class="btn btn-block btn-large btn-primary">continue</button>
+    </div>
 </form>

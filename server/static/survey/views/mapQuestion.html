@@ -3,12 +3,11 @@
         center="map.center" 
         zoom="map.zoom" 
         requiredzoom="question.min_zoom"
-        
+
         marker="map.marker" 
         multimarkers="locations" 
         popupfield="'answers'" 
-        
-        
+
         iscrosshairalerting="isCrosshairAlerting"
         multimarkersedit="true"
         editmarker="editMarker"
@@ -17,7 +16,7 @@
 
 
     <div class="map-controls map-controls-top-left">
-        
+
         <div zoomto onload="openModal()" states="survey.states" zoomtoresult="zoomModel.zoomToResult" numlocations="locations.length"></div>
 
         <div class="btn-group">
