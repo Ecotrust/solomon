@@ -104,9 +104,9 @@ class ReportRespondantResource(AuthSurveyModelResource):
         data['meta']['statuses'] = dict(REVIEW_STATE_CHOICES)
         return data
 
-    def alter_detail_data_to_serialize(self, request, data):
-        data['meta']['statuses'] = dict(REVIEW_STATE_CHOICES)
-        return data
+    def alter_detail_data_to_serialize(self, request, bundle):
+        bundle.data['meta'] = {'statuses': dict(REVIEW_STATE_CHOICES)}
+        return bundle
 
 
 class ReportRespondantDetailsResource(ReportRespondantResource):
