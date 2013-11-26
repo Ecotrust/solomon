@@ -11,6 +11,7 @@ cd into the source directory with your terminal
 ```
 
 # Server Setup
+## Vagrant
 ```bash
 vagrant plugin install vagrant-omnibus # for chef
 vagrant up
@@ -18,9 +19,21 @@ easy_install pip #(if you do not already have)
 pip install fabric #(if you do not already have)
 fab vagrant bootstrap
 fab vagrant createsuperuser
-fab vagrant loaddata
 fab vagrant runserver
 ```
+
+### Loading Data
+From Fixtures
+```bash
+fab vagrant loaddata
+```
+
+From the currently running instance
+```bash
+fab staging:eknuth@hapifis-dev.pointnineseven.com backup_db
+fab staging:eknuth@hapfis-dev.pointnineseven.com restore_db:backups/2013-11-111755-geosurvey.dump
+fab staging:eknuth@hapifis-dev.pointnineseven.com migrate_db
+
 
 
 ## Provision a fresh Server with Chef and Fabric
