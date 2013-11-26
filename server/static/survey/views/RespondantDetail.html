@@ -6,7 +6,7 @@
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-10">
-        <div class="col-md-3">
+        <div class="col-md-10">
             <dl class="dl-horizontal">
                 <dt>surveyor</dt>
                 <dd>{{ respondent.user.username }}</dd>
@@ -16,12 +16,12 @@
                 <dd>{{ respondent.ts  |validDate: 'dd-MM-yyyy hh:mm' }}</dd>
             </dl>
         </div>
-        <div class="col-md-7"></div>
         <div id="market_status_filters" class="col-md-2">
             <h4>Statuses:</h4>
             <select class="form-control">
-                <option ng-repeat="status in statuses" data-status_val="{{statuses.status}}">{{status}}</option>
+                <option ng-selected="survey.status == statuses[status]" ng-repeat="status in statuses" data-status_val="{{statuses.status}}">{{status}}</option>
             </select>
+            <button class="btn btn-default" type="button">Review Next</button>
         </div>
     </div>
     <div class="col-md-2"></div>
