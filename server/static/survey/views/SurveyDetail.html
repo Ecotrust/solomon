@@ -16,8 +16,5 @@
             </h2>
             <div ng-include="viewPath + 'views/questionTypes.html'"></div>
         </div>
-        <h2 class="question-title" ng-bind-html-unsafe="question.displayTitle" ng-hide="question.type == 'info' || question.type == 'map-multipoint'" >
-        </h2>
-        <div ng-include="viewPath + 'views/questionTypes.html'"></div>
     </div>
 </div>

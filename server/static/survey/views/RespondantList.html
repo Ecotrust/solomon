@@ -20,7 +20,7 @@
             </select>
             <select class="form-control">
                 <option>All Statuses</option>
-                <option ng-repeat="status in statii"></option>
+                <option ng-repeat="status in statuses" data-status_val="{{statuses.status}}">{{status}}</option>
             </select>
         </div>
     </div>

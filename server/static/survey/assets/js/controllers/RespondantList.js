@@ -180,6 +180,7 @@ angular.module('askApp')
             $scope.respondentsLoading = false;
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
+            $scope.statuses = data.meta.statuses;
         });
     }
 
