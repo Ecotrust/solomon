@@ -8,10 +8,11 @@ from tastypie.test import ResourceTestCase
 from ..models import REVIEW_STATE_CHOICES, Survey
 
 
-class TestReportRespondantResource(ResourceTestCase):
-    fixtures = ['surveys.json.gz']
+class SolomonResourceTestCase(ResourceTestCase):
 
     def setUp(self):
+        if self.__class__ == SolomonResourceTestCase:
+            self.skipTest('Base class, not actually tests.')
         self.username = 'survey_report_user'
         self.password = 'pass'
         self.user = User.objects.create_superuser(
@@ -22,7 +23,7 @@ class TestReportRespondantResource(ResourceTestCase):
 
     def get_url(self):
         return reverse('api_dispatch_list', kwargs={
-            'resource_name': 'reportrespondant',
+            'resource_name': self.resource_name,
             'api_name': 'v1'
         })
 
@@ -34,6 +35,11 @@ class TestReportRespondantResource(ResourceTestCase):
         self.client.login(username=self.username, password=self.password)
         res = self.client.get(self.get_url())
         self.assertEqual(res.status_code, 200)
+
+
+class TestReportRespondantResource(SolomonResourceTestCase):
+    fixtures = ['surveys.json.gz']
+    resource_name = 'reportrespondant'
 
     def test_meta_includes_statuses(self):
         self.client.login(username=self.username, password=self.password)
@@ -46,30 +52,10 @@ class TestReportRespondantResource(ResourceTestCase):
             self.assertIn(item[0], content['meta']['statuses'].keys())
 
 
-class TestSurveyDashResource(ResourceTestCase):
+class TestSurveyDashResource(SolomonResourceTestCase):
     fixtures = ['surveys.json.gz']
+    resource_name = 'surveydash'
 
     def setUp(self):
-        self.username = 'survey_report_user'
-        self.password = 'pass'
-        self.user = User.objects.create_superuser(
-            username=self.username,
-            email=self.username + '@example.com',
-            password=self.password
-        )
+        super(TestSurveyDashResource, self).setUp()
         self.survey = Survey.objects.get(slug='reef-fish-market-survey')
-
-    def get_url(self):
-        return reverse('api_dispatch_list', kwargs={
-            'resource_name': 'surveydash',
-            'api_name': 'v1'
-        })
-
-    def test_unauthorized(self):
-        res = self.client.get(self.get_url())
-        self.assertEqual(res.status_code, 401)
-
-    def test_authorized(self):
-        self.client.login(username=self.username, password=self.password)
-        res = self.client.get(self.get_url())
-        self.assertEqual(res.status_code, 200)
