@@ -1,10 +1,10 @@
 import os
 import datetime
-from tempfile import mkdtemp
 from contextlib import contextmanager
+from tempfile import mkdtemp
 
-from fabric.operations import put
 from fabric.api import cd, env, get, local, prefix, run, settings, sudo, task
+from fabric.operations import put
 
 #platform = "ubuntu"
 #deploy_user = "www-data"
