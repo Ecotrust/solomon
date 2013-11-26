@@ -13,7 +13,7 @@ angular.module('askApp')
         $scope.timer = setInterval(function () {
             $scope.width = $scope.width + 10;
         }, 500);
-        $http.get(app.server + '/api/v1/surveyreport/?format=json').success(function(data) {
+        $http.get(app.server + '/api/v1/surveydash/?format=json').success(function(data) {
             $scope.surveys = data.objects;
             _.each($scope.surveys, function (survey) {
                 survey.updated_at = new Date();

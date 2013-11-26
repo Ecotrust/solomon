@@ -9,19 +9,19 @@
                             <a href="#/RespondantList/{{survey.slug}}"><h4>{{survey.name}}</h4></a>
                         </td>
                         <td>
-                            <h2 class="survey-num">{{survey.survey_responses}}</h2>
+                            <h2 class="survey-num">{{survey.survey_responses || 0}}</h2>
                             <p>Total</p>
                         </td>
                         <td>
-                            <h2 class="survey-num">0</h2>
+                            <h2 class="survey-num">{{survey.today || 0}}</h2>
                             <p>Today</p>
                         </td>
                         <td>
-                            <h2 class="survey-num">0</h2>
+                            <h2 class="survey-num">{{survey.reviews_needed || 0}}</h2>
                             <p>Need Review</p>
                         </td>
                         <td>
-                            <h2 class="survey-num">0</h2>
+                            <h2 class="survey-num">{{survey.flagged || 0}}</h2>
                             <p>Flagged</p>
                         </td>
                         <td ng-hide="confirmDelete">
