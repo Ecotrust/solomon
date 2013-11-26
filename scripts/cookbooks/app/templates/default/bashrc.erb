@@ -1,5 +1,5 @@
 export EDITOR=vim
-
+export PATH=/usr/pgsql-9.1/bin/pg_config:$PATH
 function psg {
     ps auxww | grep --color=always $* | grep -v grep | sed -e 's/  */ /g' | cut -d' ' -f 2,11-
 }
