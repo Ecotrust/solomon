@@ -1,9 +1,15 @@
 import os
-from tempfile import mkdtemp
+import datetime
 from contextlib import contextmanager
+from tempfile import mkdtemp
 
+from fabric.api import cd, env, get, local, prefix, run, settings, sudo, task
 from fabric.operations import put
-from fabric.api import env, local, sudo, run, cd, prefix, task, settings
+
+#platform = "ubuntu"
+#deploy_user = "www-data"
+platform = "centos"
+deploy_user = "nginx"
 
 branch = 'master'
 
@@ -24,6 +30,7 @@ vars = {
     'venv': '/usr/local/venv/geosurvey'
 }
 
+
 @contextmanager
 def _virtualenv():
     with prefix(env.activate):
@@ -31,8 +38,7 @@ def _virtualenv():
 
 
 def _manage_py(command):
-    run('python manage.py %s'
-            % command)
+    run('python manage.py %s' % command)
 
 
 @task
@@ -40,13 +46,13 @@ def install_chef(latest=True):
     """
     Install chef-solo on the server
     """
-    sudo('apt-get update', pty=True)
-    sudo('apt-get install -y git-core rubygems ruby ruby-dev', pty=True)
-
-    if latest:
+    if platform == 'ubuntu':
+        sudo('apt-get update', pty=True)
+        sudo('apt-get install -y git-core rubygems ruby ruby-dev', pty=True)
         sudo('gem install chef --no-ri --no-rdoc', pty=True)
     else:
-        sudo('gem install chef --no-ri --no-rdoc --version {0}'.format(CHEF_VERSION), pty=True)
+        sudo('curl -LO https://www.opscode.com/chef/install.sh && sudo bash ./install.sh -v 10.20.0 && rm install.sh')
+
 
 def parse_ssh_config(text):
     """
@@ -116,6 +122,8 @@ def bootstrap(username=None):
             _manage_py('migrate')
             # _manage_py('collectstatic --noinput')
             # _manage_py('enable_sharing')
+
+
 @task
 def createsuperuser(username=None):
     set_env_for_user(username)
@@ -126,12 +134,14 @@ def createsuperuser(username=None):
         with _virtualenv():
             _manage_py('createsuperuser')
 
+
 @task
 def runserver():
     set_env_for_user('vagrant')
     with cd(env.code_dir):
         with _virtualenv():
             _manage_py('runserver 0.0.0.0:8000')
+
 
 @task
 def loaddata():
@@ -140,7 +150,7 @@ def loaddata():
         with _virtualenv():
             _manage_py('loaddata apps/survey/fixtures/surveys.json.gz')
 
-            
+
 @task
 def dumpdata():
     set_env_for_user('vagrant')
@@ -148,7 +158,7 @@ def dumpdata():
         with _virtualenv():
             _manage_py('dumpdata --format=json --indent=4 survey --exclude=survey.Respondant --exclude=survey.LocationAnswer --exclude=survey.Location --exclude=survey.MultiAnswer --exclude=survey.GridAnswer --exclude=survey.Response | gzip > apps/survey/fixtures/surveys.json.gz ')
 
-            
+
 @task
 def push():
     """
@@ -158,7 +168,7 @@ def push():
         remote_result = local('git remote | grep %s' % env.remote)
         if not remote_result.succeeded:
             local('git remote add %s ssh://%s@%s:%s%s' %
-                (env.remote, env.user, env.host, env.port,env.root_dir))
+                (env.remote, env.user, env.host, env.port, env.root_dir))
 
         result = local("git push %s %s" % (env.remote, env.branch))
 
@@ -186,28 +196,28 @@ def push():
         run('git checkout .')
         run('git checkout %s' % env.branch)
 
-        sudo('chown -R www-data:deploy *')
-        sudo('chown -R www-data:deploy /usr/local/venv')
+        sudo("chown -R %s:deploy *" % deploy_user)
+        sudo("chown -R %s:deploy /usr/local/venv" % deploy_user)
         sudo('chmod -R 0770 *')
 
 
 @task
-def deploy():
+def deploy(branch="master"):
     set_env_for_user(env.user)
-
+    env.branch = branch
     push()
     sudo('chmod -R 0770 %s' % env.virtualenv)
 
     with cd(env.code_dir):
         with _virtualenv():
             run('pip install -r requirements.txt')
-            _manage_py('collectstatic --noinput')
-            _manage_py('syncdb --noinput')
+            _manage_py('collectstatic --noinput --settings=config.environments.staging')
+            _manage_py('syncdb --noinput --settings=config.environments.staging')
             # _manage_py('add_srid 99996')
-            _manage_py('migrate')
+            _manage_py('migrate --settings=config.environments.staging')
             # _manage_py('enable_sharing')
-            sudo('chown -R www-data:deploy %s/public/static' % env.root_dir)
-
+            sudo('chown -R %s:deploy %s' % (deploy_user, env.root_dir))
+            sudo('chmod -R g+w %s' % env.root_dir)
 
     restart()
 
@@ -218,12 +228,16 @@ def restart():
     Reload nginx/gunicorn
     """
     with settings(warn_only=True):
-        sudo('supervisorctl restart app')
+        sudo('initctl stop app')
+        sudo('initctl start app')
         sudo('/etc/init.d/nginx reload')
+
+
 @task
 def restore(file=None):
     if file is not None:
         run(" pg_restore --verbose --clean --no-acl --no-owner -d %s /vagrant/%s" % (project, file))
+
 
 @task
 def vagrant(username='vagrant'):
@@ -267,7 +281,7 @@ def upload_project_sudo(local_dir=None, remote_dir=""):
     #target_tar = os.path.join(remote_dir, tar_file)
     zip_file = "%s.zip" % local_name
     target_zip = os.path.join(remote_dir, zip_file)
-    target_zip = target_zip.replace('\\','/')
+    target_zip = target_zip.replace('\\', '/')
     tmp_folder = mkdtemp()
     try:
         #tar_path = os.path.join(tmp_folder, tar_file)
@@ -280,7 +294,10 @@ def upload_project_sudo(local_dir=None, remote_dir=""):
         with cd(remote_dir):
             try:
                 #sudo("tar -xzf %s" % tar_file)
-                sudo("apt-get install -y unzip")
+                if platform == "ubuntu":
+                    sudo("apt-get install -y unzip")
+                else:
+                    sudo("yum install -y unzip")
                 sudo("unzip %s" % zip_file)
             finally:
                 #sudo("rm -f %s" % tar_file)
@@ -288,6 +305,7 @@ def upload_project_sudo(local_dir=None, remote_dir=""):
     finally:
         pass
         #local("rm -rf %s" % tmp_folder)
+
 
 def zipdir(basedir, archivename):
     from zipfile import ZipFile, ZIP_DEFLATED
@@ -297,8 +315,9 @@ def zipdir(basedir, archivename):
             #NOTE: ignoring empty directories
             for fn in files:
                 absfn = os.path.join(root, fn)
-                zfn = absfn[len(basedir)+len(os.sep):] #XXX: relative path
+                zfn = absfn[len(basedir) + len(os.sep):]  # XXX: relative path
                 z.write(absfn, zfn)
+
 
 @task
 def sync_config():
@@ -336,11 +355,13 @@ def package():
         local("android/app/cordova/build --debug")
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis.apk")
 
+
 @task
 def package_test():
         run("cd %s && %s/bin/python manage.py package hapifis-test.herokuapp.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-test.apk")
+
 
 @task
 def transfer_db():
@@ -349,3 +370,25 @@ def transfer_db():
     local("heroku pgbackups:capture --expire")
     run("curl -o /tmp/%s.dump \"%s\"" % (date, db_url))
     run("pg_restore --verbose --clean --no-acl --no-owner -U vagrant -d geosurvey /tmp/%s.dump" % date)
+
+
+@task
+def migrate_db():
+    with cd(env.code_dir):
+        with _virtualenv():
+            _manage_py('migrate --settings=config.environments.staging')
+
+
+@task
+def backup_db():
+    date = datetime.datetime.now().strftime("%Y-%m-%d%H%M")
+    dump_name = "%s-geosurvey.dump" % date
+    run("pg_dump geosurvey -n public -c -f /tmp/%s -Fc -O -no-acl -U postgres" % dump_name)
+    get("/tmp/%s" % dump_name, "backups/%s" % dump_name)
+
+
+@task
+def restore_db(dump_name):
+    put(dump_name, "/tmp/%s" % dump_name.split('/')[-1])
+    run("pg_restore --verbose --clean --no-acl --no-owner -U postgres -d geosurvey /tmp/%s" % dump_name.split('/')[-1])
+    #run("cd %s && %s/bin/python manage.py migrate --settings=config.environments.staging" % (env.app_dir, env.venv))

@@ -11,78 +11,67 @@ cd into the source directory with your terminal
 ```
 
 # Server Setup
+## Vagrant
 ```bash
+vagrant plugin install vagrant-omnibus # for chef
 vagrant up
-easy_install pip (if you do not already have)
-pip install fabric (if you do not already have)
+easy_install pip #(if you do not already have)
+pip install fabric #(if you do not already have)
 fab vagrant bootstrap
 fab vagrant createsuperuser
-fab vagrant loaddata
 fab vagrant runserver
 ```
 
-## to update test server
+### Loading Data
+From Fixtures
 ```bash
-fab test update
+fab vagrant loaddata
 ```
 
-# Install Requirements
-From the geosurvey project directory
+From the currently running instance
 ```bash
-sudo npm install -g yo grunt-cli bower
-npm install && bower install --dev
-npm install generator-angular generator-karma
-```
+fab staging:eknuth@hapifis-dev.pointnineseven.com backup_db
+fab staging:eknuth@hapfis-dev.pointnineseven.com restore_db:backups/2013-11-111755-geosurvey.dump
+fab staging:eknuth@hapifis-dev.pointnineseven.com migrate_db
 
-# Backing up and restoring databases
 
-```bash
-pg_dump -U vagrant --clean --no-acl -Fc geosurvey> geosurvey.dump
-```
 
-```bash
-pg_restore --verbose --clean --no-acl --no-owner -U vagrant -d geosurvey geosurvey.dump
-```
-# Launching Server
-Run all of these in seperate tabs/windows
+## Provision a fresh Server with Chef and Fabric
+Create a node file with the name scripts/cookbook/node_staging.json from the template in scripts/cookbook/node_staging.json.template.  Set the postgresql password and add your ssh public key to scripts/node_staging.json.  Tested with Ubuntu 12.04 (precise pangolin).
 
-The app will be served on port 9000.  A browser window will open automatically.
-```bash
-grunt server
-```
-# Running Tests
-
-With the server running in port 9000, run the following commands for continuous test running.
-
-Unit tests will run whenever you save a file:
+These commands install all the prerequisites for running marine planner, including postgresql/postgis, python and all the required modules in a virtual environment as well as gunicorn and nginx to serve the static files.
 
 ```bash
-grunt c-unit
+fab staging:root@hostname prepare
+fab staging:username@hostname deploy
 ```
 
-End to end tests will run whenever you save a file:
-
-
-```bash
-grunt c-e2e
-```
-
-
-# Using the angular app generator
-
-Add a new route, view, controller, unit test:
-```bash
-yo angular:route myRoute
-```
-
-Because the app is being served out of the django app we need to specify a path for the controls and templates.  Here is an axample route:
-
+###Sample config file
 ```javascript
-.when('/RespondantDetail', {
-  templateUrl: '/static/survey/views/RespondantDetail.html',
-  controller: 'RespondantDetailCtrl'
-})
+{
+    "user": "www-data",
+    "servername": "staging.example.com",
+    "dbname": "marine-planner",
+    "staticfiles": "/usr/local/apps/marine-planner/mediaroot",
+    "mediafiles": "/usr/local/apps/marine-planner/mediaroot",
+    "users": [
+        {
+            "name": "jsmith",
+            "key": "ssh-rsa AAAAB3sdkfjhsdkhjfdjkhfffdj.....fhfhfjdjdfhQ== jsmith@machine.local"
+        }
+    ],
+    "postgresql": {
+        "password": {
+            "postgres": "some random password here"
+        }
+    },
+    "run_list": [
+        "marine-planner::default"
+    ]
+}
 ```
+
+After the prepare command runs you will no longer be able to login as root with a password.  The prepare command creates one or more users with sudo access based on the list of users specified in the json file.
 
 #Heroku
 ##requirements

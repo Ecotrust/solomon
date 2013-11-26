@@ -15,7 +15,16 @@ def make_uuid():
 STATE_CHOICES = (
     ('complete', 'Complete'),
     ('terminate', 'Terminate'),
+)
 
+REVIEW_STATE_NEEDED = 'needs review'
+REVIEW_STATE_FLAGGED = 'flagged'
+REVIEW_STATE_ACCEPTED = 'accepted'
+
+REVIEW_STATE_CHOICES = (
+    (REVIEW_STATE_NEEDED, 'Needs Review'),
+    (REVIEW_STATE_FLAGGED, 'Flagged'),
+    (REVIEW_STATE_ACCEPTED, 'Accepted')
 )
 
 
@@ -24,6 +33,7 @@ class Respondant(caching.base.CachingMixin, models.Model):
     survey = models.ForeignKey('Survey')
     responses = models.ManyToManyField('Response', related_name='responses', null=True, blank=True)
     complete = models.BooleanField(default=False)
+    review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=None, null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATE_CHOICES, default=None, null=True, blank=True)
     last_question = models.CharField(max_length=240, null=True, blank=True)
 
@@ -90,6 +100,14 @@ class Survey(caching.base.CachingMixin, models.Model):
     @property
     def completes(self):
         return self.respondant_set.filter(complete=True).count()
+
+    @property
+    def reviews_needed(self):
+        return self.respondant_set.filter(review_state=REVIEW_STATE_NEEDED).count()
+
+    @property
+    def flagged(self):
+        return self.respondant_set.filter(review_state=REVIEW_STATE_FLAGGED).count()
 
     @property
     def activity_points(self):
