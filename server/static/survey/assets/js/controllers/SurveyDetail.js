@@ -402,9 +402,10 @@ angular.module('askApp')
 
     $scope.saveState = function (state) {
         var appCopy = angular.copy(state);
-        delete appCopy.currentRespondent;  
+        delete appCopy.currentRespondent; 
+        appCopy.currentRespondantKey =  'hapifish-' + $routeParams.uuidSlug;
         localStorage.setItem('hapifish', JSON.stringify(appCopy));
-        localStorage.setItem('hapifish-' + $routeParams.uuidSlug, JSON.stringify(state.currentRespondent));
+        localStorage.setItem(appCopy.currentRespondantKey, JSON.stringify(state.currentRespondent));
     };
 
     $scope.answerQuestion = function(answer, otherAnswer) {

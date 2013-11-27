@@ -49,6 +49,22 @@
                 text-decoration: none;
                 color: inherit;
             }
+            .nav > li > a {
+                background-color: rgb(100,100,100);
+                border-radius: 0;
+            }
+            .nav > li > a:hover {
+                background-color: rgb(150,150,150);   
+            }
+            .nav-pills > .active > a {
+                background-color: rgb(0, 136, 204);
+            }
+            .nav-stacked > li:hover {
+                background-color: rgb(120,120,120);   
+            }
+            .todo li {
+                padding: 0;
+            }
             .list {
                 margin-bottom: 10px;
             }
@@ -133,12 +149,15 @@
         .main .segmented-controller {
             margin-top: 20px;
         }         
-
+        #gridQuestion .row {
+            margin-left: 0;
+        }
         .ngHeaderText {
             white-space: normal;
         }
         .ngHeaderContainer {
             height: inherit;
+            width: 100%;
         }
         .ngCellText {
             white-space: normal !important;
@@ -161,7 +180,7 @@
     <script src="assets/lib/js/date.min.js"></script>
     <script src="assets/lib/js/jquery-1.8.2.min.js"></script>
     <script src="assets/lib/js/jquery-ui.min.js"></script>
-     <script src="assets/lib/js/angular.js"></script>
+     <script src="assets/lib/js/angular-1.0.6.js"></script>
      <script src="assets/lib/js/angular-ui.js"></script>
      <script src="assets/js/directives/ui-bootstrap-tpls-0.2.0.js"></script>
 

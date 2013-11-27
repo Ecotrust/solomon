@@ -20,10 +20,13 @@ angular.module('askApp')
         $scope.surveys = app.surveys;
     }
     $scope.survey = _.findWhere($scope.surveys, { slug: $routeParams.surveySlug});
-    
+        
     if (app.offline) {
         // app.respondents[$routeParams.uuidSlug].complete = true;
         // app.respondents[$routeParams.uuidSlug].status = 'complete';
+        $scope.respondent = JSON.parse(localStorage.getItem(app.currentRespondantKey));
+        $scope.respondent.complete = true;
+        localStorage.setItem(app.currentRespondantKey, JSON.stringify($scope.respondent));
     } else {
         $http.post(url).success(function (data) {
             app.data.state = $routeParams.action;

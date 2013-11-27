@@ -151,7 +151,7 @@
     <!-- Multi-Select -->
     <div ng-switch-when="multi-select">
         <form class="question" ng-submit="answerMultiSelect(question)">
-            <div class="todo mrm">
+            <div class="mrm">
                 <div ng-show="question.hoisted_options.length" ng-cloak class="hoisted-activities">
                     <h3>Activities You Selected</h3>
                     <ul class="nav nav-pills nav-stacked hoisted">
@@ -165,7 +165,7 @@
                 </div>
             </div>
             <p ng-show="question.hoisted_options.length > 0" style="margin-bottom: 20px;">Are there additional activities you conducted at this location in the last 12 months? If so, please select from below.</p>
-            <div class="todo mrm options-list">
+            <div class="mrm options-list">
               <!-- with accordion -->
               <accordion ng-show="question.groupedOptions.length">
                 <div ng-repeat="groupOption in question.groupedOptions" class="accordion-div">
