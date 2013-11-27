@@ -448,12 +448,11 @@ angular.module('askApp')
                 $scope.dialog.$scope.close();
             }
         } else {
-            if ($scope.question.type === 'datepicker') {
-
-                //answer = new Date.parse(answer, "dd-MM-yyyy");    
+            if ($scope.question.type === 'timepicker' || $scope.question.type === 'datepicker') {
+                if (! $scope.answer) {
+                    answer = $scope.now;
+                }
             }
-            
-
             // sometimes we'll have an other field with option text box
             if (answer === 'other' && otherAnswer) {
                 answer = otherAnswer;
@@ -1499,14 +1498,18 @@ $scope.loadSurvey = function(data) {
         }
 
         if ($scope.question && $scope.question.type === 'datepicker') {
-            $scope.now =  $scope.answer || (new Date()).toString("dd-MM-yyyy");
-            if ($scope.answer) {
-                $scope.answer = new Date.parse($scope.answer, "dd-MM-yyyy").toString("dd-MM-yyyy");    
-            }
+            $scope.now =  $scope.answer || (new Date()).toString("yyyy-MM-dd");
         }
-        if ($scope.question && $scope.question.type === 'timepicker') {
-            $scope.now = $scope.answer || (new Date()).toString("HH:mm");
-        }
+
+        // if ($scope.question && $scope.question.type === 'datepicker') {
+        //     $scope.now =  $scope.answer || (new Date()).toString("dd-MM-yyyy");
+        //     if ($scope.answer) {
+        //         $scope.answer = new Date.parse($scope.answer, "dd-MM-yyyy").toString("dd-MM-yyyy");    
+        //     }
+        // }
+        // if ($scope.question && $scope.question.type === 'timepicker') {
+        //     $scope.now = $scope.answer || (new Date()).toString("HH:mm");
+        // }
         // if ($scope.question.foreach_question) {
         //     $scope.question.foreach = true;
         //     $scope.question.foreachAnswers = $scope.getAnswer($scope.question.foreach_question.slug);
