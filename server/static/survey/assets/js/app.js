@@ -3,7 +3,7 @@
 if (localStorage.getItem('hapifish') && window.location.pathname !== '/respond') {
     app = JSON.parse(localStorage.getItem('hapifish'));
 } else {
-    var app = {};    
+    var app = {};
 }
 if (_.string.startsWith(window.location.protocol, "http")) {
     app.server = window.location.protocol + "//" + window.location.host;
