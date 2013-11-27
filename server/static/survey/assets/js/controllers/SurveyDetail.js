@@ -448,11 +448,11 @@ angular.module('askApp')
                 $scope.dialog.$scope.close();
             }
         } else {
-            if ($scope.question.type === 'timepicker' || $scope.question.type === 'datepicker') {
-                if (! $scope.answer) {
-                    answer = $scope.now;
-                }
+            if ($scope.question.type === 'datepicker') {
+
+                //answer = new Date.parse(answer, "dd-MM-yyyy");    
             }
+            
 
             // sometimes we'll have an other field with option text box
             if (answer === 'other' && otherAnswer) {
@@ -483,7 +483,6 @@ angular.module('askApp')
                 }));
             }
             if (app.offline) {
-
                 $scope.answerOffline({
                     answer: answer,
                     question: $scope.question
@@ -1500,11 +1499,12 @@ $scope.loadSurvey = function(data) {
         }
 
         if ($scope.question && $scope.question.type === 'datepicker') {
-            $scope.now =  $scope.answer || (new Date()).toString("yyyy-MM-dd");
-
+            $scope.now =  $scope.answer || (new Date()).toString("dd-MM-yyyy");
+            if ($scope.answer) {
+                $scope.answer = new Date.parse($scope.answer, "dd-MM-yyyy").toString("dd-MM-yyyy");    
+            }
         }
         if ($scope.question && $scope.question.type === 'timepicker') {
-
             $scope.now = $scope.answer || (new Date()).toString("HH:mm");
         }
         // if ($scope.question.foreach_question) {

@@ -82,26 +82,26 @@
     </div>
     <div ng-switch-when="datepicker">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
-            <script type="text/javascript">
-                $(function() {
-                    if ($("html").is(".lt-ie9")) {
-                        $("input[type=date]").datepicker({
-                            onSelect: function(date) {
-                                // For some reason the datepicker doesn't
-                                // actually do anything in IE8.
-                                $("input[type=date]").val(date);
-                            }
-                        });
-                    }
-                });
-            </script>
-            <input class="form-control input-block-level" type="date" placeholder="{{ question.label }}" ng-model="answer"/>
+            <!--<script type="text/javascript">
+                // $(function() {
+                //     if ($("html").is(".lt-ie9")) {
+                //         $("input[type=date]").datepicker({
+                //             onSelect: function(date) {
+                //                 // For some reason the datepicker doesn't
+                //                 // actually do anything in IE8.
+                //                 $("input[type=date]").val(date);
+                //             }
+                //         });
+                //     }
+                // });
+            </script>-->
+            <input class="form-control input-block-level datepicker" placeholder="pick a date" date-picker answer="answer"/>
             <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
         </form>
     </div>
     <div ng-switch-when="timepicker">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
-            <input class="form-control input-block-level" type="time" placeholder="{{ question.label }}" ng-model="answer"/>
+            <input class="form-control input-block-level" placeholder="pick a time" time-picker answer="answer"/>
             <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
         </form>
     </div>

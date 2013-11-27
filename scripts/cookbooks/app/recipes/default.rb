@@ -94,6 +94,13 @@ else
     # end
 end
 
+directory "/srv/downloads" do
+    owner $user
+    group "deploy"
+    mode 0770
+end
+
+
 directory "/usr/local/apps" do
     owner $user
     group "deploy"

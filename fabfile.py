@@ -253,7 +253,8 @@ def vagrant(username='vagrant'):
     env.host = '127.0.0.1'
     env.port = data['Port']
     env.code_dir = '/vagrant/%s' % app
-
+    env.app_dir = '/vagrant/server'
+    env.venv = '/usr/local/venv/geosurvey'
     try:
         env.host_string = '%s@127.0.0.1:%s' % (username, data['Port'])
     except KeyError:
@@ -268,8 +269,8 @@ def staging(connection):
     env.user, env.host = connection.split('@')
     env.port = 22
     env.host_string = '%s@%s:%s' % (env.user, env.host, env.port)
-
-
+    env.app_dir = '/usr/local/apps/geosurvey/server'
+    env.venv = '/usr/local/venv/geosurvey'
 def upload_project_sudo(local_dir=None, remote_dir=""):
     """
     Copied from Fabric and updated to use sudo.
@@ -402,3 +403,9 @@ def restore_db(dump_name):
     put(dump_name, "/tmp/%s" % dump_name.split('/')[-1])
     run("pg_restore --verbose --clean --no-acl --no-owner -U postgres -d geosurvey /tmp/%s" % dump_name.split('/')[-1])
     #run("cd %s && %s/bin/python manage.py migrate --settings=config.environments.staging" % (env.app_dir, env.venv))
+
+@task
+def package_android_dev():
+        run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
+        local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
+#        local("scp ./mobile/platforms/android/bin/DigitalDeck-debug.apk usvi-dev.pointnineseven.com:/srv/downloads")

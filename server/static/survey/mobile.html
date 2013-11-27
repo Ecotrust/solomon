@@ -24,6 +24,9 @@
         <link href="assets/lib/css/bootstrap.css" rel="stylesheet">
          <link rel="stylesheet" href="assets/lib/css/ng-grid.css">
         <link rel="stylesheet" href="assets/lib/css/flat-ui.css">
+        <link rel="stylesheet" href="assets/lib/css/default.css">
+        <link rel="stylesheet" href="assets/lib/css/default.date.css">
+        <link rel="stylesheet" href="assets/lib/css/default.time.css">
         <link rel="stylesheet" href="styles/main.css">
         <!-- Intro paragraph styles. Delete once you start using this page -->
         <style type="text/css">
@@ -45,6 +48,14 @@
                 background-color: #222;
                 color: white;
             }*/
+            
+            .datepicker, .timepicker {
+            color: rgb(0, 0, 0)!important;
+            }
+
+            .question-page .content-padded {
+                height: 100%;
+            }
             a,a:hover {
                 text-decoration: none;
                 color: inherit;
@@ -54,7 +65,7 @@
                 border-radius: 0;
             }
             .nav > li > a:hover {
-                background-color: rgb(150,150,150);   
+                background-color: rgb(100,100,100);
             }
             .nav-pills > .active > a {
                 background-color: rgb(0, 136, 204);
@@ -191,7 +202,9 @@
      <script src="assets/lib/js/ng-grid.min.js"></script>
      <script src="assets/lib/js/ng-grid-plugins/ng-grid-flexible-height.js"></script>
      <script src="assets/lib/js/bootstrap.js"></script>
-
+     <script src="assets/lib/js/picker.js"></script>
+     <script src="assets/lib/js/picker.time.js"></script>
+     <script src="assets/lib/js/picker.date.js"></script>
      <script>
      window.isAuthenticated = false;
      </script>
@@ -209,6 +222,7 @@
     <script src="assets/js/controllers/settings.js"></script>
     <script src="assets/js/controllers/complete.js"></script>
     <script src="assets/js/directives/mobilemenu.js"></script>
+    <script src="assets/js/directives/directives.js"></script>
     <script src="assets/js/directives/titlebar.js"></script>
     <script src="assets/js/directives/tap.js"></script>
     <!-- endbuild -->
