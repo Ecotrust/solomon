@@ -354,20 +354,21 @@ def prepare():
 
 @task
 def package():
-        run("cd %s && %s/bin/python manage.py package hapifis.herokuapp.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
+        run("cd %s && %s/bin/python manage.py package https://hapifis.herokuapp.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis.apk")
 
 
 @task
 def package_test():
-        run("cd %s && %s/bin/python manage.py package hapifis-test.herokuapp.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
+        run("cd %s && %s/bin/python manage.py package https://hapifis-test.herokuapp.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-test.apk")
 
+
 @task
 def package_dev():
-        run("cd %s && %s/bin/python manage.py package hapifis-dev.pointnineseven.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
+        run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-dev.apk")
 
