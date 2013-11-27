@@ -14,20 +14,21 @@ angular.module('askApp')
         link: function (scope, element, attrs) {
             // initialize slider
             scope.initializeSlider = _.once(function () {
-                element.dateRangeSlider({
+                element.editRangeSlider({
                     formatter:function(val){
-                        var days = val.getDate(),
-                            month = val.getMonth() + 1,
-                            year = val.getFullYear();
+                        var date = new Date(val);
+                        var days = date.getDate(),
+                            month = date.getMonth() + 1,
+                            year = date.getFullYear();
                         return days + "/" + month + "/" + year;
                     },
                     bounds:{
-                        min: scope.start,
-                        max: scope.end
+                        min: scope.start.valueOf(),
+                        max: scope.end.valueOf()
                     },
-                    set: {
+                    set: 86400/*{
                         days: 1
-                    }
+                    }*/
                 });
             });
 
@@ -36,7 +37,7 @@ angular.module('askApp')
                 scope.$watch('start', function (newStart) {
                     if (newStart) {
                         scope.initializeSlider();
-                        element.dateRangeSlider("min", newStart);
+                        element.editRangeSlider("min", newStart.valueOf());
                     }
                 });
             }
@@ -44,7 +45,7 @@ angular.module('askApp')
                 scope.$watch('end', function (newEnd) {
                     if (newEnd) {
                         scope.initializeSlider();
-                        element.dateRangeSlider("max", newEnd);
+                        element.editRangeSlider("max", newEnd.valueOf());
                     }
                 });
             }
