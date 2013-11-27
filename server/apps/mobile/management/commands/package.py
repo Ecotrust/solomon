@@ -39,5 +39,5 @@ class Command(BaseCommand):
         # copy app assets
         copy_dir('static/survey/assets', "%s/assets" % dest)
         copy_dir('static/survey/views', "%s/views" % dest)
-        os.system("sed -i -e 's/APP_SERVER/%s/' %s/assets/js/app.js" % (url, dest))
-        os.system("sed -i -e 's/APP_SERVER/%s/' %s/views/main.html" % (url, dest))
+        os.system("sed -i -e 's,APP_SERVER,%s,' %s/views/main.html" % (url, dest))
+        os.system("sed -i -e 's,APP_SERVER,%s,' %s/assets/js/app.js" % (url, dest))
