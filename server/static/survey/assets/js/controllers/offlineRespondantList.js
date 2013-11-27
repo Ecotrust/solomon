@@ -5,21 +5,35 @@ angular.module('askApp')
         $http.defaults.headers.post['Content-Type'] = 'application/json';
 
         $scope.saveState = function () {
-            app.respondents = {};
-            _.each($scope.respondents, function (respondent) {
-                app.respondents[respondent.uuid] = respondent;
+            _.each($scope.respondentIndex, function (value, key) {
+                localStorage.setItem('hapifish-'+ key, JSON.stringify(value));
             });
             localStorage.setItem('hapifish', JSON.stringify(app));
         }
 
+
+        // $scope.saveState = function (state) {
+        //     var appCopy = angular.copy(state);
+        //     delete appCopy.currentRespondent;  
+        //     localStorage.setItem('hapifish', JSON.stringify(appCopy));
+        //     localStorage.setItem('hapifish-' + $routeParams.uuidSlug, JSON.stringify(state.currentRespondent));
+        // };
+
+        $scope.loadRespondents = function () {
+            var respondents  = {};
+            _.each(app.respondents, function (key, uuid) {
+                respondents[uuid] = JSON.parse(localStorage.getItem(key));
+            })
+            
+            return respondents;
+        }
         // load the respondents and remove ghosts
-        $scope.respondents = _.filter(_.toArray(app.respondents), function (respondent) {
-            return respondent.responses.length > 0;
+        $scope.respondentIndex = $scope.loadRespondents();
+        $scope.respondents = _.filter(_.toArray($scope.respondentIndex), function (respondent) {
+            return respondent && respondent.responses.length > 0;
         });
         $scope.saveState();
 
-
-        $scope.respondentIndex = app.respondents;        
         if (app.user) {
             $scope.user = app.user;    
         } else {
@@ -124,6 +138,9 @@ angular.module('askApp')
                         _.each($scope.synchronized, function (synced) {
                             $scope.respondents = _.without($scope.respondents,
                                 _.findWhere($scope.respondents, { uuid: synced.uuid }));
+                            delete $scope.respondentIndex[synced.uuid];
+                            delete app.respondents[synced.uuid];
+                            localStorage.removeItem('hapifish-'+ synced.uuid);
                             $scope.saveState();
                         })
                         $scope.synchronized = [];
@@ -138,6 +155,10 @@ angular.module('askApp')
 
         $scope.resume = function(respondent) {
             var url;
+            if (respondent.resumePath) {
+                $location.path(respondent.resumePath);
+            }
+            
             if (respondent.responses.length) {
                 url = [
                     '/survey',

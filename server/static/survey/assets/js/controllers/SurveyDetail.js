@@ -233,15 +233,15 @@ angular.module('askApp')
             if ($scope.answers[question.slug]) {
                 delete $scope.answers[question.slug];
             }
-            _.each(app.respondents[uuidSlug].responses, function (response, i) {
+            _.each(app.currentRespondent.responses, function (response, i) {
                 if (response.question.slug === question.slug) {
                     index = i;
                 }
             });
             if (index) {
-                app.respondents[uuidSlug].responses.splice(index, 1);
+                app.currentRespondent.responses.splice(index, 1);
             }
-            $scope.saveState();
+            $scope.saveState(app);
         }
         
     }
@@ -391,16 +391,20 @@ angular.module('askApp')
 
     $scope.answerOffline = function(answer) {
         $scope.deleteAnswer($scope.question, $routeParams.uuidSlug);
-        app.respondents[$routeParams.uuidSlug].responses.push(answer);
-        app.respondents[$routeParams.uuidSlug].ts = new Date();
+        app.currentRespondent.responses.push(answer);
+        app.currentRespondent.ts = new Date();
+        app.currentRespondent.resumePath = window.location.hash;
         $scope.answers[$routeParams.questionSlug] = answer;
-        $scope.saveState();
+        $scope.saveState(app);
         $scope.gotoNextQuestion();
 
     };
 
-    $scope.saveState = function () {
-        localStorage.setItem('hapifish', JSON.stringify(app));
+    $scope.saveState = function (state) {
+        var appCopy = angular.copy(state);
+        delete appCopy.currentRespondent;  
+        localStorage.setItem('hapifish', JSON.stringify(appCopy));
+        localStorage.setItem('hapifish-' + $routeParams.uuidSlug, JSON.stringify(state.currentRespondent));
     };
 
     $scope.answerQuestion = function(answer, otherAnswer) {
@@ -1544,19 +1548,27 @@ $scope.loadSurvey = function(data) {
                 app.respondents = {};
             }
             $routeParams.uuidSlug = ['offline', app.user.username, ts.getTime()].join('_');
-            app.respondents[$routeParams.uuidSlug] = {
+            app.respondents[$routeParams.uuidSlug] = 'hapifish-' + $routeParams.uuidSlug;
+            app.currentRespondent = {
                 uuid: $routeParams.uuidSlug,
                 survey: $routeParams.surveySlug,
                 ts: ts,
                 responses: []
             }
-            $scope.saveState();
+            $scope.saveState(app);
         }
+        app.currentRespondent = JSON.parse(localStorage.getItem('hapifish-' + $routeParams.uuidSlug));
+        if (! app.currentRespondent) {
+            app.currentRespondent = {
+                responses: []
+            }
+        }
+
         $scope.loadSurvey({
             survey: _.findWhere(app.surveys, {
                 slug: $routeParams.surveySlug
             }),
-            responses: app.respondents[$routeParams.uuidSlug].responses
+            responses: app.currentRespondent.responses
         });
     } else {
         $http.get(app.server + '/api/v1/respondant/' + $routeParams.uuidSlug + '/?format=json').success(function(data) {

@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from tastypie import fields
-from tastypie.authentication import SessionAuthentication
+from tastypie.authentication import SessionAuthentication, Authentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
@@ -65,6 +65,8 @@ class OfflineResponseResource(AuthSurveyModelResource):
 
     class Meta(AuthSurveyModelResource.Meta):
         queryset = Response.objects.all()
+        authorization = StaffUserOnlyAuthorization()
+        authentication = Authentication()
 
 
 class OfflineRespondantResource(AuthSurveyModelResource):
@@ -75,6 +77,8 @@ class OfflineRespondantResource(AuthSurveyModelResource):
         always_return_data = True
         queryset = Respondant.objects.all()
         ordering = ['-ts']
+        authorization = StaffUserOnlyAuthorization()
+        authentication = Authentication()
 
     def obj_create(self, bundle, **kwargs):
         return super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
