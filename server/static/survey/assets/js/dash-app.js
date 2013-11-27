@@ -3,6 +3,8 @@
 var app = {};
 
 app.server = window.location.protocol + '//' + window.location.host;
+app.viewPath = app.server + '/static/survey/';
+
 angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
     .config(function($routeProvider, $httpProvider, $compileProvider) {
 
@@ -10,48 +12,55 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
     $httpProvider.defaults.headers.post['Content-Type'] = 'application/json';
 
     $routeProvider.when('/author/:surveySlug', {
-        templateUrl: '/static/survey/views/author.html',
+        templateUrl: app.viewPath + 'views/author.html',
         controller: 'AuthorCtrl',
         reloadOnSearch: false
     })
         .when('/author', {
-        templateUrl: '/static/survey/views/author.html',
+        templateUrl: app.viewPath + 'views/author.html',
         controller: 'AuthorCtrl',
         reloadOnSearch: false
     })
+        .when('/', {
+        templateUrl: app.viewPath + 'views/LandingPage.html',
+        controller: 'SurveyListMenuCtrl',
+        reloadOnSearch: false
+    })
         .when('/surveys', {
-        templateUrl: '/static/survey/views/SurveyList.html',
+        templateUrl: app.viewPath + 'views/SurveyList.html',
         controller: 'SurveyListCtrl'
     })
         .when('/survey/:surveySlug/complete/:uuidSlug', {
-        templateUrl: '/static/survey/views/complete.html',
+        templateUrl: app.viewPath + 'views/complete.html',
         controller: 'CompleteCtrl'
     })
         .when('/survey/:surveySlug/complete/:uuidSlug/:action/:questionSlug', {
-        templateUrl: '/static/survey/views/complete.html',
+        templateUrl: app.viewPath + 'views/complete.html',
         controller: 'CompleteCtrl'
     })
         .when('/survey/:surveySlug/:questionSlug/:uuidSlug', {
-        templateUrl: '/static/survey/views/SurveyDetail.html',
+        templateUrl: app.viewPath + 'views/SurveyDetail.html',
         controller: 'SurveyDetailCtrl'
     })
         .when('/survey/:surveySlug/:uuidSlug', {
-        templateUrl: '/static/survey/views/landing.html',
+        templateUrl: app.viewPath + 'views/landing.html',
         controller: 'SurveyDetailCtrl'
     })
         .when('/RespondantList/:surveySlug', {
-        templateUrl: '/static/survey/views/RespondantList.html',
+        templateUrl: app.viewPath + 'views/RespondantList.html',
         controller: 'RespondantListCtrl'
     })
         .when('/RespondantDetail/:surveySlug/:uuidSlug', {
-        templateUrl: '/static/survey/views/RespondantDetail.html',
+        templateUrl: app.viewPath + 'views/RespondantDetail.html',
         controller: 'RespondantDetailCtrl'
     })
         .when('/crosstab/:surveySlug/:questionSlugX/:questionSlugY', {
-        templateUrl: '/static/survey/views/crosstab.html',
+        templateUrl: app.viewPath + 'views/crosstab.html',
         controller: 'CrossTabCtrl'
     })
         .otherwise({
+        templateUrl: app.viewPath + 'views/LandingPage.html',
+        controller: 'SurveyListMenuCtrl',
         redirectTo: '/'
     });
 });

@@ -5,7 +5,8 @@ from tastypie.authentication import SessionAuthentication, Authentication
 from tastypie.authorization import Authorization
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
-from survey.models import Survey, Question, Option, Respondant, Response, Page, Block
+from survey.models import (Survey, Question, Option, Respondant, Response,
+                           Page, Block, REVIEW_STATE_CHOICES)
 
 
 class SurveyModelResource(ModelResource):
@@ -102,6 +103,14 @@ class ReportRespondantResource(AuthSurveyModelResource):
             'ts': ['gte', 'lte']
         }
         ordering = ['-ts']
+
+    def alter_list_data_to_serialize(self, request, data):
+        data['meta']['statuses'] = dict(REVIEW_STATE_CHOICES)
+        return data
+
+    def alter_detail_data_to_serialize(self, request, bundle):
+        bundle.data['meta'] = {'statuses': dict(REVIEW_STATE_CHOICES)}
+        return bundle
 
 
 class ReportRespondantDetailsResource(ReportRespondantResource):

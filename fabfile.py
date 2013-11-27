@@ -365,6 +365,12 @@ def package_test():
         local("android/app/cordova/build --debug")
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-test.apk")
 
+@task
+def package_dev():
+        run("cd %s && %s/bin/python manage.py package hapifis-dev.pointnineseven.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
+        local("android/app/cordova/build --debug")
+        local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-dev.apk")
+
 
 @task
 def transfer_db():
