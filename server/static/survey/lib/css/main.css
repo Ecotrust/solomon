@@ -65,3 +65,6 @@
     margin-left: 2em;
 }
 
+th.sortable_table {
+    cursor: pointer;
+}

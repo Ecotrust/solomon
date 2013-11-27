@@ -110,6 +110,27 @@ angular.module('askApp')
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = 'overview';
 
+    $scope.columns = [ 'Surveyor'
+                     , 'Date'
+                     , 'Time'
+                     , 'Market'
+                     , 'Vendor Name'
+                     , 'Buyer/Fisher'
+                     , 'Sales Type'
+                     , 'Status'
+                     , 'Detail'
+                     ];
+    $scope.currentColumn = 'Date';
+    $scope.sortDescending = true;
+    $scope.changeSorting = function (column) {
+        if ($scope.currentColumn == column) {
+            $scope.sortDescending = !$scope.sortDescending;
+        } else {
+            $scope.currentColumn = column;
+            $scope.sortDescending = true;
+        }
+    };
+
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
             $scope.charts = [];

@@ -55,15 +55,10 @@
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
                     <tr>
-                        <th>Surveyor</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Market</th>
-                        <th>Vendor Name</th>
-                        <th>Buyer/Fisher</th>
-                        <th>Sales Type</th>
-                        <th>Status</th>
-                        <th>Detail</th>
+                        <th class="sortable_table" ng-repeat="column in columns" ng-click="changeSorting(column)">{{column}}
+                            <i ng-show="currentColumn == column && sortDescending" class="icon-caret-down"></i>
+                            <i ng-show="currentColumn == column && !sortDescending" class="icon-caret-up"></i>
+                        </th>
                     </tr>
                     <tr ng-repeat="respondent in respondents">
                         <td>{{ respondent.user.username }}</td>
