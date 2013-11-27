@@ -26,9 +26,7 @@ angular.module('askApp')
                         min: scope.start.valueOf(),
                         max: scope.end.valueOf()
                     },
-                    set: 86400/*{
-                        days: 1
-                    }*/
+                    set: 86400 // Day in seconds
                 });
             });
 
