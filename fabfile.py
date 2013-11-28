@@ -371,7 +371,7 @@ def package_test():
 def package_dev():
         run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
         local("android/app/cordova/build --debug")
-        local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-dev.apk")
+        # local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-dev.apk")
 
 
 @task

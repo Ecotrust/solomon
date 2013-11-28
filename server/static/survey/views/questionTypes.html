@@ -101,9 +101,20 @@
         </form>
     </div>
     <div ng-switch-when="timepicker">
-        <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
+        <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)" novalidate>
             <!-- <input class="form-control input-block-level" placeholder="pick a time" time-picker answer="answer"/> -->
-            <input class="form-control input-block-level" type="time" placeholder="{{ question.label }}" ng-model="answer"/>
+            <!-- <input class="form-control input-block-level" type="time" placeholder="{{ question.label }}" ng-model="answer"/> -->
+            <!-- <input class="form-control input-block-level" type="time" placeholder="{{ question.label }}" ng-model="answer"/>  -->
+            <input class="form-control input-block-level" type="text" placeholder="{{ question.label }}" ng-model="answer"/> 
+            <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
+        </form>
+    </div>
+    <div ng-switch-when="datetimepicker">
+        <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)" novalidate>
+            <!-- <input class="form-control input-block-level" placeholder="pick a time" time-picker answer="answer"/> -->
+            <!-- <input class="form-control input-block-level" type="time" placeholder="{{ question.label }}" ng-model="answer"/> -->
+            <!-- <input class="form-control input-block-level" type="time" placeholder="{{ question.label }}" ng-model="answer"/>  -->
+            <input class="form-control input-block-level" type="datetime" placeholder="{{ question.label }}" ng-model="answer"/> 
             <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
         </form>
     </div>

@@ -448,8 +448,8 @@ angular.module('askApp')
                 $scope.dialog.$scope.close();
             }
         } else {
-            if ($scope.question.type === 'timepicker' || $scope.question.type === 'datepicker') {
-                if (! $scope.answer) {
+            if ($scope.question.type === 'timepicker' || $scope.question.type === 'datepicker' || $scope.question.type === 'datetimepicker') {
+                if (! answer) {
                     answer = $scope.now;
                 }
             }
