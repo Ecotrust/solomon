@@ -1,6 +1,6 @@
 
 angular.module('askApp')
-    .directive('rangeSlider', function() {
+    .directive('editableDateRangeSlider', function() {
 
     return {
         template: '<div class="range-slider"></div>',
@@ -22,10 +22,7 @@ angular.module('askApp')
                             year = date.getFullYear();
                         return days + "/" + month + "/" + year;
                     },
-                    bounds:{
-                        min: scope.start.valueOf(),
-                        max: scope.end.valueOf()
-                    },
+                    bounds: { min: scope.start, max: scope.end },
                     set: 86400 // Day in seconds
                 });
             });
@@ -57,6 +54,7 @@ angular.module('askApp')
                     if (attrs.end) {
                         s.end = data.values.max;//.clearTime();
                     }
+                    element.editRangeSlider("values", s.start, s.end);
                 });
             });
         }
