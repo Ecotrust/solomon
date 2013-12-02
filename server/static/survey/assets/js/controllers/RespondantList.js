@@ -138,6 +138,7 @@ angular.module('askApp')
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = 'overview';
     $scope.statuses = [];
+    $scope.status_single = "";
 
     $scope.columns = [ 'Surveyor'
                      , 'Date'
@@ -166,7 +167,7 @@ angular.module('askApp')
         }
     }, true);
 
-    $scope.$watch('status', function (newValue) {
+    $scope.$watch('status_single', function (newValue) {
         if ($scope.filter) {
             filters_changed($http, $scope, $routeParams.surveySlug);
         }
@@ -215,7 +216,8 @@ angular.module('askApp')
         if ($scope.market) {
             url = url + '&survey_site=' + $scope.market;
         }
-        if ($scope.status != "") {
+        if ($scope.status_single) {
+            url = url + '&status=' + $scope.status_single;
         }
 
         $http.get(url).success(function(data) {
@@ -223,7 +225,6 @@ angular.module('askApp')
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
             $scope.statuses = data.meta.statuses;
-            $scope.status = "";
         });
     }
 
