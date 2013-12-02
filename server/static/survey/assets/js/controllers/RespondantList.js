@@ -90,6 +90,7 @@ function setup_market_dropdown($http, $scope, market_site_id) {
 
     $http.get(url).success(function(data) {
         $scope.markets = [];
+        $scope.market = "";
         var markets_with_dupes = _.map(data.objects,
             function(x) { return x.answer; });
 
@@ -99,7 +100,6 @@ function setup_market_dropdown($http, $scope, market_site_id) {
             }
         });
     });
-
 }
 
 angular.module('askApp')
