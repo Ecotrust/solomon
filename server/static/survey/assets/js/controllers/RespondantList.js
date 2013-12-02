@@ -109,8 +109,8 @@ function filters_changed($http, $scope, surveySlug) {
     $scope.charts = [];
     $scope.getRespondents();
 
-    var start_date = new Date($scope.filter.startDate.toString('yyyyMMdd'));
-    var end_date = new Date($scope.filter.endDate.toString('yyyyMMdd'))
+    var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
+    var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
 
     fish_weight_by_market($http, $scope.charts, start_date, end_date,
         surveySlug)
