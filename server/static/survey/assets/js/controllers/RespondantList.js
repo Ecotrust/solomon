@@ -85,7 +85,10 @@ function total_weight_for_market($http, charts, start_date, end_date, slug) {
     });
 }
 
-function setup_market_dropdown($http, $scope, market_site_id) {
+function setup_market_dropdown($http, $scope) {
+    var market_site_id = _.find($scope.survey.questions, function(x) {
+        return x.slug == 'survey-site';
+    }).id;
     var url = '/api/v1/response?format=json&question=' + market_site_id;
 
     $http.get(url).success(function(data) {
@@ -100,6 +103,31 @@ function setup_market_dropdown($http, $scope, market_site_id) {
             }
         });
     });
+}
+
+function filters_changed($http, $scope, surveySlug) {
+    $scope.charts = [];
+    $scope.getRespondents();
+
+    var start_date = $scope.filter.startDate.toString('yyyyMMdd');
+    var end_date = $scope.filter.endDate.toString('yyyyMMdd')
+
+    fish_weight_by_market($http, $scope.charts, start_date, end_date,
+        surveySlug)
+
+    fish_weight_by_province($http, $scope.charts, start_date, end_date,
+        surveySlug);
+
+    average_trip_costs_by_market($http, $scope.charts, start_date, end_date,
+        surveySlug);
+
+    total_weight_for_market($http, $scope.charts, start_date, end_date,
+        surveySlug);
+
+    // FIXME: When the survey data can be pulled in, put it here.
+    $scope.surveyor_by_time = {
+        yLabel: "Survey Responses"
+    }
 }
 
 angular.module('askApp')
@@ -134,39 +162,26 @@ angular.module('askApp')
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
-            $scope.charts = [];
-            $scope.getRespondents();
-
-            var start_date = $scope.filter.startDate.toString('yyyyMMdd');
-            var end_date = $scope.filter.endDate.toString('yyyyMMdd')
-            var market_site_id = _.find($scope.survey.questions, function(x) {
-                return x.slug == 'survey-site';
-            }).id;
-
-            setup_market_dropdown($http, $scope, market_site_id);
-            fish_weight_by_market($http, $scope.charts, start_date, end_date,
-                $routeParams.surveySlug)
-
-            fish_weight_by_province($http, $scope.charts, start_date, end_date,
-                $routeParams.surveySlug);
-
-            average_trip_costs_by_market($http, $scope.charts, start_date, end_date,
-                $routeParams.surveySlug);
-
-            total_weight_for_market($http, $scope.charts, start_date, end_date,
-                $routeParams.surveySlug);
-
-            // FIXME: When the survey data can be pulled in, put it here.
-            $scope.surveyor_by_time = {
-                yLabel: "Survey Responses"
-            }
+            filters_changed($http, $scope, $routeParams.surveySlug);
         }
+    }, true);
 
+    $scope.$watch('status', function (newValue) {
+        if ($scope.filter) {
+            filters_changed($http, $scope, $routeParams.surveySlug);
+        }
+    }, true);
+
+    $scope.$watch('market', function (newValue) {
+        if ($scope.filter) {
+            filters_changed($http, $scope, $routeParams.surveySlug);
+        }
     }, true);
 
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
+        setup_market_dropdown($http, $scope);
         $scope.filter = {
             startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day(),
             endDate: $scope.dateFromISO($scope.survey.response_date_end).add(1).day()
@@ -192,10 +207,15 @@ angular.module('askApp')
         }
 
         if ($scope.filter.startDate) {
-            url = url + '&ts__gte=' + $scope.filter.startDate.toString('yyyy-MM-dd')
+            url = url + '&ts__gte=' + $scope.filter.startDate.toString('yyyy-MM-dd');
         }
         if ($scope.filter.endDate) {
-            url = url + '&ts__lte=' + $scope.filter.endDate.toString('yyyy-MM-dd')
+            url = url + '&ts__lte=' + $scope.filter.endDate.toString('yyyy-MM-dd');
+        }
+        if ($scope.market) {
+            url = url + '&survey_site=' + $scope.market;
+        }
+        if ($scope.status != "") {
         }
 
         $http.get(url).success(function(data) {
@@ -203,7 +223,7 @@ angular.module('askApp')
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
             $scope.statuses = data.meta.statuses;
-            $scope.status_single = "";
+            $scope.status = "";
         });
     }
 
