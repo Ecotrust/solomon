@@ -109,6 +109,7 @@ angular.module('askApp')
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = 'overview';
+    $scope.statuses = [];
 
     $scope.columns = [ 'Surveyor'
                      , 'Date'
@@ -202,6 +203,7 @@ angular.module('askApp')
             $scope.respondents = data.objects;
             $scope.meta = data.meta;
             $scope.statuses = data.meta.statuses;
+            $scope.status_single = "";
         });
     }
 
