@@ -207,16 +207,16 @@ angular.module('askApp')
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
 
-        if ($scope.filter.startDate) {
+        if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
             url = url + '&ts__gte=' + $scope.filter.startDate.toString('yyyy-MM-dd');
         }
-        if ($scope.filter.endDate) {
+        if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
             url = url + '&ts__lte=' + $scope.filter.endDate.toString('yyyy-MM-dd');
         }
-        if ($scope.market) {
+        if ($scope.market && url.indexOf("&survey_site=") == -1) {
             url = url + '&survey_site=' + $scope.market;
         }
-        if ($scope.status_single) {
+        if ($scope.status_single && url.indexOf("&status=") == -1) {
             url = url + '&status=' + $scope.status_single;
         }
 
