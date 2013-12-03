@@ -15,14 +15,15 @@ angular.module('askApp')
             // initialize slider
             scope.initializeSlider = _.once(function () {
                 element.editRangeSlider({
-                    formatter:function(val){
-                        var date = new Date(val);
+                    formatter:function(value_of_the_thing){
+                        var date = new Date(value_of_the_thing);
                         var days = date.getDate(),
                             month = date.getMonth() + 1,
                             year = date.getFullYear();
                         return days + "/" + month + "/" + year;
                     },
                     bounds: { min: scope.start, max: scope.end },
+                    defaultValues: { min: scope.start, max: scope.end },
                     set: 86400 // Day in seconds
                 });
             });
