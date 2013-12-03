@@ -33,7 +33,6 @@ angular.module('askApp')
                 scope.$watch('start', function (newStart) {
                     if (newStart) {
                         scope.initializeSlider();
-                        element.editRangeSlider("min", newStart.valueOf());
                     }
                 });
             }
@@ -41,7 +40,6 @@ angular.module('askApp')
                 scope.$watch('end', function (newEnd) {
                     if (newEnd) {
                         scope.initializeSlider();
-                        element.editRangeSlider("max", newEnd.valueOf());
                     }
                 });
             }
