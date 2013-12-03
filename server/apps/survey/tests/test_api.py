@@ -16,13 +16,11 @@ class SolomonResourceTestCase(ResourceTestCase):
         if self.__class__ == SolomonResourceTestCase:
             self.skipTest('Base class, not actually tests.')
 
-        self.username = 'survey_report_user'
-        self.password = 'pass'
-        self.user = User.objects.create_superuser(
-            username=self.username,
-            email=self.username + '@example.com',
-            password=self.password
-        )
+        self.username = 'superuser_alpha'
+        self.user = User.objects.get(username=self.username)
+
+    def login(self):
+        self.client.login(username=self.username, password='password')
 
     def get_list_url(self):
         return reverse('api_dispatch_list', kwargs={
@@ -42,17 +40,17 @@ class SolomonResourceTestCase(ResourceTestCase):
         self.assertEqual(res.status_code, 401)
 
     def test_authorized(self):
-        self.client.login(username=self.username, password=self.password)
+        self.login()
         res = self.client.get(self.get_list_url())
         self.assertEqual(res.status_code, 200)
 
 
 class TestReportRespondantResource(SolomonResourceTestCase):
-    # fixtures = ['surveys.json.gz']
+    fixtures = ['users.json']
     resource_name = 'reportrespondant'
 
     def test_list_meta_includes_statuses(self):
-        self.client.login(username=self.username, password=self.password)
+        self.login()
         res = self.client.get(self.get_list_url())
         self.assertEqual(res.status_code, 200)
 
@@ -63,7 +61,7 @@ class TestReportRespondantResource(SolomonResourceTestCase):
 
 
 class TestReportRepondantDetailsResource(SolomonResourceTestCase):
-    fixtures = ['surveys.json.gz']
+    fixtures = ['reef.json', 'users.json']
     resource_name = 'reportrespondantdetails'
 
     def create_respondant(self):
@@ -79,7 +77,7 @@ class TestReportRepondantDetailsResource(SolomonResourceTestCase):
         response.save()
 
     def test_list_meta_includes_statuses(self):
-        self.client.login(username=self.username, password=self.password)
+        self.login()
         res = self.client.get(self.get_list_url())
         self.assertEqual(res.status_code, 200)
 
@@ -89,7 +87,7 @@ class TestReportRepondantDetailsResource(SolomonResourceTestCase):
             self.assertIn(item[0], content['meta']['statuses'].keys())
 
     def test_detail_meta_includes_statuses(self):
-        self.client.login(username=self.username, password=self.password)
+        self.login()
         self.create_respondant()
         res = self.client.get(self.get_detail_url(pk=self.respondant.pk))
         self.assertEqual(res.status_code, 200)
@@ -145,7 +143,7 @@ class TestReportRepondantDetailsResource(SolomonResourceTestCase):
 
 
 class TestSurveyDashResource(SolomonResourceTestCase):
-    fixtures = ['surveys.json.gz']
+    fixtures = ['reef.json', 'users.json']
     resource_name = 'surveydash'
 
     def setUp(self):

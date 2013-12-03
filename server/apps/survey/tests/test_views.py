@@ -9,16 +9,12 @@ from ..models import Respondant, Response, Survey
 
 
 class TestAnswer(TestCase):
-    fixtures = ['surveys.json.gz']
+    fixtures = ['reef.json', 'users.json']
 
     def setUp(self):
         self.survey = Survey.objects.get(slug='reef-fish-market-survey')
         self.question = self.survey.questions.get(slug='survey-site')
-        self.respondant_user = User.objects.create_superuser(
-            username='respondant_user',
-            email='respondant_user@example.com',
-            password='pass'
-        )
+        self.respondant_user = User.objects.get(username='superuser_alpha')
         self.respondant = Respondant(survey=self.survey,
                                      ts=datetime.datetime.now(),
                                      surveyor=self.respondant_user)
@@ -27,6 +23,9 @@ class TestAnswer(TestCase):
         response.answer_raw = json.dumps({'text': 'Fishing Village'})
         self.respondant.save()
         response.save()
+
+    def login(self):
+        self.client.login(username='superuser_alpha', password='password')
 
     def get_url(self):
         return reverse('survey_answer', kwargs={
@@ -40,7 +39,7 @@ class TestAnswer(TestCase):
         self.assertEqual(res.status_code, 200)
 
     def test_edit_with_same_user(self):
-        self.client.login(username='respondant_user', password='pass')
+        self.login()
         res = self.client.post(self.get_url(), data={
             json.dumps({
                 'answer': {
@@ -55,10 +54,8 @@ class TestAnswer(TestCase):
         self.assertEqual(respondant.surveyor, self.respondant_user)
 
     def test_edit_with_new_user(self):
-        self.new_user = User.objects.create_superuser(
-            username='new_user', email='new_user@example.com',
-            password='pass')
-        self.client.login(username='new_user', password='pass')
+        self.new_user = User.objects.get(username='superuser_beta')
+        self.client.login(username='superuser_beta', password='password')
         res = self.client.post(self.get_url(), data={
             json.dumps({
                 'answer': {
