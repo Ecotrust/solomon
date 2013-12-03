@@ -31,6 +31,9 @@
     padding: 2px 3px;
     bottom: 10px;
 }
+.ui-rangeSlider input {
+    width: 5em;
+}
 
 #surveyor_by_time_chart {
     margin-top: 10px;

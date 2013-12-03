@@ -109,8 +109,8 @@ function filters_changed($http, $scope, surveySlug) {
     $scope.charts = [];
     $scope.getRespondents();
 
-    var start_date = $scope.filter.startDate.toString('yyyyMMdd');
-    var end_date = $scope.filter.endDate.toString('yyyyMMdd')
+    var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
+    var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
 
     fish_weight_by_market($http, $scope.charts, start_date, end_date,
         surveySlug)
@@ -184,8 +184,8 @@ angular.module('askApp')
         $scope.survey = data;
         setup_market_dropdown($http, $scope);
         $scope.filter = {
-            startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day(),
-            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(1).day()
+            startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
+            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(1).day().valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {
@@ -208,10 +208,10 @@ angular.module('askApp')
         }
 
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + $scope.filter.startDate.toString('yyyy-MM-dd');
+            url = url + '&ts__gte=' + new Date($scope.filter.startDate).toString('yyyy-MM-dd');
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + $scope.filter.endDate.toString('yyyy-MM-dd');
+            url = url + '&ts__lte=' + new Date($scope.filter.endDate).toString('yyyy-MM-dd');
         }
         if ($scope.market && url.indexOf("&survey_site=") == -1) {
             url = url + '&survey_site=' + $scope.market;
