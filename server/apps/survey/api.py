@@ -104,7 +104,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
             'status': ['exact'],
             'ts': ['gte', 'lte']
         }
-        ordering = ['-ts']
+        ordering = ['ts', 'survey', 'vendor', 'survey_site', 'survey__surveyor']
 
     def alter_list_data_to_serialize(self, request, data):
         data['meta']['statuses'] = dict(REVIEW_STATE_CHOICES)

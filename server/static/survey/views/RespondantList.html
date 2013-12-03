@@ -53,7 +53,7 @@
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
                     <tr>
-                        <th class="sortable_table" ng-repeat="column in columns" ng-click="changeSorting(column)">{{column}}
+                        <th class="sortable_table" ng-repeat="column in columns" ng-click="changeSorting(column)">{{column.name}}
                             <i ng-show="currentColumn == column && sortDescending" class="icon-caret-down"></i>
                             <i ng-show="currentColumn == column && !sortDescending" class="icon-caret-up"></i>
                         </th>

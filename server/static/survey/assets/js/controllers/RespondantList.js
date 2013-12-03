@@ -140,24 +140,26 @@ angular.module('askApp')
     $scope.statuses = [];
     $scope.status_single = "";
 
-    $scope.columns = [ 'Surveyor'
-                     , 'Date'
-                     , 'Time'
-                     , 'Market'
-                     , 'Vendor Name'
-                     , 'Buyer/Fisher'
-                     , 'Sales Type'
-                     , 'Status'
-                     , 'Detail'
+    $scope.columns = [ { name: 'Surveyor', field: 'surveyor' }
+                     , { name: 'Date', field: 'ts' }
+                     , { name: 'Time', field: 'ts' }
+                     , { name: 'Market', field: 'survey_site' }
+                     , { name: 'Vendor Name', field: 'vendor' }
+                     , { name: 'Buyer/Fisher', field: 'buy_or_catch' }
+                     , { name: 'Sales Type', field: 'how_sold' }
+                     , { name: 'Status', field: 'status' }
+                     , { name: 'Detail', field: 'respondent__responses' }
                      ];
-    $scope.currentColumn = 'Date';
+    $scope.currentColumn = $scope.columns[1];
     $scope.sortDescending = true;
     $scope.changeSorting = function (column) {
         if ($scope.currentColumn == column) {
             $scope.sortDescending = !$scope.sortDescending;
+            $scope.getRespondents();
         } else {
             $scope.currentColumn = column;
             $scope.sortDescending = true;
+            $scope.getRespondents();
         }
     };
 
@@ -218,6 +220,12 @@ angular.module('askApp')
         }
         if ($scope.status_single && url.indexOf("&status=") == -1) {
             url = url + '&status=' + $scope.status_single;
+        }
+        if ($scope.currentColumn && url.indexOf("&order_by=") == -1) {
+            console.log($scope.currentColumn);
+            url = url + '&order_by=' + (
+                $scope.sortDescending ? "-" + $scope.currentColumn.field : $scope.currentColumn.field
+            );
         }
 
         $http.get(url).success(function(data) {
