@@ -1,0 +1,12 @@
+<div class="container">
+    <div class="col-md-2" ng-include="viewPath + 'views/sideNav.html'"></div>
+    <div class="col-md-10">
+        <div class="center-text col-md-2">
+            <h2>{{meta.total_count}}</h2>
+            <p>Responses Found</p>
+        </div>
+        <div class="col-md-10">
+            <div start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
+        </div>
+    </div>
+</div>
