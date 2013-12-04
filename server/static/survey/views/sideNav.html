@@ -25,8 +25,8 @@
                         <li>
                         <a ng-class="{'active': activePage == 'reports'}">Reports</a>
                         <ul>
-                            <li><a ng-class="{'active': activePage == 'economic'}">Economic</a></li>
-                            <li><a ng-class="{'active': activePage == 'biological'}">Biological</a></li>
+                            <li><a ng-class="{'active': activePage == 'economic'}" href="#/survey/{{survey.slug}}/reports/economic">Economic</a></li>
+                            <li><a ng-class="{'active': activePage == 'biological'}" href="#/survey/{{survey.slug}}/reports/biological">Biological</a></li>
                         </ul>
                     </li>
                     <li><a ng-class="{'active': activePage == 'search'}">Search</a></li>

@@ -18,7 +18,11 @@ angular.module('askApp')
             _.each($scope.surveys, function (survey) {
                 survey.updated_at = new Date();
             });
-            app.surveys = $scope.surveys;
+            app.surveys = $scope.surveys.sort(
+                function (a,b) {
+                    return b.completes - a.completes;
+                }
+            );
             $scope.saveState();
             $scope.hideSurveys = false;
             $scope.loaded = true;
