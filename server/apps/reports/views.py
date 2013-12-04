@@ -212,12 +212,16 @@ def surveyor_stats(request, survey_slug, interval):
 
     res = res.values('surveyor__first_name', 'surveyor__last_name', 'timestamp').annotate(count=Count('pk'))
 
-    graph_data = defaultdict(list)
+    grouped_data = defaultdict(list)
 
     for respondant in res:
         name = _get_fullname(respondant)
-        graph_data[name].append((calendar.timegm(respondant['timestamp'].utctimetuple()) * 1000,
-                                 respondant['count']))
+        grouped_data[name].append((calendar.timegm(respondant['timestamp'].utctimetuple()) * 1000,
+                                  respondant['count']))
+
+    graph_data = []
+    for name, data in grouped_data.iteritems():
+        graph_data.append({'data': data, 'name': name})
 
     return HttpResponse(json.dumps({
         'success': True,
