@@ -28,8 +28,11 @@ angular.module('askApp')
 
         var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
         var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
+        var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
+        url = url + '?startdate=' + start_date;
+        url = url + '&enddate=' + end_date;
 
-        $http.get('/report/surveyor-stats/' + $routeParams.surveySlug + '/week').success(function(data) {
+        $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {
                 yLabel: "Survey Responses",
                 raw_data: data.graph_data
@@ -79,6 +82,12 @@ angular.module('askApp')
     }, true);
 
     $scope.$watch('market', function (newValue) {
+        if ($scope.filter) {
+            filters_changed($routeParams.surveySlug);
+        }
+    }, true);
+
+    $scope.$watch('surveyorTimeFilter', function (newValue) {
         if ($scope.filter) {
             filters_changed($routeParams.surveySlug);
         }
