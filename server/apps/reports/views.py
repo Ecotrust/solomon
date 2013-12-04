@@ -194,7 +194,7 @@ def surveyor_stats(request, survey_slug, interval):
     if end_date:
         try:
             end_date = (datetime.datetime.strptime(end_date, '%Y%m%d')
-                        + datetime.timdelta(days=1))
+                        + datetime.timedelta(days=1))
         except ValueError as err:
             print err
             return _error(enddate=err.message)
