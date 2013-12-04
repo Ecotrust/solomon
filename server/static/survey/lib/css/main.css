@@ -1,12 +1,23 @@
 #global-navbar {
-    border-bottom: solid 1px #000;
+    margin-bottom: 0;
 }
+
+#global-navbar .container {
+    border-bottom: solid 1px #000;
+    padding-left: 0;
+}
+
+
 #global-navbar img {
-    border-right: solid 1px #000;
+    
     min-height: 50px;
 }
 #global-navbar button {
     margin-right: 1em;
+}
+.main-container {
+    padding-left: 0;   
+    padding-right: 10px;
 }
 #survey-landing-table td {
     vertical-align: middle;
@@ -32,9 +43,10 @@
     bottom: 10px;
 }
 .ui-rangeSlider input {
-    width: 5em;
+    width: 6em;
+    padding-left: 5px;
+    padding-right: 5px;
 }
-
 #surveyor_by_time_chart {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -45,6 +57,7 @@
 }
 #sidenav_respondants {
     border-right: solid 1px #000;
+    padding: inherit;
 }
 #sidenav_respondants .stats {
     text-align: center;
