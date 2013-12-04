@@ -213,7 +213,6 @@ angular.module('askApp')
                                 labels: {
                                     formatter: function() {
                                         return Highcharts.dateFormat('%d/%m/%y', this.value);
-                                        
                                     }
                                 }
                             },
@@ -229,8 +228,7 @@ angular.module('askApp')
                                         Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' kg';
                                 }
                             },
-
-                            series: data
+                            series: scope.chart.raw_data ? scope.chart.raw_data : data
                         });
                     }
                 });

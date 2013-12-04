@@ -11,7 +11,7 @@
             <p>Responses Found</p>
         </div>
         <div class="col-md-8">
-            <div start="filter.startDate" end="filter.endDate" range-slider></div>
+            <div start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
         </div>
         <div id="market_status_filters" class="col-md-2">
             <select class="form-control" ng-model="market" ng-options="m for m in markets">
@@ -89,18 +89,6 @@
         <!-- <div class="row">
             <div heatmap question="question.slug"></div>
         </div> -->
-
-        <!--
-        <div ng-repeat="chart in charts" class="dash-chart">
-            <h2>{{ chart.title }}</h2>
-            <div class="error">{{ chart.message }}</div>
-            <div ng-switch on="chart.type">
-                <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
-                <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
-                <div ng-switch-when="time-series" time-series chart="chart"></div>
-            </div>
-        </div>
-        -->
 
         <!--
         <div class="row" ng-repeat="question in survey.questions">

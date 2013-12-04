@@ -1,0 +1,24 @@
+<div class="container">
+    <div class="col-md-2" ng-include="viewPath + 'views/sideNav.html'"></div>
+    <div class="col-md-10">
+        <div class="center-text col-md-2">
+            <h2>{{meta.total_count}}</h2>
+            <p>Responses Found</p>
+        </div>
+        <div class="col-md-10">
+            <div start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
+        <div ng-repeat="chart in charts" class="dash-chart">
+            <h2>{{ chart.title }}</h2>
+            <div class="error">{{ chart.message }}</div>
+            <div ng-switch on="chart.type">
+                <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
+                <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
+                <div ng-switch-when="time-series" time-series chart="chart"></div>
+            </div>
+        </div>
+    </div>
+</div>
