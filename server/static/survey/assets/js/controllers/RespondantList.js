@@ -29,10 +29,12 @@ angular.module('askApp')
         var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
         var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
 
-        // FIXME: When the survey data can be pulled in, put it here.
-        $scope.surveyor_by_time = {
-            yLabel: "Survey Responses"
-        }
+        $http.get('/report/surveyor-stats/' + $routeParams.surveySlug + '/week').success(function(data) {
+            $scope.surveyor_by_time = {
+                yLabel: "Survey Responses",
+                raw_data: data.graph_data
+            }
+        });
     }
 
 
