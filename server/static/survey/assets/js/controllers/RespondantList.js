@@ -11,7 +11,6 @@ angular.module('askApp')
 
         $http.get(url).success(function(data) {
             $scope.markets = [];
-            $scope.market = "";
             var markets_with_dupes = _.map(data.objects,
                 function(x) { return x.answer; });
 
@@ -42,6 +41,7 @@ angular.module('askApp')
     }
 
 
+    $scope.market = "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
