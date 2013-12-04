@@ -1,0 +1,74 @@
+[
+{
+  "pk": 1, 
+  "model": "auth.user", 
+  "fields": {
+    "username": "user_alpha", 
+    "first_name": "user", 
+    "last_name": "alpha", 
+    "is_active": true, 
+    "is_superuser": false, 
+    "is_staff": false, 
+    "last_login": "2013-11-30T06:14:14.556", 
+    "groups": [], 
+    "user_permissions": [], 
+    "password": "pbkdf2_sha256$10000$eKgJPx52JVl4$V4Ij0E++fLZGR673A9X9PkokjL6YrjXo6jJUwKvu9H4=", 
+    "email": "alpha@example.com", 
+    "date_joined": "2013-11-30T06:14:14.556"
+  }
+},
+{
+  "pk": 2, 
+  "model": "auth.user", 
+  "fields": {
+    "username": "user_beta", 
+    "first_name": "user", 
+    "last_name": "beta", 
+    "is_active": true, 
+    "is_superuser": false, 
+    "is_staff": false, 
+    "last_login": "2013-11-30T06:14:18.668", 
+    "groups": [], 
+    "user_permissions": [], 
+    "password": "pbkdf2_sha256$10000$oAAteyaA0Xn4$FpjvIHbk1DSLCyuBEKWAeMw2TuHtvJU7iTkc+WXk9WM=", 
+    "email": "beta@example.com", 
+    "date_joined": "2013-11-30T06:14:18.668"
+  }
+},
+{
+  "pk": 3, 
+  "model": "auth.user", 
+  "fields": {
+    "username": "superuser_beta", 
+    "first_name": "superuser", 
+    "last_name": "beta", 
+    "is_active": true, 
+    "is_superuser": true, 
+    "is_staff": true, 
+    "last_login": "2013-11-30T06:15:22.393", 
+    "groups": [], 
+    "user_permissions": [], 
+    "password": "pbkdf2_sha256$10000$hlxteJ79YOAw$z/AEoI8BPBB9e8ODH1z/1luKoKlzOnf5ig/1joJI3/I=", 
+    "email": "superbeta@example.com", 
+    "date_joined": "2013-11-30T06:15:22.393"
+  }
+},
+{
+  "pk": 4, 
+  "model": "auth.user", 
+  "fields": {
+    "username": "superuser_alpha", 
+    "first_name": "superuser", 
+    "last_name": "alpha", 
+    "is_active": true, 
+    "is_superuser": true, 
+    "is_staff": true, 
+    "last_login": "2013-11-30T06:15:33.592", 
+    "groups": [], 
+    "user_permissions": [], 
+    "password": "pbkdf2_sha256$10000$ghCoGQybS9jy$nqDsEImuL7Dnvi3xN20BuqeJias/yMUU5NkquUcPa3Y=", 
+    "email": "superalpha@example.com", 
+    "date_joined": "2013-11-30T06:15:33.592"
+  }
+}
+]

@@ -1,14 +1,18 @@
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
-from django.db.models import Avg, Sum
-from django.contrib.admin.views.decorators import staff_member_required
-from django.core.serializers.json import DjangoJSONEncoder
-
+import calendar
 import datetime
 import json
+from collections import defaultdict
+
+from django.contrib.admin.views.decorators import staff_member_required
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Avg, Count, Sum
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+
 
 from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer
-from apps.reports.models import QuestionReport
+from .decorators import api_user_passes_test
+from .models import QuestionReport
 
 
 @staff_member_required
@@ -66,6 +70,14 @@ def get_distribution(request, survey_slug, question_slug):
 
     answer_domain = question.get_answer_domain(survey, filter_list)
     return HttpResponse(json.dumps({'success': "true", "answer_domain": list(answer_domain)}))
+
+
+def _error(message='An error occurred.', **kwargs):
+    return HttpResponse(json.dumps({
+        'success': False,
+        'message': message,
+        'errors': kwargs
+    }))
 
 
 @staff_member_required
@@ -140,4 +152,78 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         return HttpResponse(json.dumps(obj, cls=DjangoJSONEncoder))
     except Exception, err:
         print Exception, err
-        return HttpResponse(json.dumps({'success': False, 'message': "No records for this date range."}))
+        return _error('No records for this range.', __all__=err.message)
+
+
+class DateTimeJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return super(DateTimeJSONEncoder, self).default(obj)
+
+
+def _get_fullname(data):
+    return ('{0} {1}'.format(data.pop('surveyor__first_name'),
+                             data.pop('surveyor__last_name'))
+            .strip())
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def surveyor_stats(request, survey_slug, interval):
+    start_date = request.GET.get('startdate', None)
+    end_date = request.GET.get('enddate', None)
+    market = request.GET.get('market', None)
+    surveyor = request.GET.get('surveyor', None)
+    status = request.GET.get('status', None)
+
+    res = Respondant.objects.filter(survey__slug=survey_slug)
+
+    if start_date:
+        try:
+            start_date = datetime.datetime.strptime(start_date, '%Y%m%d')
+        except ValueError as err:
+            print err
+            return _error(startdate=err.message)
+
+        res = res.filter(ts__gte=start_date)
+
+    if end_date:
+        try:
+            end_date = (datetime.datetime.strptime(end_date, '%Y%m%d')
+                        + datetime.timdelta(days=1))
+        except ValueError as err:
+            print err
+            return _error(enddate=err.message)
+        res = res.filter(ts__lt=end_date)
+
+    if market:
+        res = res.filter(survey_site=market)
+
+    if surveyor:
+        res = res.filter(surveyor__id=surveyor)
+
+    if status:
+        res = res.filter(review_status=status)
+
+    if not res.exists():
+        return _error('No records for these filters.')
+
+    res = res.extra(select={'timestamp': "date_trunc('%s', ts)" % interval})
+
+    res = res.values('surveyor__first_name', 'surveyor__last_name', 'timestamp').annotate(count=Count('pk'))
+
+    grouped_data = defaultdict(list)
+
+    for respondant in res:
+        name = _get_fullname(respondant)
+        grouped_data[name].append((calendar.timegm(respondant['timestamp'].utctimetuple()) * 1000,
+                                  respondant['count']))
+
+    graph_data = []
+    for name, data in grouped_data.iteritems():
+        graph_data.append({'data': data, 'name': name})
+
+    return HttpResponse(json.dumps({
+        'success': True,
+        'graph_data': graph_data
+    }, cls=DateTimeJSONEncoder))
