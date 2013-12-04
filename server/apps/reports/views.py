@@ -212,6 +212,8 @@ def surveyor_stats(request, survey_slug, interval):
 
     res = res.values('surveyor__first_name', 'surveyor__last_name', 'timestamp').annotate(count=Count('pk'))
 
+    res = res.order_by('timestamp')
+
     grouped_data = defaultdict(list)
 
     for respondant in res:
