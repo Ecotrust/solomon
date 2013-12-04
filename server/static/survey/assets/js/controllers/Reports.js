@@ -14,7 +14,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 xLabel: 'Market',
                 yLabel: 'Total Weight (kg)',
                 order: 2,
-                message: data.message
+                message: data.message,
+                unit: 'kg'
             });
             charts.sort(function (a,b) { return a-b;})
         });
@@ -34,7 +35,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 xLabel: 'Province',
                 yLabel: 'Total Weight (kg)',
                 order: 3,
-                message: data.message
+                message: data.message,
+                unit: 'kg'
             });
             charts.sort(function (a,b) { return a-b;})
         });

@@ -225,7 +225,7 @@ angular.module('askApp')
                             tooltip: {
                                 formatter: function() {
                                     return '<b>' + this.series.name + '</b><br/>' +
-                                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' kg';
+                                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' ' + scope.chart.unit || 'kg';
                                 }
                             },
                             series: scope.chart.raw_data ? scope.chart.raw_data : data

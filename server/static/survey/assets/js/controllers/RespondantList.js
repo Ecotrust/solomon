@@ -35,7 +35,8 @@ angular.module('askApp')
         $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {
                 yLabel: "Survey Responses",
-                raw_data: data.graph_data
+                raw_data: data.graph_data,
+                unit: "surveys"
             }
         });
     }
