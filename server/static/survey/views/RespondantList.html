@@ -14,13 +14,11 @@
             <div start="filter.startDate" end="filter.endDate" range-slider></div>
         </div>
         <div id="market_status_filters" class="col-md-2">
-            <select class="form-control">
-                <option>All Markets</option>
-                <option ng-repeat="market in markets">{{market}}</option>
+            <select class="form-control" ng-model="market" ng-options="m for m in markets">
+                <option value="">All Markets</option>
             </select>
-            <select class="form-control">
-                <option>All Statuses</option>
-                <option ng-repeat="status in statuses" data-status_val="{{statuses.status}}">{{status}}</option>
+            <select class="form-control" ng-model="status_single" ng-options="value for (key, value) in statuses">
+                <option value="">All Statuses</option>
             </select>
         </div>
     </div>
@@ -55,15 +53,10 @@
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
                     <tr>
-                        <th>Surveyor</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Market</th>
-                        <th>Vendor Name</th>
-                        <th>Buyer/Fisher</th>
-                        <th>Sales Type</th>
-                        <th>Status</th>
-                        <th>Detail</th>
+                        <th class="sortable_table" ng-repeat="column in columns" ng-click="changeSorting(column)">{{column}}
+                            <i ng-show="currentColumn == column && sortDescending" class="icon-caret-down"></i>
+                            <i ng-show="currentColumn == column && !sortDescending" class="icon-caret-up"></i>
+                        </th>
                     </tr>
                     <tr ng-repeat="respondent in respondents">
                         <td>{{ respondent.user.username }}</td>
