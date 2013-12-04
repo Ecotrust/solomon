@@ -44,7 +44,7 @@ class Respondant(caching.base.CachingMixin, models.Model):
 
     locations = models.IntegerField(null=True, blank=True)
 
-    ts = models.DateTimeField(default=datetime.datetime.now())
+    ts = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(max_length=254, null=True, blank=True, default=None)
 
     surveyor = models.ForeignKey(User, null=True, blank=True)
@@ -60,12 +60,8 @@ class Respondant(caching.base.CachingMixin, models.Model):
             return "%s" % self.uuid
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.uuid:
-            self.ts = datetime.datetime.now()
-        else:
-            if ":" in self.uuid:
-                self.uuid = self.uuid.replace(":", "_")
+        if self.uuid and ":" in self.uuid:
+            self.uuid = self.uuid.replace(":", "_")
         self.locations = self.location_set.all().count()
         super(Respondant, self).save(*args, **kwargs)
 
@@ -302,7 +298,7 @@ class Response(caching.base.CachingMixin, models.Model):
     answer_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     answer_raw = models.TextField(null=True, blank=True)
     answer_date = models.DateTimeField(null=True, blank=True)
-    ts = models.DateTimeField(default=datetime.datetime.now())
+    ts = models.DateTimeField(auto_now_add=True)
     objects = caching.base.CachingManager()
 
     def save_related(self):
@@ -389,12 +385,6 @@ class Response(caching.base.CachingMixin, models.Model):
             return "%s/%s (%s)" % (self.respondant.survey.slug, self.question.slug, self.respondant.uuid)
         else:
             return "No Respondant"
-
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.ts = datetime.datetime.now()
-        super(Response, self).save(*args, **kwargs)
 
 
 def save_related(sender, instance, created, **kwargs):
