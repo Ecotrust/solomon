@@ -45,4 +45,5 @@ class TestSurveyorStats(TestCase):
         self.assertEqual(res.status_code, 200)
         print res.content
         body = json.loads(res.content)
-        self.assertIn(self.respondant_user.get_full_name(), body['graph_data'])
+        self.assertEqual(body['graph_data'][0]['name'],
+                         self.respondant_user.get_full_name())
