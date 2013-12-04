@@ -111,19 +111,23 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
                 respondants = respondants.filter(ts__lte=end_date, ts__gte=start_date)
 
             respondants = respondants.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
-
+            print question_a_answer
             if question_b.type in ['grid']:
                 obj['type'] = 'stacked-column'
-                rows = (Response.objects.filter(respondant__in=respondants, question=question_b)[0]
-                                        .gridanswer_set
-                                        .all()
-                                        .values('row_text', 'row_label')
-                                        .order_by('row_label'))
-                obj['seriesNames'] = [row['row_text'] for row in rows]
-                crosstab.append({
-                    'name': question_a_answer['answer'],
-                    'value': list(rows.annotate(average=Avg('answer_number')))
-                })
+                try:
+                    rows = (Response.objects.filter(respondant__in=respondants, question=question_b)[0]
+                                            .gridanswer_set
+                                            .all()
+                                            .values('row_text', 'row_label')
+                                            .order_by('row_label'))
+                    obj['seriesNames'] = [row['row_text'] for row in rows]
+                    crosstab.append({
+                        'name': question_a_answer['answer'],
+                        'value': list(rows.annotate(average=Avg('answer_number')))
+                    })
+                except IndexError as e:
+                    print "not found"
+                    print e                
             elif question_b.type in ['currency', 'integer', 'number']:
                 if group is None:
                     obj['type'] = 'bar-chart'

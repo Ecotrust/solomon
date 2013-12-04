@@ -200,7 +200,7 @@ angular.module('askApp')
                         
                         element.highcharts({
                             chart: {
-                                type: 'spline'
+                                type: 'line'
                             },
                             title: false,
                             subtitle: false,

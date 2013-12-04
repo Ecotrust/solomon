@@ -317,19 +317,20 @@ class Response(caching.base.CachingMixin, models.Model):
                 else:
                     self.answer = None
             if self.question.type in ['auto-single-select', 'single-select']:
+
                 answer = simplejson.loads(self.answer_raw)
                 if answer.get('text'):
-                    self.answer = answer['text']
+                    self.answer = answer['text'].strip()
                 if answer.get('name'):
-                    self.answer = answer['name']
+                    self.answer = answer['name'].strip()
             if self.question.type in ['auto-multi-select', 'multi-select']:
                 answers = []
                 self.multianswer_set.all().delete()
                 for answer in simplejson.loads(self.answer_raw):
                     if answer.get('text'):
-                        answer_text = answer['text']
+                        answer_text = answer['text'].strip()
                     if answer.get('name'):
-                        answer_text = answer['name']
+                        answer_text = answer['name'].strip()
                     answers.append(answer_text)
                     answer_label = answer.get('label', None)
                     multi_answer = MultiAnswer(response=self, answer_text=answer_text, answer_label=answer_label)
@@ -360,7 +361,7 @@ class Response(caching.base.CachingMixin, models.Model):
                                     col_label=grid_col.label, col_text=grid_col.text)
                                 grid_answer.save()
                             except Exception as e:
-                                print "problem with ", grid_col.label
+                                print "problem with %s in response id %s" % (grid_col.label, self.id)
                                 print "not found in", self.answer_raw
                                 print e
 
