@@ -1,0 +1,47 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static %}
+
+{% block stylesheets %}
+<link href="{{ STATIC_URL }}survey/lib/css/bootstrap.css" rel="stylesheet">
+<style>
+#grp-navigation {
+    display: none;
+}
+img {
+    margin-top: 2em;
+}
+h1 {
+    text-align: center;
+}
+#login-form input,
+#login-form li
+#login-form p {
+    float: right;
+    margin-bottom: 1em;
+    list-style-type: none;
+}
+#login-form input[type=text], input[type=password] {
+    clear: right;
+}
+#login-row {
+    width: 392px;
+    margin: 0 auto;
+}
+</style>
+{% endblock %}
+
+{% block bodyclass %}login{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    {% block hapifis_content %}
+    {% endblock %}
+</div>
+{% endblock %}
