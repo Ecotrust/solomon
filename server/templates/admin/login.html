@@ -1,47 +1,44 @@
 {% extends "admin/hapifis_admin_base.html" %}
 {% load i18n admin_static %}
 {% block hapifis_content %}
-    <div id="login-row" class="row">
-      <img src="{{STATIC_URL}}survey/assets/img/hapifis.jpg"></img>
-      <!-- <h1>ADMINISTRATIVE DASHBOARD</h1> -->
-      {% if form.errors and not form.non_field_errors and not form.this_is_the_login_form.errors %}
-          <p class="errornote">
-          {% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
-          </p>
-      {% endif %}
+<!-- <h1>ADMINISTRATIVE DASHBOARD</h1> -->
+{% if form.errors and not form.non_field_errors and not form.this_is_the_login_form.errors %}
+  <p class="errornote">
+  {% blocktrans count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+  </p>
+{% endif %}
 
-      {% if form.non_field_errors or form.this_is_the_login_form.errors %}
-          {% for error in form.non_field_errors|add:form.this_is_the_login_form.errors %}
-          <p class="errornote">
-              {{ error }}
-          </p>
-          {% endfor %}
-      {% endif %}
-      <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
-        <div class="form-group">
-          {% if not form.this_is_the_login_form.errors %}{{ form.username.errors }}{% endif %}
-          {{ form.username }}
-        </div>
-        <div class="form-group">
-          {% if not form.this_is_the_login_form.errors %}{{ form.password.errors }}{% endif %}
-          {{ form.password }}
-          <input type="hidden" name="this_is_the_login_form" value="1" />
-          <input type="hidden" name="next" value="{{ next }}" />
-        </div>
-        <div class="submit-row">
-          <div>
-            <input type="submit" class="btn btn-default" value="{% trans 'Sign In' %}" />
-            <a href="{% url 'admin_password_reset' %}"><button type="button" class="btn">{% trans 'Reset Password' %}</button></a>
-          </div>
-        </div>
-      </form>
+{% if form.non_field_errors or form.this_is_the_login_form.errors %}
+  {% for error in form.non_field_errors|add:form.this_is_the_login_form.errors %}
+  <p class="errornote">
+      {{ error }}
+  </p>
+  {% endfor %}
+{% endif %}
+<form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+<div class="form-group">
+  {% if not form.this_is_the_login_form.errors %}{{ form.username.errors }}{% endif %}
+  {{ form.username }}
+</div>
+<div class="form-group">
+  {% if not form.this_is_the_login_form.errors %}{{ form.password.errors }}{% endif %}
+  {{ form.password }}
+  <input type="hidden" name="this_is_the_login_form" value="1" />
+  <input type="hidden" name="next" value="{{ next }}" />
+</div>
+<div class="submit-row">
+  <div>
+    <input type="submit" class="btn btn-default" value="{% trans 'Sign In' %}" />
+    <a href="{% url 'admin_password_reset' %}"><button type="button" class="btn">{% trans 'Reset Password' %}</button></a>
   </div>
+</div>
+</form>
 
-  <script type="text/javascript">
-    document.getElementById('id_username').focus()
-    document.getElementById('id_username').setAttribute('placeholder', 'Username')
-    document.getElementById('id_password').setAttribute('placeholder', 'Password')
-    document.getElementById('id_username').setAttribute('class', 'form-control')
-    document.getElementById('id_password').setAttribute('class', 'form-control')
-  </script>
+<script type="text/javascript">
+  document.getElementById('id_username').focus()
+  document.getElementById('id_username').setAttribute('placeholder', 'Username')
+  document.getElementById('id_password').setAttribute('placeholder', 'Password')
+  document.getElementById('id_username').setAttribute('class', 'form-control')
+  document.getElementById('id_password').setAttribute('class', 'form-control')
+</script>
 {% endblock %}

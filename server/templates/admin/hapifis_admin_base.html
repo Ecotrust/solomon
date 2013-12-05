@@ -41,7 +41,10 @@ h1 {
 {% block content %}
 
 <div class="container">
-    {% block hapifis_content %}
-    {% endblock %}
+    <div id="login-row" class="row">
+        <img src="{{STATIC_URL}}survey/assets/img/hapifis.jpg"></img>
+        {% block hapifis_content %}
+        {% endblock %}
+    </div>
 </div>
 {% endblock %}
