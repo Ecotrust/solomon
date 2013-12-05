@@ -312,7 +312,7 @@ class Response(caching.base.CachingMixin, models.Model):
                     self.answer_number = self.answer
                 else:
                     self.answer = None
-            if self.question.type in ['auto-single-select', 'single-select']:
+            if self.question.type in ['auto-single-select', 'single-select', 'yes-no']:
 
                 answer = simplejson.loads(self.answer_raw)
                 if answer.get('text'):
