@@ -35,7 +35,14 @@ v1_api.register(SurveyReportResource())
 admin.autodiscover()
 
 urlpatterns = patterns('',
+
+    # Password reset URLs:
+    url(r'^admin/password_reset/$', 'django.contrib.auth.views.password_reset', name='admin_password_reset'),
+    (r'^admin/password_reset/done/$', 'django.contrib.auth.views.password_reset_done'),
+    (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
+    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete'),
     url(r'^admin/', include(admin.site.urls)),
+
     url(r'^grappelli/', include('grappelli.urls')),
     (r'^api/', include(v1_api.urls)),
 
@@ -51,7 +58,7 @@ urlpatterns = patterns('',
     # backend urls
     url(r'^dash/(?P<survey_slug>[\w\d-]+)$', 'apps.survey.views.dash'),
     #survey responder with preassigned uuid
-    url(r'^dash$', 'apps.survey.views.dash'),
+    url(r'^dash$', 'apps.survey.views.dash', name='dashboard'),
     #other survey urls
     url(r'^dash', include(survey_urls)),
 
