@@ -58,7 +58,7 @@ urlpatterns = patterns('',
     # backend urls
     url(r'^dash/(?P<survey_slug>[\w\d-]+)$', 'apps.survey.views.dash'),
     #survey responder with preassigned uuid
-    url(r'^dash$', 'apps.survey.views.dash'),
+    url(r'^dash$', 'apps.survey.views.dash', name='dashboard'),
     #other survey urls
     url(r'^dash', include(survey_urls)),
 

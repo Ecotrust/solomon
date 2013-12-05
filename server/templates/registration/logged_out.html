@@ -1,0 +1,7 @@
+{% extends "admin/hapifis_admin_base.html" %}
+{% load i18n admin_static %}
+{% block hapifis_content %}
+  <div class="login-row">
+      <p>You have been logged out. <a href="{% url 'dashboard' %}">Log in again.</a></p>
+  </div>
+{% endblock %}
