@@ -190,7 +190,7 @@ def surveyor_stats(request, survey_slug, interval):
     if end_date:
         try:
             end_date = (datetime.datetime.strptime(end_date, '%Y%m%d')
-                        + datetime.timdelta(days=1))
+                        + datetime.timedelta(days=1))
         except ValueError as err:
             print err
             return _error(enddate=err.message)
@@ -211,6 +211,8 @@ def surveyor_stats(request, survey_slug, interval):
     res = res.extra(select={'timestamp': "date_trunc('%s', ts)" % interval})
 
     res = res.values('surveyor__first_name', 'surveyor__last_name', 'timestamp').annotate(count=Count('pk'))
+
+    res = res.order_by('timestamp')
 
     grouped_data = defaultdict(list)
 

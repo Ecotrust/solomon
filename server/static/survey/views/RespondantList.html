@@ -11,16 +11,14 @@
             <p>Responses Found</p>
         </div>
         <div class="col-md-8">
-            <div start="filter.startDate" end="filter.endDate" range-slider></div>
+            <div start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
         </div>
         <div id="market_status_filters" class="col-md-2">
-            <select class="form-control">
-                <option>All Markets</option>
-                <option ng-repeat="market in markets">{{market}}</option>
+            <select class="form-control" ng-model="market" ng-options="m for m in markets">
+                <option value="">All Markets</option>
             </select>
-            <select class="form-control">
-                <option>All Statuses</option>
-                <option ng-repeat="status in statuses" data-status_val="{{statuses.status}}">{{status}}</option>
+            <select class="form-control" ng-model="status_single" ng-options="value for (key, value) in statuses">
+                <option value="">All Statuses</option>
             </select>
         </div>
     </div>
@@ -30,10 +28,10 @@
         <div>
             <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
             <div class="btn-group">
-                <button ng-class="{'active': surveyorTimeFilter == 'hourly'}"
+                <button ng-class="{'active': surveyorTimeFilter == 'hour'}"
                     type="button"
                     class="btn btn-default"
-                    ng-click="surveyorTimeFilter='hourly'">Hourly</button>
+                    ng-click="surveyorTimeFilter='hour'">Hourly</button>
                 <button ng-class="{'active': surveyorTimeFilter == 'day'}"
                     type="button"
                     class="btn btn-default"
@@ -55,15 +53,10 @@
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
                     <tr>
-                        <th>Surveyor</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Market</th>
-                        <th>Vendor Name</th>
-                        <th>Buyer/Fisher</th>
-                        <th>Sales Type</th>
-                        <th>Status</th>
-                        <th>Detail</th>
+                        <th class="sortable_table" ng-repeat="column in columns" ng-click="changeSorting(column)">{{column}}
+                            <i ng-show="currentColumn == column && sortDescending" class="icon-caret-down"></i>
+                            <i ng-show="currentColumn == column && !sortDescending" class="icon-caret-up"></i>
+                        </th>
                     </tr>
                     <tr ng-repeat="respondent in respondents">
                         <td>{{ respondent.user.username }}</td>
@@ -96,18 +89,6 @@
         <!-- <div class="row">
             <div heatmap question="question.slug"></div>
         </div> -->
-
-        <!--
-        <div ng-repeat="chart in charts" class="dash-chart">
-            <h2>{{ chart.title }}</h2>
-            <div class="error">{{ chart.message }}</div>
-            <div ng-switch on="chart.type">
-                <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
-                <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
-                <div ng-switch-when="time-series" time-series chart="chart"></div>
-            </div>
-        </div>
-        -->
 
         <!--
         <div class="row" ng-repeat="question in survey.questions">
