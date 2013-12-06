@@ -46,6 +46,23 @@ angular.module('askApp')
                 raw_data: data.graph_data,
                 unit: "surveys"
             }
+            // map reduuuuuuce
+            var bar_data = _.map(data.graph_data,
+                function (x) {
+                    return {
+                        name: x.name,
+                        data: _.reduce(x.data,
+                            function (attr, val) {
+                                return attr + val[1];
+                            }, 0)
+                    }
+                }
+            );
+            $scope.surveyor_total = {
+                yLabel: "Surveys Collected",
+                raw_data: bar_data,
+                unit: "surveys"
+            }
         });
     }
 
