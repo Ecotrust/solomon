@@ -44,7 +44,7 @@ class StaffUserOnlyAuthorization(Authorization):
 class AuthSurveyModelResource(SurveyModelResource):
     class Meta:
         authorization = StaffUserOnlyAuthorization()
-        authentication = SessionAuthentication()
+        authentication = Authentication()
 
 
 class ResponseResource(SurveyModelResource):
@@ -72,7 +72,7 @@ class OfflineResponseResource(AuthSurveyModelResource):
 
 class OfflineRespondantResource(AuthSurveyModelResource):
     responses = fields.ToManyField(OfflineResponseResource, 'responses', null=True, blank=True)
-    survey = fields.ToOneField('apps.survey.api.OfflineSurveyResource', 'survey', null=True, blank=True)
+    survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True)
 
     class Meta(AuthSurveyModelResource.Meta):
         always_return_data = True
@@ -82,8 +82,6 @@ class OfflineRespondantResource(AuthSurveyModelResource):
         authentication = Authentication()
 
     def obj_create(self, bundle, **kwargs):
-        print bundle.request.user
-        print "trying to create"
         return super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
 
     def save_related(self, bundle):
