@@ -49,18 +49,13 @@ angular.module('askApp')
             // map reduuuuuuce
             var bar_data = _.map(data.graph_data,
                 function (x) {
-                    return {
-                        name: x.name,
-                        data: _.reduce(x.data,
-                            function (attr, val) {
-                                return attr + val[1];
-                            }, 0)
-                    }
+                    return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
                 }
             );
             $scope.surveyor_total = {
+                labels: _.pluck(data.graph_data, 'name'),
                 yLabel: "Surveys Collected",
-                raw_data: bar_data,
+                data: bar_data,
                 unit: "surveys"
             }
         });
