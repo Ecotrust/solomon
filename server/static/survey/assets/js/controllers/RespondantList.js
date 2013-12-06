@@ -28,8 +28,16 @@ angular.module('askApp')
         var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
         var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
-        url = url + '?startdate=' + start_date;
-        url = url + '&enddate=' + end_date;
+        url += '?startdate=' + start_date;
+        url += '&enddate=' + end_date;
+
+        if ($scope.market) {
+            url += '&market=' + $scope.market;
+        }
+
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
 
         $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {
