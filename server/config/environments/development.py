@@ -26,7 +26,6 @@ CACHES = {
 #         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
 #     }
 # }
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 COMPRESS_ENABLED = False
 
 # config/environments/local.py is ignored to allow for easy settings
