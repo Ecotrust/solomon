@@ -36,7 +36,7 @@ angular.module('askApp')
         }
 
         if ($scope.status_single) {
-            url += '&status=' + $scope.status_single;
+            url += '&status=' + $scope.status_single[0];
         }
 
         $http.get(url).success(function(data) {
@@ -140,7 +140,7 @@ angular.module('askApp')
             url = url + '&survey_site=' + $scope.market;
         }
         if ($scope.status_single && url.indexOf("&status=") == -1) {
-            url = url + '&status=' + $scope.status_single;
+            url = url + '&status=' + $scope.status_single[0];
         }
 
         $http.get(url).success(function(data) {

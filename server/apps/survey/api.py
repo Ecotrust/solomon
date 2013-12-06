@@ -107,7 +107,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
         ordering = ['-ts']
 
     def alter_list_data_to_serialize(self, request, data):
-        data['meta']['statuses'] = dict(REVIEW_STATE_CHOICES)
+        data['meta']['statuses'] = REVIEW_STATE_CHOICES
         return data
 
     def alter_detail_data_to_serialize(self, request, bundle):
