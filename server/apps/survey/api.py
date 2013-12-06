@@ -72,7 +72,7 @@ class OfflineResponseResource(AuthSurveyModelResource):
 
 class OfflineRespondantResource(AuthSurveyModelResource):
     responses = fields.ToManyField(OfflineResponseResource, 'responses', null=True, blank=True)
-    survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True)
+    survey = fields.ToOneField('apps.survey.api.OfflineSurveyResource', 'survey', null=True, blank=True)
 
     class Meta(AuthSurveyModelResource.Meta):
         always_return_data = True
@@ -207,6 +207,12 @@ class BaseSurveyResource(AuthSurveyModelResource):
 
 class SurveyResource(BaseSurveyResource):
     questions = fields.ToManyField(QuestionResource, 'questions', full=True, null=True, blank=True)
+
+
+class OfflineSurveyResource(BaseSurveyResource):
+    class Meta:
+        authorization = StaffUserOnlyAuthorization()
+        authentication = Authentication()
 
 
 class SurveyDashResource(BaseSurveyResource):
