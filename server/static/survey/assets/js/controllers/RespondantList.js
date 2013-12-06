@@ -109,7 +109,7 @@ angular.module('askApp')
         setup_market_dropdown();
         $scope.filter = {
             startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
-            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(1).day().valueOf()
+            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {

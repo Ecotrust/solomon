@@ -127,7 +127,7 @@ def get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
                     })
                 except IndexError as e:
                     print "not found"
-                    print e                
+                    print e
             elif question_b.type in ['currency', 'integer', 'number']:
                 if group is None:
                     obj['type'] = 'bar-chart'
