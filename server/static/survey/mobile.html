@@ -25,6 +25,8 @@
          <link rel="stylesheet" href="assets/lib/css/ng-grid.css">
         <link rel="stylesheet" href="assets/lib/css/flat-ui.css">
         <link rel="stylesheet" href="styles/main.css">
+        
+        <link rel="stylesheet" href="assets/lib/css/mobiscroll-2.0.full.min.css">
         <!-- Intro paragraph styles. Delete once you start using this page -->
         <style type="text/css">
             .welcome { line-height: 1.5; color: #555; }
@@ -172,6 +174,11 @@
         input[type="week"] {
             display: -webkit-inline-flex;
         }
+
+        input.datepicker, input.timepicker {
+            color: black;
+            padding-left: 10px;
+        }
         </style>
     </head>
     
@@ -187,6 +194,8 @@
      <script src="assets/lib/js/ng-grid.min.js"></script>
      <script src="assets/lib/js/ng-grid-plugins/ng-grid-flexible-height.js"></script>
      <script src="assets/lib/js/bootstrap.js"></script>
+
+     <script src="assets/lib/js/mobiscroll-2.0.full.min.js"></script>
      <script>
      window.isAuthenticated = false;
      </script>

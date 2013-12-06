@@ -11,17 +11,22 @@ angular.module('askApp')
             answer: '=answer'
         },
         link: function (scope, element, attrs) {
-            var picker;
-            element.pickadate({
-                format: 'dd-mm-yyyy'
+            var scroller = element.scroller({
+                preset: 'date',
+                mode: 'clickpick',
+                // theme: 'android-ics light',
+                dateFormat : "dd/mm/yy",
+                onSelect: function (date) {
+                     scope.$apply(function (s) {
+                        s.answer = date;    
+                    });
+                }
             });
-            picker = element.pickadate('picker');
-            picker.on('set', function () {
-                var picker = this;
-                scope.$apply(function (s) {
-                    s.answer = picker.get();
-                });
-            });
+
+            if (scope.answer) {
+                console.log(scope.answer);
+                scroller.scroller('setValue', scope.answer, true);
+            }
         }
     }
 });
@@ -39,27 +44,21 @@ angular.module('askApp')
             answer: '=answer'
         },
         link: function (scope, element, attrs) {
-            var picker, now = new Date();
-            element.pickatime({
-                format: 'HH:i',
-                formatSubmit: 'HH:i',
-                interval: 15
+            var scroller = element.scroller({
+                preset: 'time',
+                mode: 'clickpick',
+                // theme: 'android-ics light',
+                onSelect: function (date) {
+                     scope.$apply(function (s) {
+                        s.answer = date;    
+                    });
+                }
             });
-            picker = element.pickatime('picker');
 
             if (scope.answer) {
-                // picker.set('select', scope.answer);
-                picker.set('select', [scope.answer.split(':')[0], scope.answer.split(':')[1]]);    
-            } else {
-                picker.set('select', [now.getHours(), now.getMinutes()]);    
+                console.log(scope.answer);
+                scroller.scroller('setValue', scope.answer, true);
             }
-            
-            picker.on('set', function () {
-                var picker = this;
-                scope.$apply(function (s) {
-                    s.answer = picker.get();    
-                });
-            });
 
         }
     }

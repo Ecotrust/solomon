@@ -96,13 +96,15 @@
                 });
             </script>
             <!-- <input class="form-control input-block-level datepicker" placeholder="pick a date" type="date" answer="answer"/> -->
-            <input class="form-control input-block-level" type="date" placeholder="{{ question.label }}" ng-model="answer"/>
+            <!-- <input class="form-control input-block-level" type="date" placeholder="{{ question.label }}" ng-model="answer"/> -->
+            <input class="form-control input-block-level" date-picker placeholder="enter a date" answer="answer"/>
             <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
         </form>
     </div>
     <div ng-switch-when="timepicker">
         <form class="question" ng-show="survey.questions.length" ng-submit="answerQuestion(answer)">
-            <input class="form-control input-block-level" step="1" type="time" ng-model="answer"/> 
+            <!-- <input class="form-control input-block-level" step="1" type="time" ng-model="answer"/>  -->
+            <input class="form-control input-block-level" placeholder="enter a time" time-picker answer="answer"/>
             <button type="submit" class="btn btn-primary btn-large btn-block button-block">continue</button>
         </form>
     </div>

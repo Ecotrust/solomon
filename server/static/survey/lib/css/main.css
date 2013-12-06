@@ -84,3 +84,7 @@
 th.sortable_table {
     cursor: pointer;
 }
+
+input.datepicker {
+    color: black;
+}

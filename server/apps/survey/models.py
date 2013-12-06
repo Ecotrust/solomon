@@ -306,7 +306,7 @@ class Response(caching.base.CachingMixin, models.Model):
         if self.answer_raw:
             self.answer = simplejson.loads(self.answer_raw)
             if self.question.type in ['datepicker']:
-                self.answer_date = datetime.datetime.strptime(self.answer, '%Y-%m-%d')
+                self.answer_date = datetime.datetime.strptime(self.answer, '%d/%m/%Y')
             if self.question.type in ['currency', 'integer', 'number']:
                 if isinstance(self.answer, (int, long, float, complex)):
                     self.answer_number = self.answer
