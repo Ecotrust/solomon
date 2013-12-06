@@ -17,7 +17,7 @@
             <select class="form-control" ng-model="market" ng-options="m for m in markets">
                 <option value="">All Markets</option>
             </select>
-            <select class="form-control" ng-model="status_single" ng-options="item[1] for item in statuses">
+            <select class="form-control" ng-model="status_single" ng-options="i[0] as i[1] for i in statuses">
                 <option value="">All Statuses</option>
             </select>
         </div>

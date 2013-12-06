@@ -30,13 +30,14 @@ angular.module('askApp')
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
         url += '?startdate=' + start_date;
         url += '&enddate=' + end_date;
+        console.log("Status: ", $scope.status_single);
 
         if ($scope.market) {
             url += '&market=' + $scope.market;
         }
 
         if ($scope.status_single) {
-            url += '&status=' + $scope.status_single[0];
+            url += '&status=' + $scope.status_single;
         }
 
         $http.get(url).success(function(data) {
@@ -88,7 +89,7 @@ angular.module('askApp')
         if ($scope.filter) {
             filters_changed($routeParams.surveySlug);
         }
-    }, true);
+    }, false);
 
     $scope.$watch('market', function (newValue) {
         if ($scope.filter) {
@@ -140,7 +141,7 @@ angular.module('askApp')
             url = url + '&survey_site=' + $scope.market;
         }
         if ($scope.status_single && url.indexOf("&status=") == -1) {
-            url = url + '&status=' + $scope.status_single[0];
+            url = url + '&status=' + $scope.status_single;
         }
 
         $http.get(url).success(function(data) {
