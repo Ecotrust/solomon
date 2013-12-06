@@ -33,7 +33,7 @@ class Respondant(caching.base.CachingMixin, models.Model):
     survey = models.ForeignKey('Survey')
     responses = models.ManyToManyField('Response', related_name='responses', null=True, blank=True)
     complete = models.BooleanField(default=False)
-    review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=None, null=True, blank=True)
+    review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=REVIEW_STATE_NEEDED)
     status = models.CharField(max_length=20, choices=STATE_CHOICES, default=None, null=True, blank=True)
     last_question = models.CharField(max_length=240, null=True, blank=True)
 
@@ -306,7 +306,7 @@ class Response(caching.base.CachingMixin, models.Model):
         if self.answer_raw:
             self.answer = simplejson.loads(self.answer_raw)
             if self.question.type in ['datepicker']:
-                self.answer_date = datetime.datetime.strptime(self.answer, '%d-%m-%Y')
+                self.answer_date = datetime.datetime.strptime(self.answer, '%Y-%m-%d')
             if self.question.type in ['currency', 'integer', 'number']:
                 if isinstance(self.answer, (int, long, float, complex)):
                     self.answer_number = self.answer
