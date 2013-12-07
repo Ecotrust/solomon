@@ -391,7 +391,7 @@ class Response(caching.base.CachingMixin, models.Model):
 
 def save_related(sender, instance, created, **kwargs):
     # save the related objects on initial creation
-    if created:
-        instance.save_related()
+    # if created:
+    instance.save_related()
 
 signals.post_save.connect(save_related, sender=Response)
