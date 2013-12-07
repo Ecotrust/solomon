@@ -72,7 +72,7 @@ class OfflineResponseResource(AuthSurveyModelResource):
     def obj_create(self, bundle, **kwargs):
         obj = super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
         obj.save_related()
-        return super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
+        return obj
 
 
 class OfflineRespondantResource(AuthSurveyModelResource):
