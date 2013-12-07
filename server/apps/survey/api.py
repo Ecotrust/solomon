@@ -69,6 +69,11 @@ class OfflineResponseResource(AuthSurveyModelResource):
         authorization = StaffUserOnlyAuthorization()
         authentication = Authentication()
 
+    def obj_create(self, bundle, **kwargs):
+        obj = super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
+        obj.save_related()
+        return super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
+
 
 class OfflineRespondantResource(AuthSurveyModelResource):
     responses = fields.ToManyField(OfflineResponseResource, 'responses', null=True, blank=True)
