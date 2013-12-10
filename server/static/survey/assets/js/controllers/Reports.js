@@ -95,7 +95,6 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
 
         // FIXME: Actually pull these charts from the DB or something.
-        console.log("Filters_changed called.");
         if ($scope.activePage == 'economic') {
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);

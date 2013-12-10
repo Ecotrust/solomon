@@ -16,7 +16,7 @@ angular.module('askApp')
                     var labels, data, series;
 
                     if (newValue && !newValue.message) {
-                        if (scope.chart.data.length != 0) {
+                        if (scope.chart.data && scope.chart.data.length != 0) {
                             series = _.map(scope.chart.data, function(item, index) {
                                 return {
                                     name: scope.chart.labels[index],
