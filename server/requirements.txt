@@ -13,7 +13,7 @@ django-extensions==1.1.1
 django-grappelli==2.4.5
 django-redis-cache==0.9.7
 django-storages==1.1.8
-django-tastypie==0.11.0
+django-tastypie==0.9.16
 gunicorn==0.17.4
 hiredis==0.1.1
 mimeparse==0.1.3
