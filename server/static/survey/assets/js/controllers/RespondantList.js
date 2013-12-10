@@ -60,13 +60,13 @@ angular.module('askApp')
         });
     }
 
-    $scope.market = "";
+    $scope.market = $location.search().market || "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = 'overview';
     $scope.statuses = [];
-    $scope.status_single = "";
+    $scope.status_single = $location.search().status || "";
 
     $scope.columns = [ 'Surveyor'
                      , 'Date'
@@ -117,9 +117,13 @@ angular.module('askApp')
         data.questions.reverse();
         $scope.survey = data;
         setup_market_dropdown();
+        var start_date = $location.search().ts__gte || $scope.survey.response_date_start;
+        var end_date = $location.search().ts__lte || $scope.survey.response_date_end;
         $scope.filter = {
-            startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
-            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf()
+            min: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
+            max: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf(),
+            startDate: $scope.dateFromISO(start_date).add(-1).day().valueOf(),
+            endDate: $scope.dateFromISO(end_date).add(2).day().valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {
