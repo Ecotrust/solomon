@@ -1,7 +1,7 @@
 //'use strict';
 
 angular.module('askApp')
-    .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
+    .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location) {
 
     function setup_market_dropdown() {
         var market_site_id = _.find($scope.survey.questions, function(x) {
@@ -30,7 +30,6 @@ angular.module('askApp')
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
         url += '?startdate=' + start_date;
         url += '&enddate=' + end_date;
-        console.log("Status: ", $scope.status_single);
 
         if ($scope.market) {
             url += '&market=' + $scope.market;
@@ -60,7 +59,6 @@ angular.module('askApp')
             }
         });
     }
-
 
     $scope.market = "";
     $scope.filter = null;
@@ -143,18 +141,26 @@ angular.module('askApp')
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
 
+        var location_obj = {};
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            location_obj.ts__gte = str;
+            url = url + '&ts__gte=' + str;
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            location_obj.ts__lte = str;
+            url = url + '&ts__lte=' + str;
         }
         if ($scope.market && url.indexOf("&survey_site=") == -1) {
+            location_obj.survey_site = $scope.market;
             url = url + '&survey_site=' + $scope.market;
         }
         if ($scope.status_single && url.indexOf("&status=") == -1) {
+            location_obj.status = $scope.status_single;
             url = url + '&status=' + $scope.status_single;
         }
+        $location.search(location_obj);
 
         $http.get(url).success(function(data) {
             $scope.respondentsLoading = false;
