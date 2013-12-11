@@ -166,7 +166,7 @@ angular.module('askApp')
         }
         if ($scope.status_single && url.indexOf("&status=") == -1) {
             location_obj.status = $scope.status_single;
-            url = url + '&status=' + $scope.status_single;
+            url = url + '&review_status=' + $scope.status_single;
         }
         $location.search(location_obj);
         // hue hue hue:

@@ -97,7 +97,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
             'survey': ALL_WITH_RELATIONS,
             'responses': ALL_WITH_RELATIONS,
             'survey_site': ['exact'],
-            'status': ['exact'],
+            'review_status': ['exact'],
             'ts': ['gte', 'lte']
         }
         ordering = ['-ts']
