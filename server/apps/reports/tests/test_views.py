@@ -1,3 +1,4 @@
+import csv
 import datetime
 import json
 
@@ -8,7 +9,7 @@ from django.test import TestCase
 from survey.models import Respondant, Response, Survey
 
 
-class TestSurveyorStats(TestCase):
+class BaseSurveyorStatsCase(TestCase):
     fixtures = ['reef.json', 'users.json']
 
     def setUp(self):
@@ -29,21 +30,71 @@ class TestSurveyorStats(TestCase):
         self.client.login(username=self.respondant_user.username,
                           password='password')
 
+
+class TestSurveyorStatsJson(BaseSurveyorStatsCase):
     def get_url(self, interval):
-        return reverse('reports_surveyor_stats', kwargs={
+        return reverse('reports_surveyor_stats_json', kwargs={
             'survey_slug': self.survey.slug,
             'interval': interval
         })
 
-    def test_get_unauthorized(self):
+    def test_unauthorized(self):
         res = self.client.get(self.get_url('month'))
         self.assertEqual(res.status_code, 403)
 
-    def test_get_authorized(self):
+    def test_authorized(self):
         self.login()
         res = self.client.get(self.get_url('month'))
         self.assertEqual(res.status_code, 200)
-        print res.content
         body = json.loads(res.content)
         self.assertEqual(body['graph_data'][0]['name'],
                          self.respondant_user.get_full_name())
+
+
+class TestSurveyorStatsCsv(BaseSurveyorStatsCase):
+    def get_url(self, interval):
+        return reverse('reports_surveyor_stats_csv', kwargs={
+            'survey_slug': self.survey.slug,
+            'interval': interval
+        })
+
+    def test_unauthorized(self):
+        res = self.client.get(self.get_url('month'))
+        self.assertEqual(res.status_code, 403)
+
+    def test_authorized(self):
+        self.login()
+        res = self.client.get(self.get_url('month'))
+        self.assertEqual(res.status_code, 200)
+
+        data = csv.reader(res.content.splitlines())
+
+        # This is a bit janky, but required if we are using the CSV lib.
+        for i, row in enumerate(data):
+            if i == 1:
+                self.assertEqual(row[0],
+                                 self.respondant_user.get_full_name())
+
+
+class TestSurveyorStatsRawDataCsv(BaseSurveyorStatsCase):
+    def get_url(self):
+        return reverse('reports_surveyor_stats_raw_data_csv', kwargs={
+            'survey_slug': self.survey.slug,
+        })
+
+    def test_unauthorized(self):
+        res = self.client.get(self.get_url())
+        self.assertEqual(res.status_code, 403)
+
+    def test_authorized(self):
+        self.login()
+        res = self.client.get(self.get_url())
+        self.assertEqual(res.status_code, 200)
+
+        data = csv.reader(res.content.splitlines())
+
+        # This is a bit janky, but required if we are using the CSV lib.
+        for i, row in enumerate(data):
+            if i == 1:
+                self.assertEqual(row[0],
+                                 self.respondant_user.get_full_name())
