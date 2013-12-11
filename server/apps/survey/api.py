@@ -208,6 +208,7 @@ class SurveyDashResource(BaseSurveyResource):
     survey_responses = fields.IntegerField(attribute='survey_responses', readonly=True)
     reviews_needed = fields.IntegerField(attribute='reviews_needed', readonly=True)
     flagged = fields.IntegerField(attribute='flagged', readonly=True)
+    today = fields.IntegerField(attribute='today', readonly=True)
 
 
 class SurveyReportResource(SurveyDashResource):
