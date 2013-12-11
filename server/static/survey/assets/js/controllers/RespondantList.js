@@ -170,8 +170,8 @@ angular.module('askApp')
         }
         $location.search(location_obj);
         // hue hue hue:
-        $scope.filtered_list_url = "filtered_list_url='#/RespondantList/" + $scope.survey.slug + "?" +
-            _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&") + "'";
+        $scope.filtered_list_url = "filtered_list_url=" + btoa("#/RespondantList/" + $scope.survey.slug + "?" +
+            _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&"));
 
         $http.get(url).success(function(data) {
             $scope.respondentsLoading = false;
