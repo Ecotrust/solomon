@@ -65,6 +65,30 @@ class Respondant(caching.base.CachingMixin, models.Model):
         self.locations = self.location_set.all().count()
         super(Respondant, self).save(*args, **kwargs)
 
+    @classmethod
+    def stats_report_filter(cls, survey_slug, start_date=None,
+                            end_date=None, market=None, surveyor=None,
+                            status=None):
+
+        qs = cls.objects.filter(survey__slug=survey_slug)
+
+        if start_date is not None:
+            qs = qs.filter(ts__gte=start_date)
+
+        if end_date is not None:
+            qs = qs.filter(ts__lt=end_date)
+
+        if market is not None:
+            qs = qs.filter(survey_site=market)
+
+        if surveyor is not None:
+            qs = qs.filter(surveyor__id=surveyor)
+
+        if status is not None:
+            qs = qs.filter(review_status=status)
+
+        return qs
+
 
 class Page(caching.base.CachingMixin, models.Model):
     question = models.ForeignKey('Question', null=True, blank=True)

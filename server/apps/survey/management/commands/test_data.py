@@ -62,10 +62,14 @@ class Command(BaseCommand):
             slug='survey-date', survey=survey)
         users = []
         for i in range(7):
-            users.append(User.objects.create_user(username='user{0}'.format(i),
-                                                  first_name='user',
-                                                  last_name=i,
-                                                  password='pass'))
+            user = User.objects.get(username='user{0}'.format(i))
+            if user:
+                users.append(user)
+            else:
+                users.append(User.objects.create_user(username='user{0}'.format(i),
+                                                      first_name='user',
+                                                      last_name=i,
+                                                      password='pass'))
 
         for i in range(100):
             date = datetime.date.today() + datetime.timedelta(-randint(0, 365))
@@ -81,7 +85,7 @@ class Command(BaseCommand):
             cost_response = Response(
                 question=cost_question, respondant=respondant)
             volume_response.answer_raw = simplejson.dumps(randint(1, 1000))
-            date_response.answer_raw = simplejson.dumps(date.isoformat())
+            date_response.answer_raw = simplejson.dumps(date.strftime('%d/%m/%Y'))
             market_response.answer_raw = simplejson.dumps(
                 {'text': centers[randint(0, len(centers) - 1)]})
             origin_response.answer_raw = simplejson.dumps(
