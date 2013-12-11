@@ -13,7 +13,8 @@ django-extensions==1.1.1
 django-grappelli==2.4.5
 django-redis-cache==0.9.7
 django-storages==1.1.8
-django-tastypie==0.9.16
+#django-tastypie==0.9.16
+-e git+https://github.com/point97/django-tastypie.git@c3626145440c533bad3b0f966423ab0cb9701add#egg=django_tastypie-origin/v0.11.0-patch
 gunicorn==0.17.4
 hiredis==0.1.1
 mimeparse==0.1.3
