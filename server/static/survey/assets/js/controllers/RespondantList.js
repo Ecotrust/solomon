@@ -1,144 +1,72 @@
 //'use strict';
 
-function fish_weight_by_market($http, charts, start_date, end_date, slug) {
-    var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
-        url = url + '?startdate=' + start_date;
-        url = url + '&enddate=' + end_date;
+angular.module('askApp')
+    .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location) {
 
-    return $http.get(url).success(function(data) {
-        charts.push({
-            title: "Total Fish Weight by Market",
-            type: data.type,
-            labels: _.pluck(data.crosstab, 'name'),
-            data: _.pluck(data.crosstab, 'value'),
-            xLabel: 'Market',
-            yLabel: 'Total Weight (kg)',
-            order: 2,
-            message: data.message
+    function setup_market_dropdown() {
+        var market_site_id = _.find($scope.survey.questions, function(x) {
+            return x.slug == 'survey-site';
+        }).id;
+        var url = '/api/v1/response?format=json&question=' + market_site_id;
+
+        $http.get(url).success(function(data) {
+            $scope.markets = [];
+            var markets_with_dupes = _.map(data.objects,
+                function(x) { return x.answer; });
+
+            _.each(markets_with_dupes, function (x) {
+                if (_.indexOf($scope.markets, x) === -1) {
+                    $scope.markets.push(x);
+                }
+            });
         });
-        charts.sort(function (a,b) { return a-b;})
-    });
-}
+    }
 
-function fish_weight_by_province($http, charts, start_date, end_date, slug) {
-    var url = ['/reports/crosstab', slug, 'province-purchased-caught', 'total-weight'].join('/');
-        url = url + '?startdate=' + start_date;
-        url = url + '&enddate=' + end_date;
+    function filters_changed(surveySlug) {
+        $scope.getRespondents();
 
-    return $http.get(url).success(function(data) {
-        charts.push({
-            title: "Total Fish Weight by Province",
-            type: data.type,
-            labels: _.pluck(data.crosstab, 'name'),
-            data: _.pluck(data.crosstab, 'value'),
-            xLabel: 'Province',
-            yLabel: 'Total Weight (kg)',
-            order: 3,
-            message: data.message
-        });
-        charts.sort(function (a,b) { return a-b;})
-    });
-}
+        var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+        var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
+        url += '?start_date=' + start_date;
+        url += '&end_date=' + end_date;
 
-function average_trip_costs_by_market($http, charts, start_date, end_date, slug) {
-    var url = ['/reports/crosstab', slug, 'survey-site', 'cost'].join('/');
-        url = url + '?startdate=' + start_date;
-        url = url + '&enddate=' + end_date;
+        if ($scope.market) {
+            url += '&market=' + $scope.market;
+        }
 
-    return $http.get(url).success(function(data) {
-        charts.push({
-            title: "Average Trip Costs by Market",
-            labels: _.pluck(data.crosstab, 'name'),
-            seriesNames: data.seriesNames,
-            type: data.type,
-            data: data.crosstab,
-            xLabel: 'Market',
-            yLabel: 'Average Trip Costs',
-            order: 1,
-            message: data.message
-        });
-        charts.sort(function (a,b) { return a-b;})
-    });
-}
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
 
-function total_weight_for_market($http, charts, start_date, end_date, slug) {
-    var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
-    url = url + '?startdate=' + start_date;
-    url = url + '&enddate=' + end_date;
-    url = url + '&group=week';
-
-    return $http.get(url).success(function(data) {
-        charts.push({
-            title: "Total Weight for Week by Market",
-            labels: _.pluck(data.crosstab, 'name'),
-            seriesNames: data.seriesNames,
-            type: data.type,
-            data: data.crosstab,
-            xLabel: 'Market',
-            yLabel: 'Total Weight (kg)',
-            order: 4,
-            startDate: start_date,
-            endDate: end_date,
-            message: data.message
-        });
-        charts.sort(function (a,b) { return a-b;})
-    });
-}
-
-function setup_market_dropdown($http, $scope) {
-    var market_site_id = _.find($scope.survey.questions, function(x) {
-        return x.slug == 'survey-site';
-    }).id;
-    var url = '/api/v1/response?format=json&question=' + market_site_id;
-
-    $http.get(url).success(function(data) {
-        $scope.markets = [];
-        $scope.market = "";
-        var markets_with_dupes = _.map(data.objects,
-            function(x) { return x.answer; });
-
-        _.each(markets_with_dupes, function (x) {
-            if (_.indexOf($scope.markets, x) === -1) {
-                $scope.markets.push(x);
+        $http.get(url).success(function(data) {
+            $scope.surveyor_by_time = {
+                yLabel: "Survey Responses",
+                raw_data: data.graph_data,
+                unit: "surveys"
+            }
+            // map reduuuuuuce
+            var bar_data = _.map(data.graph_data,
+                function (x) {
+                    return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
+                }
+            );
+            $scope.surveyor_total = {
+                labels: _.pluck(data.graph_data, 'name'),
+                yLabel: "Surveys Collected",
+                data: bar_data,
+                unit: "surveys"
             }
         });
-    });
-}
-
-function filters_changed($http, $scope, surveySlug) {
-    $scope.charts = [];
-    $scope.getRespondents();
-
-    var start_date = $scope.filter.startDate.toString('yyyyMMdd');
-    var end_date = $scope.filter.endDate.toString('yyyyMMdd')
-
-    fish_weight_by_market($http, $scope.charts, start_date, end_date,
-        surveySlug)
-
-    fish_weight_by_province($http, $scope.charts, start_date, end_date,
-        surveySlug);
-
-    average_trip_costs_by_market($http, $scope.charts, start_date, end_date,
-        surveySlug);
-
-    total_weight_for_market($http, $scope.charts, start_date, end_date,
-        surveySlug);
-
-    // FIXME: When the survey data can be pulled in, put it here.
-    $scope.surveyor_by_time = {
-        yLabel: "Survey Responses"
     }
-}
 
-angular.module('askApp')
-    .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
-
+    $scope.market = $location.search().market || "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = 'overview';
     $scope.statuses = [];
-    $scope.status_single = "";
+    $scope.status_single = $location.search().status || "";
 
     $scope.columns = [ { name: 'Surveyor', field: 'surveyor' }
                      , { name: 'Date', field: 'ts' }
@@ -165,29 +93,43 @@ angular.module('askApp')
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
-            filters_changed($http, $scope, $routeParams.surveySlug);
+            filters_changed($routeParams.surveySlug);
         }
     }, true);
 
     $scope.$watch('status_single', function (newValue) {
         if ($scope.filter) {
-            filters_changed($http, $scope, $routeParams.surveySlug);
+            filters_changed($routeParams.surveySlug);
         }
-    }, true);
+    }, false);
 
     $scope.$watch('market', function (newValue) {
         if ($scope.filter) {
-            filters_changed($http, $scope, $routeParams.surveySlug);
+            filters_changed($routeParams.surveySlug);
+        }
+    }, true);
+
+    $scope.$watch('surveyorTimeFilter', function (newValue) {
+        if ($scope.filter) {
+            filters_changed($routeParams.surveySlug);
         }
     }, true);
 
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
-        setup_market_dropdown($http, $scope);
+        setup_market_dropdown();
+        var start_date = $location.search().ts__gte ?
+            new Date(parseInt($location.search().ts__gte)) :
+            $scope.dateFromISO($scope.survey.response_date_start);
+        var end_date = $location.search().ts__lte ?
+            new Date(parseInt($location.search().ts__lte)) :
+            $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day(),
-            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(1).day()
+            min: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
+            max: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf(),
+            startDate: start_date.add(-1).day().valueOf(),
+            endDate: end_date.add(2).day().valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {
@@ -209,24 +151,34 @@ angular.module('askApp')
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
 
+        var location_obj = {};
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + $scope.filter.startDate.toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            location_obj.ts__gte = new Date($scope.filter.startDate).valueOf();
+            url = url + '&ts__gte=' + str;
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + $scope.filter.endDate.toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            location_obj.ts__lte = new Date($scope.filter.endDate).valueOf();
+            url = url + '&ts__lte=' + str;
         }
         if ($scope.market && url.indexOf("&survey_site=") == -1) {
+            location_obj.survey_site = $scope.market;
             url = url + '&survey_site=' + $scope.market;
         }
         if ($scope.status_single && url.indexOf("&status=") == -1) {
-            url = url + '&status=' + $scope.status_single;
+            location_obj.status = $scope.status_single;
+            url = url + '&review_status=' + $scope.status_single;
         }
         if ($scope.currentColumn && url.indexOf("&order_by=") == -1) {
-            console.log($scope.currentColumn);
-            url = url + '&order_by=' + (
-                $scope.sortDescending ? "-" + $scope.currentColumn.field : $scope.currentColumn.field
-            );
+            var str = $scope.sortDescending ? "-" + $scope.currentColumn.field : $scope.currentColumn.field;
+            location_obj.status = str;
+            url = url + '&order_by=' + str;
         }
+        $location.search(location_obj);
+        // hue hue hue:
+        $scope.filtered_list_url = "filtered_list_url=" + btoa("#/RespondantList/" + $scope.survey.slug + "?" +
+            _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&"));
 
         $http.get(url).success(function(data) {
             $scope.respondentsLoading = false;

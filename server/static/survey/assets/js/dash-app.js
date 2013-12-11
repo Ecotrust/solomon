@@ -30,6 +30,10 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
         templateUrl: app.viewPath + 'views/SurveyList.html',
         controller: 'SurveyListCtrl'
     })
+        .when('/survey/:surveySlug/reports/:reportName', {
+        templateUrl: app.viewPath + 'views/Reports.html',
+        controller: 'ReportCtrl'
+    })
         .when('/survey/:surveySlug/complete/:uuidSlug', {
         templateUrl: app.viewPath + 'views/complete.html',
         controller: 'CompleteCtrl'
@@ -48,7 +52,8 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
     })
         .when('/RespondantList/:surveySlug', {
         templateUrl: app.viewPath + 'views/RespondantList.html',
-        controller: 'RespondantListCtrl'
+        controller: 'RespondantListCtrl',
+        reloadOnSearch: false
     })
         .when('/RespondantDetail/:surveySlug/:uuidSlug', {
         templateUrl: app.viewPath + 'views/RespondantDetail.html',

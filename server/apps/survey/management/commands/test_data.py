@@ -1,8 +1,13 @@
-from django.core.management.base import BaseCommand
-import simplejson
-from survey.models import Respondant, Response, Question, Survey
-from random import randint
 import datetime
+from random import choice, randint
+
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
+
+import simplejson
+
+from survey.models import Respondant, Response, Question, Survey
+
 
 centers = [
     'Honiara Central Market',
@@ -55,9 +60,20 @@ class Command(BaseCommand):
         cost_question = Question.objects.get(slug='cost', survey=survey)
         date_question = Question.objects.get(
             slug='survey-date', survey=survey)
+        users = []
+        for i in range(7):
+            user = User.objects.get(username='user{0}'.format(i))
+            if user:
+                users.append(user)
+            else:
+                users.append(User.objects.create_user(username='user{0}'.format(i),
+                                                      first_name='user',
+                                                      last_name=i,
+                                                      password='pass'))
+
         for i in range(100):
             date = datetime.date.today() + datetime.timedelta(-randint(0, 365))
-            respondant = Respondant(survey=survey, test_data=True, ts=date)
+            respondant = Respondant(survey=survey, test_data=True, ts=date, surveyor=choice(users))
             market_response = Response(
                 question=market_question, respondant=respondant)
             volume_response = Response(
@@ -69,7 +85,7 @@ class Command(BaseCommand):
             cost_response = Response(
                 question=cost_question, respondant=respondant)
             volume_response.answer_raw = simplejson.dumps(randint(1, 1000))
-            date_response.answer_raw = simplejson.dumps(date.isoformat())
+            date_response.answer_raw = simplejson.dumps(date.strftime('%d/%m/%Y'))
             market_response.answer_raw = simplejson.dumps(
                 {'text': centers[randint(0, len(centers) - 1)]})
             origin_response.answer_raw = simplejson.dumps(

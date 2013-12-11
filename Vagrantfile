@@ -9,10 +9,13 @@ Vagrant.configure("2") do |config|
     config.vm.network :forwarded_port, guest: 8000, host: 8000  # django dev server
     config.vm.network :forwarded_port, guest: 5432, host: 15432  # postgresql
 
+    #config.vm.synced_folder "~/.pip/downloads", "/tmp/pip-cache", disabled: true
+
+
     config.vm.hostname = "geosurvey"
 
     config.vm.provider :virtualbox do |vb|
-        vb.customize ["modifyvm", :id, "--memory", 256]
+        vb.customize ["modifyvm", :id, "--memory", 512]
     end
 
     config.omnibus.chef_version = "10.20.0"

@@ -1,4 +1,4 @@
-<div id="sidenav_respondants">
+<div class="col-md-2" id="sidenav_respondants">
     <div class="stats">
         <div class="row">
             <div class="col-md-12">
@@ -23,14 +23,14 @@
                 <ul class="nav">
                     <li><a ng-class="{'active': activePage == 'overview'}" href="#/RespondantList/{{survey.slug}}">Overview</a></li>
                         <li>
-                        <a ng-class="{'active': activePage == 'reports'}">Reports</a>
+                        <a ng-class="{'active': activePage == 'reports'}">Reports <span class="badge">soon</span></a>
                         <ul>
-                            <li><a ng-class="{'active': activePage == 'economic'}">Economic</a></li>
-                            <li><a ng-class="{'active': activePage == 'biological'}">Biological</a></li>
+                            <li><a ng-class="{'active': activePage == 'economic'}" href="#/survey/{{survey.slug}}/reports/economic">Economic</a></li>
+                            <li><a ng-class="{'active': activePage == 'biological'}" href="#/survey/{{survey.slug}}/reports/biological">Biological</a></li>
                         </ul>
                     </li>
-                    <li><a ng-class="{'active': activePage == 'search'}">Search</a></li>
-                    <li><a ng-class="{'active': activePage == 'download'}">Download</a></li>
+                    <li class="disabled"><a ng-class="{'active': activePage == 'search'}">Data <span class="badge">soon</span></a></li>
+                    <!--<li><a ng-class="{'active': activePage == 'download'}">Download</a></li> -->
                 </ul>
             </div>
         </div>

@@ -90,7 +90,8 @@ angular.module('askApp')
         }
 
         $scope.sendRespondent = function (respondent) {
-            var url = app.server + '/api/v1/offlinerespondant/',
+            var url = app.server + _.string.sprintf('/api/v1/offlinerespondant/?username=%s&api_key=%s',
+                    app.user.username, app.user.api_key);
                 newResponses = angular.copy(respondent.responses);
             _.each(newResponses, function (response) {
                 var question_uri = response.question.resource_uri;

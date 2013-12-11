@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
 from tastypie import fields
-from tastypie.authentication import SessionAuthentication, Authentication
 from tastypie.authorization import Authorization
+from tastypie.authentication import SessionAuthentication, ApiKeyAuthentication, MultiAuthentication
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 from survey.models import (Survey, Question, Option, Respondant, Response,
@@ -44,7 +44,7 @@ class StaffUserOnlyAuthorization(Authorization):
 class AuthSurveyModelResource(SurveyModelResource):
     class Meta:
         authorization = StaffUserOnlyAuthorization()
-        authentication = SessionAuthentication()
+        authentication = MultiAuthentication(ApiKeyAuthentication(), SessionAuthentication())
 
 
 class ResponseResource(SurveyModelResource):
@@ -66,8 +66,6 @@ class OfflineResponseResource(AuthSurveyModelResource):
 
     class Meta(AuthSurveyModelResource.Meta):
         queryset = Response.objects.all()
-        authorization = StaffUserOnlyAuthorization()
-        authentication = Authentication()
 
 
 class OfflineRespondantResource(AuthSurveyModelResource):
@@ -78,8 +76,6 @@ class OfflineRespondantResource(AuthSurveyModelResource):
         always_return_data = True
         queryset = Respondant.objects.all()
         ordering = ['-ts']
-        authorization = StaffUserOnlyAuthorization()
-        authentication = Authentication()
 
     def obj_create(self, bundle, **kwargs):
         return super(OfflineRespondantResource, self).obj_create(bundle, surveyor=bundle.request.user)
@@ -101,13 +97,13 @@ class ReportRespondantResource(AuthSurveyModelResource):
             'survey': ALL_WITH_RELATIONS,
             'responses': ALL_WITH_RELATIONS,
             'survey_site': ['exact'],
-            'status': ['exact'],
+            'review_status': ['exact'],
             'ts': ['gte', 'lte']
         }
         ordering = ['ts', 'survey', 'vendor', 'survey_site', 'survey__surveyor']
 
     def alter_list_data_to_serialize(self, request, data):
-        data['meta']['statuses'] = dict(REVIEW_STATE_CHOICES)
+        data['meta']['statuses'] = REVIEW_STATE_CHOICES
         return data
 
     def alter_detail_data_to_serialize(self, request, bundle):

@@ -25,29 +25,43 @@
          <link rel="stylesheet" href="assets/lib/css/ng-grid.css">
         <link rel="stylesheet" href="assets/lib/css/flat-ui.css">
         <link rel="stylesheet" href="styles/main.css">
+        
+        <link rel="stylesheet" href="assets/lib/css/mobiscroll-2.0.full.min.css">
         <!-- Intro paragraph styles. Delete once you start using this page -->
         <style type="text/css">
             .welcome { line-height: 1.5; color: #555; }
             ul {
                 margin: 0;
-             /*   background-color: #222;
-                color: white;*/
+             
             }
-            /*.list li {
-                background-color: #222;
-                border-top: rgba(255,255,255,5);
-                border-bottom: rgba(255,255,255,5);
-            }*/
+            
             h1 {
                 margin: 0;
             }
-            /*.content {
-                background-color: #222;
-                color: white;
-            }*/
+            
+
+            .question-page .content-padded {
+                height: 100%;
+            }
             a,a:hover {
                 text-decoration: none;
                 color: inherit;
+            }
+            .nav > li > a {
+                background-color: rgb(100,100,100);
+                border-radius: 0;
+            }
+            .nav > li > a:hover {
+                background-color: rgb(100,100,100);
+            }
+            .nav-pills > .active > a {
+                background-color: rgb(0, 136, 204);
+            }
+            .nav-stacked > li:hover {
+                background-color: rgb(120,120,120);   
+            }
+            .todo li {
+                padding: 0;
             }
             .list {
                 margin-bottom: 10px;
@@ -114,11 +128,6 @@
             .error {
                 color: red;
             }
-            /*.main .forms form {*/
-    /*            margin-top: 20px;
-                height: 260px;
-            }
-*/
                 .main ul {
                     font-size: 18px;
                     list-style-type: none;
@@ -133,12 +142,15 @@
         .main .segmented-controller {
             margin-top: 20px;
         }         
-
+        #gridQuestion .row {
+            margin-left: 0;
+        }
         .ngHeaderText {
             white-space: normal;
         }
         .ngHeaderContainer {
             height: inherit;
+            width: 100%;
         }
         .ngCellText {
             white-space: normal !important;
@@ -154,25 +166,36 @@
         .btn-delete {
             margin-top: 20px !important;
         }
+        input[type="date"],
+        input[type="datetime"],
+        input[type="datetime-local"],
+        input[type="month"],
+        input[type="time"],
+        input[type="week"] {
+            display: -webkit-inline-flex;
+        }
+
+        input.datepicker, input.timepicker {
+            color: black;
+            padding-left: 10px;
+        }
         </style>
     </head>
     
     <body ng-app="askApp"  ng-view></body>
-    <script src="assets/lib/js/date.min.js"></script>
+    <script src="assets/lib/js/date.js"></script>
     <script src="assets/lib/js/jquery-1.8.2.min.js"></script>
     <script src="assets/lib/js/jquery-ui.min.js"></script>
-     <script src="assets/lib/js/angular.js"></script>
+     <script src="assets/lib/js/angular-1.0.6.js"></script>
      <script src="assets/lib/js/angular-ui.js"></script>
      <script src="assets/js/directives/ui-bootstrap-tpls-0.2.0.js"></script>
-
-     <script src="assets/lib/js/select2.js"></script>
      <script src="assets/lib/js/underscore.js"></script>
      <script src="assets/lib/js/underscore.string.js"></script>
-     <script src="assets/lib/js/leaflet-src.js"></script>
      <script src="assets/lib/js/ng-grid.min.js"></script>
      <script src="assets/lib/js/ng-grid-plugins/ng-grid-flexible-height.js"></script>
      <script src="assets/lib/js/bootstrap.js"></script>
 
+     <script src="assets/lib/js/mobiscroll-2.0.full.min.js"></script>
      <script>
      window.isAuthenticated = false;
      </script>
@@ -190,6 +213,7 @@
     <script src="assets/js/controllers/settings.js"></script>
     <script src="assets/js/controllers/complete.js"></script>
     <script src="assets/js/directives/mobilemenu.js"></script>
+    <script src="assets/js/directives/directives.js"></script>
     <script src="assets/js/directives/titlebar.js"></script>
     <script src="assets/js/directives/tap.js"></script>
     <!-- endbuild -->

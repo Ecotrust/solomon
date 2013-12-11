@@ -1,5 +1,5 @@
-<div class="container">
-    <div class="col-md-2" ng-include="viewPath + 'views/sideNav.html'"></div>
+<div class="container main-container">
+    <div ng-include="viewPath + 'views/sideNav.html'"></div>
     <div class="col-md-10">
         <h1>{{ survey.name }}</h1>
         <h2>Overview</h2>
@@ -11,13 +11,13 @@
             <p>Responses Found</p>
         </div>
         <div class="col-md-8">
-            <div start="filter.startDate" end="filter.endDate" range-slider></div>
+            <div min="filter.min" max="filter.max" start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
         </div>
         <div id="market_status_filters" class="col-md-2">
             <select class="form-control" ng-model="market" ng-options="m for m in markets">
                 <option value="">All Markets</option>
             </select>
-            <select class="form-control" ng-model="status_single" ng-options="value for (key, value) in statuses">
+            <select class="form-control" ng-model="status_single" ng-options="i[0] as i[1] for i in statuses">
                 <option value="">All Statuses</option>
             </select>
         </div>
@@ -26,12 +26,11 @@
     <div class="col-md-10">
         <p ng-show="message">{{message}}</p>
         <div>
-            <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
             <div class="btn-group">
-                <button ng-class="{'active': surveyorTimeFilter == 'hourly'}"
+                <button ng-class="{'active': surveyorTimeFilter == 'hour'}"
                     type="button"
                     class="btn btn-default"
-                    ng-click="surveyorTimeFilter='hourly'">Hourly</button>
+                    ng-click="surveyorTimeFilter='hour'">Hourly</button>
                 <button ng-class="{'active': surveyorTimeFilter == 'day'}"
                     type="button"
                     class="btn btn-default"
@@ -44,6 +43,10 @@
                     type="button"
                     class="btn btn-default"
                     ng-click="surveyorTimeFilter='month'">Month</button>
+            </div>
+            <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
+            <div id="surveyor_total_chart">
+                <div bar-chart chart="surveyor_total"></div>
             </div>
             <div id="surveyor_by_time_chart">
                 <div time-series chart="surveyor_by_time"></div>
@@ -66,8 +69,12 @@
                         <td>{{ respondent.vendor }}</td>
                         <td>{{ respondent.buy_or_catch }}</td>
                         <td>{{ respondent.how_sold }}</td>
-                        <td>{{ respondent.status }}</td>
-                        <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}">Responses ({{respondent.responses.length}})</a></td>
+                        <td>
+                            <span class="label" ng-class="{ 'label-success': respondent.review_status == 'accepted', 'label-danger': respondent.review_status == 'flagged', 'label-warning': respondent.review_status == 'needs review' }">
+                                {{ respondent.review_status }}
+                            </span>
+                        </td>
+                        <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}?{{filtered_list_url}}">Responses ({{respondent.responses.length}})</a></td>
                     </tr>
                 </tbody>
             </table>
@@ -82,25 +89,13 @@
                 <button class="btn" ng-disabled="! meta.previous" ng-click="getRespondents(meta.previous)">Previous</button>
                 <button class="btn" ng-disabled="! meta.next" ng-click="getRespondents(meta.next)">Next</button>
             </div>
-            <div>
+            <!-- <div>
                 <a href="#/search"><button class="btn"><i class="icon-search"></i> Search</button></a>
-            </div>
+            </div> -->
         </div>
         <!-- <div class="row">
             <div heatmap question="question.slug"></div>
         </div> -->
-
-        <!--
-        <div ng-repeat="chart in charts" class="dash-chart">
-            <h2>{{ chart.title }}</h2>
-            <div class="error">{{ chart.message }}</div>
-            <div ng-switch on="chart.type">
-                <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
-                <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
-                <div ng-switch-when="time-series" time-series chart="chart"></div>
-            </div>
-        </div>
-        -->
 
         <!--
         <div class="row" ng-repeat="question in survey.questions">

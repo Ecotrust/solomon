@@ -402,9 +402,10 @@ angular.module('askApp')
 
     $scope.saveState = function (state) {
         var appCopy = angular.copy(state);
-        delete appCopy.currentRespondent;  
+        delete appCopy.currentRespondent; 
+        appCopy.currentRespondantKey =  'hapifish-' + $routeParams.uuidSlug;
         localStorage.setItem('hapifish', JSON.stringify(appCopy));
-        localStorage.setItem('hapifish-' + $routeParams.uuidSlug, JSON.stringify(state.currentRespondent));
+        localStorage.setItem(appCopy.currentRespondantKey, JSON.stringify(state.currentRespondent));
     };
 
     $scope.answerQuestion = function(answer, otherAnswer) {
@@ -447,12 +448,11 @@ angular.module('askApp')
                 $scope.dialog.$scope.close();
             }
         } else {
-            if ($scope.question.type === 'timepicker' || $scope.question.type === 'datepicker') {
-                if (! $scope.answer) {
+            if ($scope.question.type === 'timepicker' || $scope.question.type === 'datepicker' || $scope.question.type === 'datetimepicker') {
+                if (! answer) {
                     answer = $scope.now;
                 }
             }
-
             // sometimes we'll have an other field with option text box
             if (answer === 'other' && otherAnswer) {
                 answer = otherAnswer;
@@ -482,7 +482,6 @@ angular.module('askApp')
                 }));
             }
             if (app.offline) {
-
                 $scope.answerOffline({
                     answer: answer,
                     question: $scope.question
@@ -1499,11 +1498,12 @@ $scope.loadSurvey = function(data) {
         }
 
         if ($scope.question && $scope.question.type === 'datepicker') {
-            $scope.now =  $scope.answer || (new Date()).toString("yyyy-MM-dd");
-
+            $scope.now =  new Date();
+            // if ($scope.answer) {
+            //     $scope.answer = new Date($scope.answer);
+            // }
         }
         if ($scope.question && $scope.question.type === 'timepicker') {
-
             $scope.now = $scope.answer || (new Date()).toString("HH:mm");
         }
         // if ($scope.question.foreach_question) {

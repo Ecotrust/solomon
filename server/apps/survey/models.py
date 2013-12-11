@@ -33,7 +33,7 @@ class Respondant(caching.base.CachingMixin, models.Model):
     survey = models.ForeignKey('Survey')
     responses = models.ManyToManyField('Response', related_name='responses', null=True, blank=True)
     complete = models.BooleanField(default=False)
-    review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=None, null=True, blank=True)
+    review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=REVIEW_STATE_NEEDED)
     status = models.CharField(max_length=20, choices=STATE_CHOICES, default=None, null=True, blank=True)
     last_question = models.CharField(max_length=240, null=True, blank=True)
 
@@ -44,7 +44,7 @@ class Respondant(caching.base.CachingMixin, models.Model):
 
     locations = models.IntegerField(null=True, blank=True)
 
-    ts = models.DateTimeField(default=datetime.datetime.now())
+    ts = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(max_length=254, null=True, blank=True, default=None)
 
     surveyor = models.ForeignKey(User, null=True, blank=True)
@@ -60,14 +60,34 @@ class Respondant(caching.base.CachingMixin, models.Model):
             return "%s" % self.uuid
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.uuid:
-            self.ts = datetime.datetime.now()
-        else:
-            if ":" in self.uuid:
-                self.uuid = self.uuid.replace(":", "_")
+        if self.uuid and ":" in self.uuid:
+            self.uuid = self.uuid.replace(":", "_")
         self.locations = self.location_set.all().count()
         super(Respondant, self).save(*args, **kwargs)
+
+    @classmethod
+    def stats_report_filter(cls, survey_slug, start_date=None,
+                            end_date=None, market=None, surveyor=None,
+                            status=None):
+
+        qs = cls.objects.filter(survey__slug=survey_slug)
+
+        if start_date is not None:
+            qs = qs.filter(ts__gte=start_date)
+
+        if end_date is not None:
+            qs = qs.filter(ts__lt=end_date)
+
+        if market is not None:
+            qs = qs.filter(survey_site=market)
+
+        if surveyor is not None:
+            qs = qs.filter(surveyor__id=surveyor)
+
+        if status is not None:
+            qs = qs.filter(review_status=status)
+
+        return qs
 
 
 class Page(caching.base.CachingMixin, models.Model):
@@ -130,6 +150,7 @@ class Survey(caching.base.CachingMixin, models.Model):
 QUESTION_TYPE_CHOICES = (
     ('info', 'Info Page'),
     ('datepicker', 'Date Picker'),
+    ('datetimepicker', 'Date & Time Picker'),
     ('timepicker', 'Time Picker'),
     ('grid', 'Grid'),
     ('currency', 'Currency'),
@@ -302,33 +323,34 @@ class Response(caching.base.CachingMixin, models.Model):
     answer_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     answer_raw = models.TextField(null=True, blank=True)
     answer_date = models.DateTimeField(null=True, blank=True)
-    ts = models.DateTimeField(default=datetime.datetime.now())
+    ts = models.DateTimeField(auto_now_add=True)
     objects = caching.base.CachingManager()
 
     def save_related(self):
         if self.answer_raw:
             self.answer = simplejson.loads(self.answer_raw)
             if self.question.type in ['datepicker']:
-                self.answer_date = datetime.datetime.strptime(self.answer, '%Y-%m-%d')
+                self.answer_date = datetime.datetime.strptime(self.answer, '%d/%m/%Y')
             if self.question.type in ['currency', 'integer', 'number']:
                 if isinstance(self.answer, (int, long, float, complex)):
                     self.answer_number = self.answer
                 else:
                     self.answer = None
-            if self.question.type in ['auto-single-select', 'single-select']:
+            if self.question.type in ['auto-single-select', 'single-select', 'yes-no']:
+
                 answer = simplejson.loads(self.answer_raw)
                 if answer.get('text'):
-                    self.answer = answer['text']
+                    self.answer = answer['text'].strip()
                 if answer.get('name'):
-                    self.answer = answer['name']
+                    self.answer = answer['name'].strip()
             if self.question.type in ['auto-multi-select', 'multi-select']:
                 answers = []
                 self.multianswer_set.all().delete()
                 for answer in simplejson.loads(self.answer_raw):
                     if answer.get('text'):
-                        answer_text = answer['text']
+                        answer_text = answer['text'].strip()
                     if answer.get('name'):
-                        answer_text = answer['name']
+                        answer_text = answer['name'].strip()
                     answers.append(answer_text)
                     answer_label = answer.get('label', None)
                     multi_answer = MultiAnswer(response=self, answer_text=answer_text, answer_label=answer_label)
@@ -359,7 +381,7 @@ class Response(caching.base.CachingMixin, models.Model):
                                     col_label=grid_col.label, col_text=grid_col.text)
                                 grid_answer.save()
                             except Exception as e:
-                                print "problem with ", grid_col.label
+                                print "problem with %s in response id %s" % (grid_col.label, self.id)
                                 print "not found in", self.answer_raw
                                 print e
 
@@ -389,12 +411,6 @@ class Response(caching.base.CachingMixin, models.Model):
             return "%s/%s (%s)" % (self.respondant.survey.slug, self.question.slug, self.respondant.uuid)
         else:
             return "No Respondant"
-
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.ts = datetime.datetime.now()
-        super(Response, self).save(*args, **kwargs)
 
 
 def save_related(sender, instance, created, **kwargs):

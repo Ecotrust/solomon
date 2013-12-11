@@ -16,15 +16,22 @@ angular.module('askApp')
                     var labels, data, series;
 
                     if (newValue && !newValue.message) {
-                        series = _.map(scope.chart.data, function(item, index) {
-                            return {
-                                name: scope.chart.labels[index],
-                                data: [parseFloat(item) || 0],
-                                dataLabels: {
-                                    enabled: true,
-                                }
-                            };
-                        });
+                        if (scope.chart.data && scope.chart.data.length != 0) {
+                            series = _.map(scope.chart.data, function(item, index) {
+                                return {
+                                    name: scope.chart.labels[index],
+                                    data: [parseFloat(item) || 0],
+                                    dataLabels: {
+                                        enabled: true,
+                                    }
+                                };
+                            });
+                        } else {
+                            series = [{
+                                name: "No Data",
+                                data: []
+                            }]
+                        }
 
                         $(element[0]).highcharts({
                             chart: {
@@ -64,12 +71,8 @@ angular.module('askApp')
             },
 
             link: function postLink(scope, element, attrs) {
-
-
-
                 scope.$watch('chart', function(newValue) {
                     // Draw the graph
-                    console.log(newValue);
                     if (newValue && !newValue.message) {
                         var chart;
                         var series = _.map(scope.chart.seriesNames, function(name) {
@@ -89,7 +92,6 @@ angular.module('askApp')
                                 })
                             }
                         });
-                        console.log(series);
                         chart = element.highcharts({
                             chart: {
                                 type: 'column'
@@ -147,7 +149,8 @@ angular.module('askApp')
                                     }
                                 }
                             },
-                            series: series
+                            // Display something when there is no data:
+                            series: (series && series.length != 0) ? series : [{ name: "No Data", data: [] }]
                         });
                     }
                 });
@@ -177,30 +180,34 @@ angular.module('askApp')
                     // Draw the graph
                     if (newValue && !newValue.message) {
                         var chart;
+                        var data = null;
 
-                        var data = _.map(scope.chart.data, function (item) {
-                            return {
-                                name: item.name,
-                                data: _.map(item.value, function (value) {
-                                    var current = parseFloat(value.sum);
-                                    if (_.isNumber(current) && ! _.isNaN(current)) {
-                                        return [
-                                            new Date(value.date).getTime(),
-                                            parseFloat(current)
-                                        ]    
-                                    } else {
-                                        return [
-                                            new Date(value.date).getTime(),
-                                            null
-                                        ]    
-                                    }         
-                                })
-                            }
-                        });
-                        
+                        if (scope.chart.data && scope.chart.data.length != 0) {
+                            data = _.map(scope.chart.data, function (item) {
+                                return {
+                                    name: item.name,
+                                    data: _.map(item.value, function (value) {
+                                        var current = parseFloat(value.sum);
+                                        if (_.isNumber(current) && ! _.isNaN(current)) {
+                                            return [
+                                                new Date(value.date).getTime(),
+                                                parseFloat(current)
+                                            ]
+                                        } else {
+                                            return [
+                                                new Date(value.date).getTime(),
+                                                null
+                                            ]
+                                        }
+                                    })
+                                }
+                            });
+                        } else {
+                            data = [{name: "No Data", data: [] }];
+                        }
                         element.highcharts({
                             chart: {
-                                type: 'spline'
+                                type: 'line'
                             },
                             title: false,
                             subtitle: false,
@@ -213,7 +220,6 @@ angular.module('askApp')
                                 labels: {
                                     formatter: function() {
                                         return Highcharts.dateFormat('%d/%m/%y', this.value);
-                                        
                                     }
                                 }
                             },
@@ -226,11 +232,10 @@ angular.module('askApp')
                             tooltip: {
                                 formatter: function() {
                                     return '<b>' + this.series.name + '</b><br/>' +
-                                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' kg';
+                                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' ' + scope.chart.unit || 'kg';
                                 }
                             },
-
-                            series: data
+                            series: scope.chart.raw_data ? scope.chart.raw_data : data
                         });
                     }
                 });

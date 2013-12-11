@@ -1,6 +1,6 @@
 
 angular.module('askApp')
-    .directive('rangeSlider', function() {
+    .directive('editableDateRangeSlider', function() {
 
     return {
         template: '<div class="range-slider"></div>',
@@ -8,26 +8,25 @@ angular.module('askApp')
         replace: true,
         transclude: true,
         scope: {
+            min: "=min",
+            max: "=max",
             start: "=start",
             end: "=end"
         },
         link: function (scope, element, attrs) {
             // initialize slider
             scope.initializeSlider = _.once(function () {
-                element.dateRangeSlider({
-                    formatter:function(val){
-                        var days = val.getDate(),
-                            month = val.getMonth() + 1,
-                            year = val.getFullYear();
+                element.editRangeSlider({
+                    formatter:function(value_of_the_thing){
+                        var date = new Date(value_of_the_thing);
+                        var days = date.getDate(),
+                            month = date.getMonth() + 1,
+                            year = date.getFullYear();
                         return days + "/" + month + "/" + year;
                     },
-                    bounds:{
-                        min: scope.start,
-                        max: scope.end
-                    },
-                    set: {
-                        days: 1
-                    }
+                    bounds: { min: scope.min, max: scope.max },
+                    defaultValues: { min: scope.start, max: scope.end },
+                    set: 86400 // Day in seconds
                 });
             });
 
@@ -36,7 +35,6 @@ angular.module('askApp')
                 scope.$watch('start', function (newStart) {
                     if (newStart) {
                         scope.initializeSlider();
-                        element.dateRangeSlider("min", newStart);
                     }
                 });
             }
@@ -44,7 +42,6 @@ angular.module('askApp')
                 scope.$watch('end', function (newEnd) {
                     if (newEnd) {
                         scope.initializeSlider();
-                        element.dateRangeSlider("max", newEnd);
                     }
                 });
             }
@@ -58,6 +55,7 @@ angular.module('askApp')
                     if (attrs.end) {
                         s.end = data.values.max;//.clearTime();
                     }
+                    element.editRangeSlider("values", s.start, s.end);
                 });
             });
         }
