@@ -60,6 +60,41 @@ angular.module('askApp')
         });
     }
 
+    function setup_columns() {
+        $scope.columns = [ { name: 'Surveyor', field: 'user' }
+                         , { name: 'Date', field: 'ts' }
+                         , { name: 'Time', field: 'ts' }
+                         , { name: 'Market', field: 'survey_site' }
+                         , { name: 'Vendor Name', field: 'vendor' }
+                         , { name: 'Buyer/Fisher', field: 'buy_or_catch' }
+                         , { name: 'Sales Type', field: 'how_sold' }
+                         , { name: 'Status', field: 'review_status' }
+                         , { name: 'Detail', field: 'responses' }
+                         ];
+        var order_by = $location.search().order_by;
+
+        if (order_by) {
+            $scope.sortDescending = order_by[0] == "-";
+            $scope.currentColumn = $scope.sortDescending ?
+                _.find($scope.columns, function (x) { return "-" + x.field == order_by; }) || $scope.columns[1] :
+                _.find($scope.columns, function (x) { return x.field == order_by; }) || $scope.columns[1];
+        } else {
+            $scope.sortDescending = true;
+            $scope.currentColumn = $scope.columns[1];
+        }
+
+        $scope.changeSorting = function (column) {
+            if ($scope.currentColumn == column) {
+                $scope.sortDescending = !$scope.sortDescending;
+                $scope.getRespondents();
+            } else {
+                $scope.currentColumn = column;
+                $scope.sortDescending = true;
+                $scope.getRespondents();
+            }
+        };
+    }
+
     $scope.market = $location.search().market || "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
@@ -67,29 +102,7 @@ angular.module('askApp')
     $scope.activePage = 'overview';
     $scope.statuses = [];
     $scope.status_single = $location.search().status || "";
-
-    $scope.columns = [ { name: 'Surveyor', field: 'user' }
-                     , { name: 'Date', field: 'ts' }
-                     , { name: 'Time', field: 'ts' }
-                     , { name: 'Market', field: 'survey_site' }
-                     , { name: 'Vendor Name', field: 'vendor' }
-                     , { name: 'Buyer/Fisher', field: 'buy_or_catch' }
-                     , { name: 'Sales Type', field: 'how_sold' }
-                     , { name: 'Status', field: 'review_status' }
-                     , { name: 'Detail', field: 'responses' }
-                     ];
-    $scope.currentColumn = $scope.columns[1];
-    $scope.sortDescending = true;
-    $scope.changeSorting = function (column) {
-        if ($scope.currentColumn == column) {
-            $scope.sortDescending = !$scope.sortDescending;
-            $scope.getRespondents();
-        } else {
-            $scope.currentColumn = column;
-            $scope.sortDescending = true;
-            $scope.getRespondents();
-        }
-    };
+    setup_columns();
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
