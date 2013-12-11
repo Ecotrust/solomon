@@ -25,11 +25,11 @@ angular.module('askApp')
     function filters_changed(surveySlug) {
         $scope.getRespondents();
 
-        var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
-        var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
+        var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
-        url += '?startdate=' + start_date;
-        url += '&enddate=' + end_date;
+        url += '?start_date=' + start_date;
+        url += '&end_date=' + end_date;
 
         if ($scope.market) {
             url += '&market=' + $scope.market;
