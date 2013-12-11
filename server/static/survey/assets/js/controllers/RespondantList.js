@@ -68,15 +68,15 @@ angular.module('askApp')
     $scope.statuses = [];
     $scope.status_single = $location.search().status || "";
 
-    $scope.columns = [ { name: 'Surveyor', field: 'surveyor' }
+    $scope.columns = [ { name: 'Surveyor', field: 'user' }
                      , { name: 'Date', field: 'ts' }
                      , { name: 'Time', field: 'ts' }
                      , { name: 'Market', field: 'survey_site' }
                      , { name: 'Vendor Name', field: 'vendor' }
                      , { name: 'Buyer/Fisher', field: 'buy_or_catch' }
                      , { name: 'Sales Type', field: 'how_sold' }
-                     , { name: 'Status', field: 'status' }
-                     , { name: 'Detail', field: 'respondent__responses' }
+                     , { name: 'Status', field: 'review_status' }
+                     , { name: 'Detail', field: 'responses' }
                      ];
     $scope.currentColumn = $scope.columns[1];
     $scope.sortDescending = true;
@@ -172,7 +172,7 @@ angular.module('askApp')
         }
         if ($scope.currentColumn && url.indexOf("&order_by=") == -1) {
             var str = $scope.sortDescending ? "-" + $scope.currentColumn.field : $scope.currentColumn.field;
-            location_obj.status = str;
+            location_obj.order_by = str;
             url = url + '&order_by=' + str;
         }
         $location.search(location_obj);
