@@ -117,13 +117,17 @@ angular.module('askApp')
         data.questions.reverse();
         $scope.survey = data;
         setup_market_dropdown();
-        var start_date = $location.search().ts__gte || $scope.survey.response_date_start;
-        var end_date = $location.search().ts__lte || $scope.survey.response_date_end;
+        var start_date = $location.search().ts__gte ?
+            new Date(parseInt($location.search().ts__gte)) :
+            $scope.dateFromISO($scope.survey.response_date_start);
+        var end_date = $location.search().ts__lte ?
+            new Date(parseInt($location.search().ts__lte)) :
+            $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
             min: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
             max: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf(),
-            startDate: $scope.dateFromISO(start_date).add(-1).day().valueOf(),
-            endDate: $scope.dateFromISO(end_date).add(2).day().valueOf()
+            startDate: start_date.add(-1).day().valueOf(),
+            endDate: end_date.add(2).day().valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {
@@ -148,12 +152,12 @@ angular.module('askApp')
         var location_obj = {};
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
             var str = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
-            location_obj.ts__gte = str;
+            location_obj.ts__gte = new Date($scope.filter.startDate).valueOf();
             url = url + '&ts__gte=' + str;
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
             var str = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
-            location_obj.ts__lte = str;
+            location_obj.ts__lte = new Date($scope.filter.endDate).valueOf();
             url = url + '&ts__lte=' + str;
         }
         if ($scope.market && url.indexOf("&survey_site=") == -1) {
