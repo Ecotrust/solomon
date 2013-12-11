@@ -11,7 +11,7 @@
             <p>Responses Found</p>
         </div>
         <div class="col-md-8">
-            <div start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
+            <div min="filter.min" max="filter.max" start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
         </div>
         <div id="market_status_filters" class="col-md-2">
             <select class="form-control" ng-model="market" ng-options="m for m in markets">
@@ -74,7 +74,7 @@
                                 {{ respondent.review_status }}
                             </span>
                         </td>
-                        <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}">Responses ({{respondent.responses.length}})</a></td>
+                        <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}?{{filtered_list_url}}">Responses ({{respondent.responses.length}})</a></td>
                     </tr>
                 </tbody>
             </table>
