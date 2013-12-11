@@ -1,7 +1,7 @@
 //'use strict';
 
 angular.module('askApp')
-    .controller('RespondantListCtrl', function($scope, $http, $routeParams) {
+    .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location) {
 
     function setup_market_dropdown() {
         var market_site_id = _.find($scope.survey.questions, function(x) {
@@ -25,12 +25,11 @@ angular.module('askApp')
     function filters_changed(surveySlug) {
         $scope.getRespondents();
 
-        var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
-        var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
+        var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
-        url += '?startdate=' + start_date;
-        url += '&enddate=' + end_date;
-        console.log("Status: ", $scope.status_single);
+        url += '?start_date=' + start_date;
+        url += '&end_date=' + end_date;
 
         if ($scope.market) {
             url += '&market=' + $scope.market;
@@ -61,35 +60,49 @@ angular.module('askApp')
         });
     }
 
+    function setup_columns() {
+        $scope.columns = [ { name: 'Surveyor', field: 'user' }
+                         , { name: 'Date', field: 'ts' }
+                         , { name: 'Time', field: 'ts' }
+                         , { name: 'Market', field: 'survey_site' }
+                         , { name: 'Vendor Name', field: 'vendor' }
+                         , { name: 'Buyer/Fisher', field: 'buy_or_catch' }
+                         , { name: 'Sales Type', field: 'how_sold' }
+                         , { name: 'Status', field: 'review_status' }
+                         , { name: 'Detail', field: 'responses' }
+                         ];
+        var order_by = $location.search().order_by;
 
-    $scope.market = "";
+        if (order_by) {
+            $scope.sortDescending = order_by[0] == "-";
+            $scope.currentColumn = $scope.sortDescending ?
+                _.find($scope.columns, function (x) { return "-" + x.field == order_by; }) || $scope.columns[1] :
+                _.find($scope.columns, function (x) { return x.field == order_by; }) || $scope.columns[1];
+        } else {
+            $scope.sortDescending = true;
+            $scope.currentColumn = $scope.columns[1];
+        }
+
+        $scope.changeSorting = function (column) {
+            if ($scope.currentColumn == column) {
+                $scope.sortDescending = !$scope.sortDescending;
+                $scope.getRespondents();
+            } else {
+                $scope.currentColumn = column;
+                $scope.sortDescending = true;
+                $scope.getRespondents();
+            }
+        };
+    }
+
+    $scope.market = $location.search().market || "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = 'overview';
     $scope.statuses = [];
-    $scope.status_single = "";
-
-    $scope.columns = [ 'Surveyor'
-                     , 'Date'
-                     , 'Time'
-                     , 'Market'
-                     , 'Vendor Name'
-                     , 'Buyer/Fisher'
-                     , 'Sales Type'
-                     , 'Status'
-                     , 'Detail'
-                     ];
-    $scope.currentColumn = 'Date';
-    $scope.sortDescending = true;
-    $scope.changeSorting = function (column) {
-        if ($scope.currentColumn == column) {
-            $scope.sortDescending = !$scope.sortDescending;
-        } else {
-            $scope.currentColumn = column;
-            $scope.sortDescending = true;
-        }
-    };
+    $scope.status_single = $location.search().status || "";
+    setup_columns();
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
@@ -119,9 +132,17 @@ angular.module('askApp')
         data.questions.reverse();
         $scope.survey = data;
         setup_market_dropdown();
+        var start_date = $location.search().ts__gte ?
+            new Date(parseInt($location.search().ts__gte)) :
+            $scope.dateFromISO($scope.survey.response_date_start);
+        var end_date = $location.search().ts__lte ?
+            new Date(parseInt($location.search().ts__lte)) :
+            $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
-            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf()
+            min: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
+            max: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf(),
+            startDate: start_date.add(-1).day().valueOf(),
+            endDate: end_date.add(2).day().valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {
@@ -143,18 +164,34 @@ angular.module('askApp')
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
 
+        var location_obj = {};
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            location_obj.ts__gte = new Date($scope.filter.startDate).valueOf();
+            url = url + '&ts__gte=' + str;
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            location_obj.ts__lte = new Date($scope.filter.endDate).valueOf();
+            url = url + '&ts__lte=' + str;
         }
         if ($scope.market && url.indexOf("&survey_site=") == -1) {
+            location_obj.survey_site = $scope.market;
             url = url + '&survey_site=' + $scope.market;
         }
         if ($scope.status_single && url.indexOf("&status=") == -1) {
-            url = url + '&status=' + $scope.status_single;
+            location_obj.status = $scope.status_single;
+            url = url + '&review_status=' + $scope.status_single;
         }
+        if ($scope.currentColumn && url.indexOf("&order_by=") == -1) {
+            var str = $scope.sortDescending ? "-" + $scope.currentColumn.field : $scope.currentColumn.field;
+            location_obj.order_by = str;
+            url = url + '&order_by=' + str;
+        }
+        $location.search(location_obj);
+        // hue hue hue:
+        $scope.filtered_list_url = "filtered_list_url=" + btoa("#/RespondantList/" + $scope.survey.slug + "?" +
+            _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&"));
 
         $http.get(url).success(function(data) {
             $scope.respondentsLoading = false;

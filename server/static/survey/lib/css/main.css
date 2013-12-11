@@ -1,22 +1,18 @@
 #global-navbar {
     margin-bottom: 0;
 }
-
 #global-navbar .container {
     border-bottom: solid 1px #000;
     padding-left: 0;
 }
-
-
 #global-navbar img {
-    
     min-height: 50px;
 }
 #global-navbar button {
     margin-right: 1em;
 }
 .main-container {
-    padding-left: 0;   
+    padding-left: 0;
     padding-right: 10px;
 }
 #survey-landing-table td {
@@ -87,4 +83,9 @@ th.sortable_table {
 
 input.datepicker {
     color: black;
+}
+#review_buttons {
+    margin-top: 2em;
+    display: inline-block;
+    float: right;
 }
