@@ -97,10 +97,11 @@ class ReportRespondantResource(AuthSurveyModelResource):
             'survey': ALL_WITH_RELATIONS,
             'responses': ALL_WITH_RELATIONS,
             'survey_site': ['exact'],
-            'status': ['exact'],
+            'review_status': ['exact'],
             'ts': ['gte', 'lte']
         }
-        ordering = ['-ts']
+        ordering = ['ts', 'survey', 'vendor', 'survey_site',
+            'responses', 'buy_or_catch', 'how_sold', 'user', 'review_status']
 
     def alter_list_data_to_serialize(self, request, data):
         data['meta']['statuses'] = REVIEW_STATE_CHOICES
@@ -208,6 +209,7 @@ class SurveyDashResource(BaseSurveyResource):
     survey_responses = fields.IntegerField(attribute='survey_responses', readonly=True)
     reviews_needed = fields.IntegerField(attribute='reviews_needed', readonly=True)
     flagged = fields.IntegerField(attribute='flagged', readonly=True)
+    today = fields.IntegerField(attribute='today', readonly=True)
 
 
 class SurveyReportResource(SurveyDashResource):
