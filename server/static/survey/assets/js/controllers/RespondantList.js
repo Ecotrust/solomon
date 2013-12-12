@@ -43,7 +43,7 @@ angular.module('askApp')
             $scope.surveyor_by_time = {
                 yLabel: "Survey Responses",
                 raw_data: data.graph_data,
-                download_url: 'TEST_URL_PLZ_DELETE',
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
             // map reduuuuuuce
@@ -56,7 +56,7 @@ angular.module('askApp')
                 labels: _.pluck(data.graph_data, 'name'),
                 yLabel: "Surveys Collected",
                 data: bar_data,
-                download_url: 'TEST_URL_PLZ_DELETE',
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
         });
