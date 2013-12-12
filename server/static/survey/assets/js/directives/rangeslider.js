@@ -24,7 +24,7 @@ angular.module('askApp')
                             year = date.getFullYear();
                         return days + "/" + month + "/" + year;
                     },
-                    bounds: { min: scope.min, max: scope.max },
+                    bounds: { min: scope.min || scope.start, max: scope.max || scope.end},
                     defaultValues: { min: scope.start, max: scope.end },
                     set: 86400 // Day in seconds
                 });
