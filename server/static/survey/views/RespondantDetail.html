@@ -25,8 +25,8 @@
             </dl>
         </div>
         <div id="market_status_filters" class="col-md-3">
-            <h4>Status:</h4>
-            <select ng-model="survey.status" ng-options="s for s in statuses" class="form-control">
+            <h4>Status: {{current_status[1]}}</h4>
+            <select class="form-control" ng-model="current_status" ng-options="i as i[1] for i in statuses">
             </select>
         </div>
     </div>

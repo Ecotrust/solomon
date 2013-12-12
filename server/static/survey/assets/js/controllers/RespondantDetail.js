@@ -3,6 +3,7 @@ angular.module('askApp')
     .controller('RespondantDetailCtrl', function($scope, $routeParams, $http, $location) {
 
     $scope.statuses = [];
+    $scope.current_status = "";
     $scope.filtered_list_url = atob($location.search().filtered_list_url);
     $scope.viewPath = app.viewPath;
     $http.get('/api/v1/reportrespondantdetails/'  + $routeParams.uuidSlug + '/?format=json&survey__slug=' + $routeParams.surveySlug).success(function(data) {
@@ -14,6 +15,9 @@ angular.module('askApp')
         });
         $scope.respondent = data;
         $scope.statuses = data.meta.statuses;
+        $scope.current_status = _.reduce(data.meta.statuses,
+            // Left fold 'cuz I'm dangerous
+            function (accum, val) { return accum[0] == data.review_status ? accum : val; }, "");
     });
 
     $http.get('/api/v1/surveydash/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
