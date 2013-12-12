@@ -1,7 +1,7 @@
 angular.module('askApp')
     .directive('barChart', function($http) {
         return {
-            template: '<div style="height: 400px"></div>',
+            templateUrl: '/static/survey/views/chart_400.html',
             restrict: 'EA',
             replace: true,
             transclude: true,
@@ -33,7 +33,7 @@ angular.module('askApp')
                             }]
                         }
 
-                        $(element[0]).highcharts({
+                        element.find(".chart").highcharts({
                             chart: {
                                 type: 'column'
                             },
@@ -62,7 +62,7 @@ angular.module('askApp')
 angular.module('askApp')
     .directive('stackedColumn', function($http) {
         return {
-            template: '<div style="height: 750px"></div>',
+            templateUrl: '/static/survey/views/chart_750.html',
             restrict: 'EA',
             replace: true,
             transclude: true,
@@ -92,7 +92,7 @@ angular.module('askApp')
                                 })
                             }
                         });
-                        chart = element.highcharts({
+                        chart = element.find(".chart").highcharts({
                             chart: {
                                 type: 'column'
                             },
@@ -122,17 +122,18 @@ angular.module('askApp')
                             credits: {
                                 enabled: false
                             },
-                            legend: {
-                                align: 'right',
-                                x: -70,
-                                verticalAlign: 'top',
-                                y: 20,
-                                floating: true,
-                                backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
-                                borderColor: '#CCC',
-                                borderWidth: 1,
-                                shadow: false
-                            },
+                            // Commenting this out as per sprint.ly #148.
+                            //legend: {
+                            //    align: 'right',
+                            //    x: -70,
+                            //    verticalAlign: 'top',
+                            //    y: 20,
+                            //    floating: true,
+                            //    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
+                            //    borderColor: '#CCC',
+                            //    borderWidth: 1,
+                            //    shadow: false
+                            //},
                             tooltip: {
                                 formatter: function() {
                                     return '<b>' + this.x + '</b><br/>' +
@@ -163,7 +164,7 @@ angular.module('askApp')
 angular.module('askApp')
     .directive('timeSeries', function($http) {
         return {
-            template: '<div style="height: 400px"></div>',
+            templateUrl: '/static/survey/views/chart_400.html',
             restrict: 'EA',
             replace: true,
             transclude: true,
@@ -173,9 +174,6 @@ angular.module('askApp')
             },
 
             link: function postLink(scope, element, attrs) {
-
-
-
                 scope.$watch('chart', function(newValue) {
                     // Draw the graph
                     if (newValue && !newValue.message) {
@@ -205,7 +203,7 @@ angular.module('askApp')
                         } else {
                             data = [{name: "No Data", data: [] }];
                         }
-                        element.highcharts({
+                        element.find(".chart").highcharts({
                             chart: {
                                 type: 'line'
                             },
