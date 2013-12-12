@@ -1,7 +1,7 @@
 angular.module('askApp')
     .directive('barChart', function($http) {
         return {
-            template: '<div style="height: 400px"><div class="chart"></div><a ng-show="chart.download_url" href="{{chart.download_url}}">Download this Chart</a></div>',
+            templateUrl: '/static/survey/views/chart_400.html',
             restrict: 'EA',
             replace: true,
             transclude: true,
@@ -62,7 +62,7 @@ angular.module('askApp')
 angular.module('askApp')
     .directive('stackedColumn', function($http) {
         return {
-            template: '<div style="height: 750px"><div class="chart"></div><a ng-show="chart.download_url" href="{{chart.download_url}}">Download this Chart</a></div>',
+            templateUrl: '/static/survey/views/chart_750.html',
             restrict: 'EA',
             replace: true,
             transclude: true,
@@ -163,7 +163,7 @@ angular.module('askApp')
 angular.module('askApp')
     .directive('timeSeries', function($http) {
         return {
-            template: '<div style="height: 400px"><div class="chart"></div><a ng-show="chart.download_url" href="{{chart.download_url}}">Download this Chart</a></div>',
+            templateUrl: '/static/survey/views/chart_400.html',
             restrict: 'EA',
             replace: true,
             transclude: true,
