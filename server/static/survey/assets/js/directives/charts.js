@@ -41,6 +41,11 @@ angular.module('askApp')
                             title: {
                                 text: false
                             },
+                            tooltip: {
+                                formatter: function() {
+                                    return '<b>' + this.series.name + '</b>' + ': ' + this.y;
+                                }
+                            },
                             xAxis: {
                                 title: {
                                     text: scope.chart.xLabel
@@ -136,8 +141,7 @@ angular.module('askApp')
                             //},
                             tooltip: {
                                 formatter: function() {
-                                    return '<b>' + this.x + '</b><br/>' +
-                                        this.series.name + ': ' + this.y + '<br/>' +
+                                    return this.series.name + ': ' + this.y + '<br/>' +
                                         'Total: ' + this.point.stackTotal;
                                 }
                             },
@@ -220,6 +224,10 @@ angular.module('askApp')
                                         return Highcharts.dateFormat('%d/%m/%y', this.value);
                                     }
                                 }
+                            },
+                            formatter: function() {
+                                return '<b>' + this.series.name + '</b><br/>' +
+                                    Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' ' + scope.chart.unit || 'kg';
                             },
                             yAxis: {
                                 title: {
