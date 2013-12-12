@@ -228,7 +228,6 @@ angular.module('askApp')
 
     $scope.deleteAnswer = function (question, uuidSlug) {
         var index;
-        
         if (app.offline) {
             if ($scope.answers[question.slug]) {
                 delete $scope.answers[question.slug];
@@ -1512,6 +1511,7 @@ $scope.loadSurvey = function(data) {
         // } else {
         //     $scope.question.foreach = false;
         // }
+
         $scope.nextQuestionPath = $scope.getNextQuestionPath();
         $scope.loading = false;
         $scope.gridValidated = false;
@@ -1525,13 +1525,23 @@ $scope.loadSurvey = function(data) {
 
     };
     $scope.viewPath = app.viewPath;
-    if ($routeParams.uuidSlug && ! _.string.startsWith($routeParams.uuidSlug, 'offline') && app.offline) {
+
+    if ($routeParams.uuidSlug === 'online' || $routeParams.uuidSlug && ! _.string.startsWith($routeParams.uuidSlug, 'offline') && app.offline) {
+        if ($routeParams.uuidSlug === 'online') {
+            app.currentRespondent = {
+                uuid: $routeParams.uuidSlug,
+                survey: $routeParams.surveySlug,
+                ts: ts,
+                responses: []
+            }
+        }
         $http.get(app.server + '/api/v1/survey/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
             app.data = {
                 survey: data
             };
             $scope.loadSurvey({
-                survey: data
+                survey: data,
+                responses: []
             });
         });
     } else if ($routeParams && app.data && $routeParams.uuidSlug === app.data.uuid) {

@@ -43,7 +43,8 @@ def dash(request, survey_slug=None, template='survey/dash.html'):
         if request.GET.get('get-uid', None) is not None:
             return HttpResponse(simplejson.dumps({'success': "true", "uuid": respondant.uuid}))
         return redirect("/respond#/survey/%s/%s" % (survey.slug, respondant.uuid))
-    return render_to_response(template, RequestContext(request, {}))
+
+    return render_to_response(template, RequestContext(request, {'api_key': request.user.api_key.key}))
 
 
 def answer(request, survey_slug, question_slug, uuid):
