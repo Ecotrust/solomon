@@ -146,7 +146,7 @@ class Survey(caching.base.CachingMixin, models.Model):
     @property
     def today(self):
         today = datetime.datetime.combine(datetime.date.today(),
-                                          datetime.min.time())
+                                          datetime.datetime.min.time())
         tomorrow = today + datetime.timedelta(days=1)
         return self.respondant_set.filter(ts__gte=today, ts__lt=tomorrow).count()
 
