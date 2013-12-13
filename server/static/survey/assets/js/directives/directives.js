@@ -24,7 +24,6 @@ angular.module('askApp')
             });
 
             if (scope.answer) {
-                console.log(scope.answer);
                 scroller.scroller('setValue', scope.answer, true);
             }
         }
