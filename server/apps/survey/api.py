@@ -92,6 +92,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
     user = fields.ToOneField('apps.account.api.UserResource', 'surveyor', null=True, blank=True, full=True, readonly=True)
 
     class Meta(AuthSurveyModelResource.Meta):
+        ALLOWED_METHODS = ['get', 'post', 'put', 'delete', 'patch']
         queryset = Respondant.objects.all().order_by('-ts')
         filtering = {
             'survey': ALL_WITH_RELATIONS,

@@ -1,9 +1,13 @@
 
 angular.module('askApp')
+    .config(['$httpProvider', function($httpProvider) {
+        $httpProvider.defaults.headers.patch = {
+            'Content-Type': 'application/json;charset=utf-8'
+        }
+    }])
     .controller('RespondantDetailCtrl', function($scope, $routeParams, $http, $location) {
 
     $scope.statuses = [];
-    $scope.current_status = "";
     $scope.filtered_list_url = atob($location.search().filtered_list_url);
     $scope.viewPath = app.viewPath;
     $http.get('/api/v1/reportrespondantdetails/'  + $routeParams.uuidSlug + '/?format=json&survey__slug=' + $routeParams.surveySlug).success(function(data) {
@@ -21,6 +25,7 @@ angular.module('askApp')
     });
 
     $http.get('/api/v1/surveydash/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
+        // Need this for the sidenav
         $scope.survey = data;
     });
 
@@ -35,8 +40,19 @@ angular.module('askApp')
         zoom: 7
     }
 
+
+    $scope.$watch('current_status', function (newValue) {
+        if (newValue) {
+            $scope.updateStatus();
+        }
+    }, false);
+
     $scope.updateStatus = function() {
-        $http.patch("/api/v1/reportrespondant/" + $survey.uri).success(function(data) {
+        $http({
+            url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
+            data: { 'review_status': $scope.current_status[0] },
+            method: 'PATCH'
+        }).success(function(data) {
         });
     }
 
