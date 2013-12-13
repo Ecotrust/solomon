@@ -15,7 +15,7 @@ if (window.location.pathname === '/respond') {
     app.offline = false;
 } else {
     app.viewPath = '';
-    app.offline = true;
+    app.offline = app.offline || true;
 }
 angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
     .config(function($routeProvider, $httpProvider) {

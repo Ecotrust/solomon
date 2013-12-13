@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding field 'Respondant.review_status'
         db.add_column(u'survey_respondant', 'review_status',
-                      self.gf('django.db.models.fields.CharField')(default=None, max_length=20, null=True, blank=True),
+                      self.gf('django.db.models.fields.CharField')(default='accepted', max_length=20, null=True, blank=True),
                       keep_default=False)
 
 

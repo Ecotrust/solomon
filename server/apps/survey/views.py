@@ -47,6 +47,7 @@ def dash(request, survey_slug=None, template='survey/dash.html'):
     return render_to_response(template, RequestContext(request, {'api_key': request.user.api_key.key}))
 
 
+@csrf_exempt
 def answer(request, survey_slug, question_slug, uuid):
     if request.method == 'POST':
 
