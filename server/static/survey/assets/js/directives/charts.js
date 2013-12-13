@@ -22,7 +22,7 @@ angular.module('askApp')
                                     name: scope.chart.labels[index],
                                     data: [parseFloat(item) || 0],
                                     dataLabels: {
-                                        enabled: true,
+                                        enabled: true
                                     }
                                 };
                             });
