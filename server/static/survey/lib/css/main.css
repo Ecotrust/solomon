@@ -8,7 +8,7 @@
 #global-navbar img {
     min-height: 50px;
 }
-#global-navbar button {
+#global-navbar .btn {
     margin-right: 1em;
 }
 .main-container {
