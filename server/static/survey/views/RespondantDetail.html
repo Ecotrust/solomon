@@ -7,7 +7,7 @@
         <div class="col-md-6">
             <div id="review_buttons">
                 <a href="{{filtered_list_url}}"><button class="btn btn-default" type="button">&laquo; Back</button></a>
-                <button class="btn btn-default" type="button">Review Next &raquo;</button>
+                <button ng-click="updateStatus" class="btn btn-default" type="button">Review Next &raquo;</button>
             </div>
         </div>
     </div>
@@ -25,9 +25,8 @@
             </dl>
         </div>
         <div id="market_status_filters" class="col-md-3">
-            <h4>Status:</h4>
-            <select class="form-control">
-                <option ng-selected="survey.status == statuses[status]" ng-repeat="status in statuses" data-status_val="{{statuses.status}}">{{status}}</option>
+            <h4>Status: {{current_status[1]}}</h4>
+            <select class="form-control" ng-model="current_status" ng-options="i as i[1] for i in statuses">
             </select>
         </div>
     </div>

@@ -92,6 +92,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
     user = fields.ToOneField('apps.account.api.UserResource', 'surveyor', null=True, blank=True, full=True, readonly=True)
 
     class Meta(AuthSurveyModelResource.Meta):
+        ALLOWED_METHODS = ['get', 'post', 'put', 'delete', 'patch']
         queryset = Respondant.objects.all().order_by('-ts')
         filtering = {
             'survey': ALL_WITH_RELATIONS,
@@ -108,7 +109,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
         return data
 
     def alter_detail_data_to_serialize(self, request, bundle):
-        bundle.data['meta'] = {'statuses': dict(REVIEW_STATE_CHOICES)}
+        bundle.data['meta'] = {'statuses': REVIEW_STATE_CHOICES}
         return bundle
 
 
