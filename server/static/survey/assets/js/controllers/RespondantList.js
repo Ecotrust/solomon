@@ -71,7 +71,7 @@ angular.module('askApp')
                          , { name: 'Buyer/Fisher', field: 'buy_or_catch' }
                          , { name: 'Sales Type', field: 'how_sold' }
                          , { name: 'Status', field: 'review_status' }
-                         , { name: 'Detail', field: 'responses' }
+                         //, { name: 'Detail', field: 'responses' }
                          ];
         var order_by = $location.search().order_by;
 
@@ -97,6 +97,10 @@ angular.module('askApp')
         };
     }
 
+    $scope.goToResponse = function(respondent) {
+        window.location = "#/RespondantDetail/" + $scope.survey.slug +
+            "/" + respondent.uuid + "?" + $scope.filtered_list_url;
+    }
     $scope.market = $location.search().market || "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;

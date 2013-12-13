@@ -61,7 +61,7 @@
                             <i ng-show="currentColumn == column && !sortDescending" class="icon-caret-up"></i>
                         </th>
                     </tr>
-                    <tr ng-repeat="respondent in respondents">
+                    <tr ng-click="goToResponse(respondent)" class="highlightable_row" ng-repeat="respondent in respondents">
                         <td>{{ respondent.user.username }}</td>
                         <td>{{ respondent.ts|validDate: 'dd-MM-yyyy' }}</td>
                         <td>{{ respondent.ts|validDate: 'HH:mm' }}</td>
@@ -74,7 +74,7 @@
                                 {{ respondent.review_status }}
                             </span>
                         </td>
-                        <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}?{{filtered_list_url}}">Responses ({{respondent.responses.length}})</a></td>
+                        <!-- <td><a href="#/RespondantDetail/{{survey.slug}}/{{ respondent.uuid }}?{{filtered_list_url}}">Responses ({{respondent.responses.length}})</a></td> -->
                     </tr>
                 </tbody>
             </table>
