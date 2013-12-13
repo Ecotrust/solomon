@@ -15,7 +15,7 @@ if (window.location.pathname === '/respond') {
     app.offline = false;
 } else {
     app.viewPath = '';
-    app.offline = true;
+    app.offline = app.offline || true;
 }
 angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
     .config(function($routeProvider, $httpProvider) {
@@ -56,6 +56,10 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
         templateUrl: app.viewPath + 'views/SurveyDetail.html',
         controller: 'SurveyDetailCtrl',
         edit: true
+    })
+        .when('/survey/:surveySlug/online', {
+        templateUrl: app.viewPath + 'views/SurveyDetail.html',
+        controller: 'SurveyDetailCtrl'
     })
         .when('/survey/:surveySlug/:questionSlug/:uuidSlug', {
         templateUrl: app.viewPath + 'views/SurveyDetail.html',

@@ -15,6 +15,11 @@
     padding-left: 0;
     padding-right: 10px;
 }
+.respondent-table .highlightable_row:hover {
+    background-color: #68A1D6;
+    color: #FFF;
+    cursor: pointer;
+}
 #survey-landing-table td {
     vertical-align: middle;
 }
@@ -44,8 +49,8 @@
     padding-right: 5px;
 }
 #surveyor_by_time_chart, #surveyor_total_chart {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin-top: 20px;
+    margin-bottom: 3em;
 }
 #sidenav_respondants a.active {
     background-color: #68A1D6;

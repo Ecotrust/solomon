@@ -62,17 +62,18 @@ class Command(BaseCommand):
             slug='survey-date', survey=survey)
         users = []
         for i in range(7):
-            user = User.objects.get(username='user{0}'.format(i))
-            if user:
+            try:
+                user = User.objects.get(username='user{0}'.format(i))
                 users.append(user)
-            else:
+            except User.DoesNotExist:
                 users.append(User.objects.create_user(username='user{0}'.format(i),
                                                       first_name='user',
                                                       last_name=i,
                                                       password='pass'))
 
         for i in range(100):
-            date = datetime.date.today() + datetime.timedelta(-randint(0, 365))
+            date = datetime.datetime.utcnow()
+            date = datetime.date(year=date.year, month=date.month, day=date.day) + datetime.timedelta(-randint(0, 365))
             respondant = Respondant(survey=survey, test_data=True, ts=date, surveyor=choice(users))
             market_response = Response(
                 question=market_question, respondant=respondant)

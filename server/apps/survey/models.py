@@ -143,6 +143,13 @@ class Survey(caching.base.CachingMixin, models.Model):
         #return self.questions.filter(slug='survey-date').aggregate(date=Max('response__answer_date')).get('date', None)
         return self.respondant_set.all().aggregate(lowest=Min('ts'), highest=Max('ts'))['highest']
 
+    @property
+    def today(self):
+        today = datetime.datetime.combine(datetime.date.today(),
+                                          datetime.datetime.min.time())
+        tomorrow = today + datetime.timedelta(days=1)
+        return self.respondant_set.filter(ts__gte=today, ts__lt=tomorrow).count()
+
     def __str__(self):
         return "%s" % self.name
 

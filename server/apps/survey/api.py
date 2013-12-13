@@ -92,6 +92,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
     user = fields.ToOneField('apps.account.api.UserResource', 'surveyor', null=True, blank=True, full=True, readonly=True)
 
     class Meta(AuthSurveyModelResource.Meta):
+        ALLOWED_METHODS = ['get', 'post', 'put', 'delete', 'patch']
         queryset = Respondant.objects.all().order_by('-ts')
         filtering = {
             'survey': ALL_WITH_RELATIONS,
@@ -100,14 +101,15 @@ class ReportRespondantResource(AuthSurveyModelResource):
             'review_status': ['exact'],
             'ts': ['gte', 'lte']
         }
-        ordering = ['-ts']
+        ordering = ['ts', 'survey', 'vendor', 'survey_site',
+            'responses', 'buy_or_catch', 'how_sold', 'user', 'review_status']
 
     def alter_list_data_to_serialize(self, request, data):
         data['meta']['statuses'] = REVIEW_STATE_CHOICES
         return data
 
     def alter_detail_data_to_serialize(self, request, bundle):
-        bundle.data['meta'] = {'statuses': dict(REVIEW_STATE_CHOICES)}
+        bundle.data['meta'] = {'statuses': REVIEW_STATE_CHOICES}
         return bundle
 
 
@@ -208,6 +210,7 @@ class SurveyDashResource(BaseSurveyResource):
     survey_responses = fields.IntegerField(attribute='survey_responses', readonly=True)
     reviews_needed = fields.IntegerField(attribute='reviews_needed', readonly=True)
     flagged = fields.IntegerField(attribute='flagged', readonly=True)
+    today = fields.IntegerField(attribute='today', readonly=True, null=True, blank=True)
 
 
 class SurveyReportResource(SurveyDashResource):

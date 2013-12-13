@@ -310,6 +310,9 @@ when "rhel"
     execute "start redis" do
         command "sudo /etc/init.d/redis start"
     end
+    execute "start redis on boot" do
+        command "sudo chkconfig redis on"
+    end
     execute "install virtualenv" do
         command "sudo pip install virtualenv"
     end

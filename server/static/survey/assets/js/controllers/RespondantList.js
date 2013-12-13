@@ -43,6 +43,7 @@ angular.module('askApp')
             $scope.surveyor_by_time = {
                 yLabel: "Survey Responses",
                 raw_data: data.graph_data,
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
             // map reduuuuuuce
@@ -55,11 +56,51 @@ angular.module('askApp')
                 labels: _.pluck(data.graph_data, 'name'),
                 yLabel: "Surveys Collected",
                 data: bar_data,
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
         });
     }
 
+    function setup_columns() {
+        $scope.columns = [ { name: 'Surveyor', field: 'user' }
+                         , { name: 'Date', field: 'ts' }
+                         , { name: 'Time', field: 'ts' }
+                         , { name: 'Market', field: 'survey_site' }
+                         , { name: 'Vendor Name', field: 'vendor' }
+                         , { name: 'Buyer/Fisher', field: 'buy_or_catch' }
+                         , { name: 'Sales Type', field: 'how_sold' }
+                         , { name: 'Status', field: 'review_status' }
+                         //, { name: 'Detail', field: 'responses' }
+                         ];
+        var order_by = $location.search().order_by;
+
+        if (order_by) {
+            $scope.sortDescending = order_by[0] == "-";
+            $scope.currentColumn = $scope.sortDescending ?
+                _.find($scope.columns, function (x) { return "-" + x.field == order_by; }) || $scope.columns[1] :
+                _.find($scope.columns, function (x) { return x.field == order_by; }) || $scope.columns[1];
+        } else {
+            $scope.sortDescending = true;
+            $scope.currentColumn = $scope.columns[1];
+        }
+
+        $scope.changeSorting = function (column) {
+            if ($scope.currentColumn == column) {
+                $scope.sortDescending = !$scope.sortDescending;
+                $scope.getRespondents();
+            } else {
+                $scope.currentColumn = column;
+                $scope.sortDescending = true;
+                $scope.getRespondents();
+            }
+        };
+    }
+
+    $scope.goToResponse = function(respondent) {
+        window.location = "#/RespondantDetail/" + $scope.survey.slug +
+            "/" + respondent.uuid + "?" + $scope.filtered_list_url;
+    }
     $scope.market = $location.search().market || "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
@@ -67,27 +108,7 @@ angular.module('askApp')
     $scope.activePage = 'overview';
     $scope.statuses = [];
     $scope.status_single = $location.search().status || "";
-
-    $scope.columns = [ 'Surveyor'
-                     , 'Date'
-                     , 'Time'
-                     , 'Market'
-                     , 'Vendor Name'
-                     , 'Buyer/Fisher'
-                     , 'Sales Type'
-                     , 'Status'
-                     , 'Detail'
-                     ];
-    $scope.currentColumn = 'Date';
-    $scope.sortDescending = true;
-    $scope.changeSorting = function (column) {
-        if ($scope.currentColumn == column) {
-            $scope.sortDescending = !$scope.sortDescending;
-        } else {
-            $scope.currentColumn = column;
-            $scope.sortDescending = true;
-        }
-    };
+    setup_columns();
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
@@ -167,6 +188,11 @@ angular.module('askApp')
         if ($scope.status_single && url.indexOf("&status=") == -1) {
             location_obj.status = $scope.status_single;
             url = url + '&review_status=' + $scope.status_single;
+        }
+        if ($scope.currentColumn && url.indexOf("&order_by=") == -1) {
+            var str = $scope.sortDescending ? "-" + $scope.currentColumn.field : $scope.currentColumn.field;
+            location_obj.order_by = str;
+            url = url + '&order_by=' + str;
         }
         $location.search(location_obj);
         // hue hue hue:
