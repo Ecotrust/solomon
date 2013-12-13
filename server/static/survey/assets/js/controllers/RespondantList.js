@@ -7,7 +7,7 @@ angular.module('askApp')
         var market_site_id = _.find($scope.survey.questions, function(x) {
             return x.slug == 'survey-site';
         }).id;
-        var url = '/api/v1/response?format=json&question=' + market_site_id;
+        var url = '/api/v1/response/?format=json&question=' + market_site_id;
 
         $http.get(url).success(function(data) {
             $scope.markets = [];
