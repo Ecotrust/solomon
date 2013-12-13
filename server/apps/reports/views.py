@@ -290,7 +290,7 @@ def surveyor_stats_raw_data_csv(request, survey_slug):
     writer = csv.writer(response)
     writer.writerow(('Surveyor', 'market', 'timestamp', 'status'))
     for row in res:
-        writer.writerow((row.surveyor.get_full_name(), row.survey_site,
-                         row.ts, row.review_status))
+        writer.writerow((row.surveyor.get_full_name() if row.surveyor else '',
+                         row.survey_site, row.ts, row.review_status))
 
     return response

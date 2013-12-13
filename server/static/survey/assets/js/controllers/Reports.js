@@ -11,6 +11,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 type: data.type,
                 labels: _.pluck(data.crosstab, 'name'),
                 data: _.pluck(data.crosstab, 'value'),
+                download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
                 yLabel: 'Total Weight (kg)',
                 order: 2,
@@ -32,6 +33,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 type: data.type,
                 labels: _.pluck(data.crosstab, 'name'),
                 data: _.pluck(data.crosstab, 'value'),
+                download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Province',
                 yLabel: 'Total Weight (kg)',
                 order: 3,
@@ -54,6 +56,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 seriesNames: data.seriesNames,
                 type: data.type,
                 data: data.crosstab,
+                download_url: url.replace("cost", "cost" + '.csv'),
                 xLabel: 'Market',
                 yLabel: 'Average Trip Costs',
                 order: 1,
@@ -76,6 +79,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 seriesNames: data.seriesNames,
                 type: data.type,
                 data: data.crosstab,
+                download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
                 yLabel: 'Total Weight (kg)',
                 order: 4,
@@ -116,9 +120,11 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
+        var start_date = $scope.dateFromISO($scope.survey.response_date_start);
+        var end_date = $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            startDate: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
-            endDate: $scope.dateFromISO($scope.survey.response_date_end).add(1).day().valueOf()
+            startDate: start_date.add(-1).day().valueOf(),
+            endDate: end_date.add(1).day().valueOf()
         }
     });
 
@@ -128,10 +134,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            url = url + '&ts__gte=' + new Date($scope.filter.startDate).add(-1).day().toString('yyyy-MM-dd');
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            url = url + '&ts__lte=' + new Date($scope.filter.endDate).add(1).day().toString('yyyy-MM-dd');
         }
 
         $http.get(url).success(function(data) {
