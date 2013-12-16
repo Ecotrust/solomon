@@ -22,6 +22,30 @@ angular.module('askApp')
         });
     }
 
+    function build_survey_total_data(data) {
+        var new_data = {};
+        for (var i in data.graph_data) {
+            for (var j in data.graph_data[i].data) {
+                var current_date = data.graph_data[i].data[j][0];
+                var surveys_taken = data.graph_data[i].data[j][1];
+                if (!new_data[current_date]) {
+                    new_data[current_date] = {
+                        name: current_date,
+                        data: surveys_taken
+                    }
+                } else {
+                    new_data[current_date].data += surveys_taken;
+                }
+            }
+        }
+        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; });
+        return [
+            {
+                name: "Surveys Taken",
+                data: tuples
+            }
+        ]
+    }
     function filters_changed(surveySlug) {
         $scope.getRespondents();
 
@@ -40,25 +64,33 @@ angular.module('askApp')
         }
 
         $http.get(url).success(function(data) {
-            $scope.surveyor_by_time = {
-                yLabel: "Survey Responses",
-                raw_data: data.graph_data,
+            var new_data = build_survey_total_data(data);
+            $scope.total_surveys = {
+                title: "Total Surveys Collected by Date",
+                yLabel: "Surveys Taken",
+                raw_data: new_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
+            //$scope.surveyor_by_time = {
+            //    yLabel: "Survey Responses",
+            //    raw_data: data.graph_data,
+            //    download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
+            //    unit: "surveys"
+            //}
             // map reduuuuuuce
-            var bar_data = _.map(data.graph_data,
-                function (x) {
-                    return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
-                }
-            );
-            $scope.surveyor_total = {
-                labels: _.pluck(data.graph_data, 'name'),
-                yLabel: "Surveys Collected",
-                data: bar_data,
-                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
-                unit: "surveys"
-            }
+            //var bar_data = _.map(data.graph_data,
+            //    function (x) {
+            //        return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
+            //    }
+            //);
+            //$scope.surveyor_total = {
+            //    labels: _.pluck(data.graph_data, 'name'),
+            //    yLabel: "Surveys Collected",
+            //    data: bar_data,
+            //    download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
+            //    unit: "surveys"
+            //}
         });
     }
 

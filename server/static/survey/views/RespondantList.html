@@ -49,12 +49,15 @@
                     ng-click="surveyorTimeFilter='month'">Month</button>
             </div>
             <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
-            <div id="surveyor_total_chart">
+            <div id="total_surveys_chart">
+                <div time-series chart="total_surveys"></div>
+            </div>
+            <!-- <div id="surveyor_total_chart">
                 <div bar-chart chart="surveyor_total"></div>
             </div>
             <div id="surveyor_by_time_chart">
                 <div time-series chart="surveyor_by_time"></div>
-            </div>
+            </div> -->
         </div>
         <div class="respondent-table print-hide">
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
