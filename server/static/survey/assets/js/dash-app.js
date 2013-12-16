@@ -55,6 +55,11 @@ angular.module('askApp', ['ui', 'ui.bootstrap', 'ngGrid'])
         controller: 'RespondantListCtrl',
         reloadOnSearch: false
     })
+        .when('/RespondantList/:surveySlug/survey-stats', {
+        templateUrl: app.viewPath + 'views/SurveyStats.html',
+        controller: 'SurveyStatsCtrl',
+        reloadOnSearch: false
+    })
         .when('/RespondantDetail/:surveySlug/:uuidSlug', {
         templateUrl: app.viewPath + 'views/RespondantDetail.html',
         controller: 'RespondantDetailCtrl'
