@@ -42,6 +42,7 @@ angular.module('askApp')
             // Left fold 'cuz I'm dangerous
             function (accum, val) { return accum[0] == data.review_status ? accum : val; }, "");
         $scope.last_status = $scope.current_status;
+        $scope.review_comment = data.review_comment;
     });
 
     $http.get('/api/v1/surveydash/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
@@ -61,20 +62,27 @@ angular.module('askApp')
     }
 
 
-    $scope.$watch('current_status', function (newValue) {
-        if (newValue && newValue[0] != $scope.last_status[0]) {
-            $scope.updateStatus();
-        }
+    $scope.$watch('review_comment', function (newValue) {
+        $scope.updateStatus(newValue);
     }, false);
 
-    $scope.updateStatus = function() {
-        $http({
-            url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
-            data: { 'review_status': $scope.current_status[0] },
-            method: 'PATCH'
-        }).success(function(data) {
-            $scope.last_status = $scope.current_status;
-        });
+    $scope.$watch('current_status', function (newValue) {
+        $scope.updateStatus(newValue);
+    }, false);
+
+    $scope.updateStatus = function(newValue) {
+        if (newValue && newValue[0] != $scope.last_status[0]) {
+            window.clearTimeout($scope.save_timeout);
+            $scope.save_timeout = window.setTimeout(function() {
+                $http({
+                    url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
+                    data: { 'review_status': $scope.current_status[0], 'review_comment': $scope.review_comment },
+                    method: 'PATCH'
+                }).success(function(data) {
+                    $scope.last_status = $scope.current_status;
+                });
+            }, 1000);
+        }
     }
 
     $scope.getResponseBySlug = function(slug) {
