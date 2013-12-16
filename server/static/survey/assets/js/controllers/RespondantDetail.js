@@ -61,7 +61,7 @@ angular.module('askApp')
 
 
     $scope.$watch('current_status', function (newValue) {
-        if (newValue) {
+        if (newValue && newValue[0] != $scope.current_status[0]) {
             $scope.updateStatus();
         }
     }, false);
