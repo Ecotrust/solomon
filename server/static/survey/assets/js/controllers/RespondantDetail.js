@@ -70,16 +70,14 @@ angular.module('askApp')
     //    $scope.updateStatus(newValue);
     //}, false);
 
-    $scope.updateStatus = function(newValue) {
-        if (newValue) {
-            $http({
-                url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
-                data: { 'review_status': $scope.current_status[0], 'review_comment': $scope.review_comment },
-                method: 'PATCH'
-            }).success(function(data) {
-                $scope.last_status = $scope.current_status;
-            });
-        }
+    $scope.updateStatus = function() {
+        $http({
+            url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
+            data: { 'review_status': $scope.current_status[0], 'review_comment': $scope.review_comment },
+            method: 'PATCH'
+        }).success(function(data) {
+            $scope.last_status = $scope.current_status;
+        });
     }
 
     $scope.getResponseBySlug = function(slug) {
