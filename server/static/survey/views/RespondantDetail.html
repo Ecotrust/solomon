@@ -7,7 +7,7 @@
         <div class="col-md-6">
             <div id="review_buttons">
                 <a ng-show="filtered_list_url" href="{{filtered_list_url}}"><button class="btn btn-default" type="button">&laquo; Back</button></a>
-                <button ng-click="updateStatus" class="btn btn-default" type="button">Review Next &raquo;</button>
+                <button ng-click="updateStatus" class="btn btn-default" type="button">Save and Review Next &raquo;</button>
             </div>
         </div>
     </div>
@@ -25,7 +25,7 @@
             </dl>
         </div>
         <div id="market_status_filters" class="col-md-4">
-            <h3>Status: {{current_status[1]}}</h3>
+            <h3>Status: {{last_status[1]}}</h3>
             <h4>Set status:</h4>
             <select class="form-control" ng-model="current_status" ng-options="i as i[1] for i in statuses">
             </select>

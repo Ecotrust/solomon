@@ -62,26 +62,23 @@ angular.module('askApp')
     }
 
 
-    $scope.$watch('review_comment', function (newValue) {
-        $scope.updateStatus(newValue);
-    }, false);
+    //$scope.$watch('review_comment', function (newValue) {
+    //    $scope.updateStatus(newValue);
+    //}, false);
 
-    $scope.$watch('current_status', function (newValue) {
-        $scope.updateStatus(newValue);
-    }, false);
+    //$scope.$watch('current_status', function (newValue) {
+    //    $scope.updateStatus(newValue);
+    //}, false);
 
     $scope.updateStatus = function(newValue) {
-        if (newValue && newValue[0] != $scope.last_status[0]) {
-            window.clearTimeout($scope.save_timeout);
-            $scope.save_timeout = window.setTimeout(function() {
-                $http({
-                    url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
-                    data: { 'review_status': $scope.current_status[0], 'review_comment': $scope.review_comment },
-                    method: 'PATCH'
-                }).success(function(data) {
-                    $scope.last_status = $scope.current_status;
-                });
-            }, 1000);
+        if (newValue) {
+            $http({
+                url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
+                data: { 'review_status': $scope.current_status[0], 'review_comment': $scope.review_comment },
+                method: 'PATCH'
+            }).success(function(data) {
+                $scope.last_status = $scope.current_status;
+            });
         }
     }
 
