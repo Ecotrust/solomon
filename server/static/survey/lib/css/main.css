@@ -15,6 +15,11 @@
     padding-left: 0;
     padding-right: 10px;
 }
+.respondent-table .highlightable_row:hover {
+    background-color: #68A1D6;
+    color: #FFF;
+    cursor: pointer;
+}
 #survey-landing-table td {
     vertical-align: middle;
 }

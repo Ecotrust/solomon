@@ -7,6 +7,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ('account', '0002_api_keys'),
+    )
+
     def forwards(self, orm):
         # Adding field 'Respondant.surveyor'
         db.add_column(u'survey_respondant', 'surveyor',
