@@ -1,8 +1,14 @@
 <div class="container main-container">
     <div ng-include="viewPath + 'views/sideNav.html'"></div>
     <div class="col-md-10">
-        <h1>{{ survey.name }}</h1>
-
+        <div class="col-md-6">
+            <h1>{{ survey.name }}</h1>
+        </div>
+        <div class="col-md-6">
+            <button print-button></button>
+        </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-10 print-hide">
         <h2>
             Overview
             <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small>
