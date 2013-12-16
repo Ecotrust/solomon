@@ -220,7 +220,7 @@ angular.module('askApp')
                             chart: {
                                 type: 'line'
                             },
-                            title: false,
+                            title: { text: scope.chart.title } || false,
                             subtitle: false,
                             xAxis: {
                                 type: 'datetime',

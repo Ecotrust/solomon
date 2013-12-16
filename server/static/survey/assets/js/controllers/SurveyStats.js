@@ -41,7 +41,8 @@ angular.module('askApp')
 
         $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {
-                yLabel: "Survey Responses",
+                yLabel: "Surveys Collected",
+                title: "Surveys Collected by Date",
                 raw_data: data.graph_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
