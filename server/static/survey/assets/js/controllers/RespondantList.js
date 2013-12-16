@@ -67,7 +67,6 @@ angular.module('askApp')
             var new_data = build_survey_total_data(data);
             $scope.total_surveys = {
                 title: "Total Surveys Collected by Date",
-                yLabel: "Surveys Taken",
                 raw_data: new_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
