@@ -41,6 +41,7 @@ angular.module('askApp')
         $scope.current_status = _.reduce(data.meta.statuses,
             // Left fold 'cuz I'm dangerous
             function (accum, val) { return accum[0] == data.review_status ? accum : val; }, "");
+        $scope.last_status = $scope.current_status;
     });
 
     $http.get('/api/v1/surveydash/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
@@ -61,7 +62,7 @@ angular.module('askApp')
 
 
     $scope.$watch('current_status', function (newValue) {
-        if (newValue && newValue[0] != $scope.current_status[0]) {
+        if (newValue && newValue[0] != $scope.last_status[0]) {
             $scope.updateStatus();
         }
     }, false);
@@ -72,6 +73,7 @@ angular.module('askApp')
             data: { 'review_status': $scope.current_status[0] },
             method: 'PATCH'
         }).success(function(data) {
+            $scope.last_status = $scope.current_status;
         });
     }
 
