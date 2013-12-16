@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 
 from tastypie.test import ResourceTestCase
 
-from ..models import Respondant, Response, REVIEW_STATE_CHOICES, Survey
+from ..models import Respondant, Response, Survey
 
 
 class SolomonResourceTestCase(ResourceTestCase):
@@ -46,8 +46,21 @@ class SolomonResourceTestCase(ResourceTestCase):
 
 
 class TestReportRespondantResource(SolomonResourceTestCase):
-    fixtures = ['users.json']
+    fixtures = ['reef.json', 'users.json']
     resource_name = 'reportrespondant'
+
+    def create_respondant(self):
+        self.survey = Survey.objects.get(slug='reef-fish-market-survey')
+        self.question = self.survey.questions.get(slug='survey-site')
+        self.respondant = Respondant(survey=self.survey,
+                                     ts=datetime.datetime.now(),
+                                     surveyor=self.user)
+        response = Response(question=self.question,
+                            respondant=self.respondant)
+        response.answer_raw = json.dumps({'text': 'Fishing Village'})
+        self.respondant.save()
+        response.save()
+        return self.respondant
 
     def test_list_meta_includes_statuses(self):
         self.login()
@@ -56,8 +69,15 @@ class TestReportRespondantResource(SolomonResourceTestCase):
 
         content = json.loads(res.content)
         self.assertIn('statuses', content['meta'])
-        for item in REVIEW_STATE_CHOICES:
-            self.assertIn(item[0], content['meta']['statuses'].keys())
+
+    def test_patch_review_status(self):
+        self.login()
+        respondant = self.create_respondant()
+        res = self.client.post(self.get_detail_url(respondant.pk),
+                               json.dumps({'review_status': 'flagged'}),
+                               content_type='application/json',
+                               HTTP_X_HTTP_METHOD_OVERRIDE='PATCH')
+        self.assertEqual(res.status_code, 202)
 
 
 class TestReportRepondantDetailsResource(SolomonResourceTestCase):
@@ -83,8 +103,6 @@ class TestReportRepondantDetailsResource(SolomonResourceTestCase):
 
         content = json.loads(res.content)
         self.assertIn('statuses', content['meta'])
-        for item in REVIEW_STATE_CHOICES:
-            self.assertIn(item[0], content['meta']['statuses'].keys())
 
     def test_detail_meta_includes_statuses(self):
         self.login()
@@ -93,8 +111,6 @@ class TestReportRepondantDetailsResource(SolomonResourceTestCase):
         self.assertEqual(res.status_code, 200)
         content = json.loads(res.content)
         self.assertIn('statuses', content['meta'])
-        for item in REVIEW_STATE_CHOICES:
-            self.assertIn(item[0], content['meta']['statuses'].keys())
 
 
 # class AuthoringResource(ResourceTestCase):
