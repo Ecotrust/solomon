@@ -6,7 +6,7 @@
         </div>
         <div class="col-md-6">
             <div id="review_buttons">
-                <a href="{{filtered_list_url}}"><button class="btn btn-default" type="button">&laquo; Back</button></a>
+                <a ng-show="filter_list_url" href="{{filtered_list_url}}"><button class="btn btn-default" type="button">&laquo; Back</button></a>
                 <button ng-click="updateStatus" class="btn btn-default" type="button">Review Next &raquo;</button>
             </div>
         </div>
@@ -14,7 +14,7 @@
     <div class="col-md-2"></div>
     <div class="col-md-10">
         <h3>Respondent Details</h3>
-        <div class="col-md-9">
+        <div class="col-md-8">
             <dl class="dl-horizontal">
                 <dt>surveyor</dt>
                 <dd>{{ respondent.user.username }}</dd>
@@ -24,8 +24,9 @@
                 <dd>{{ respondent.ts  |validDate: 'dd-MM-yyyy hh:mm' }}</dd>
             </dl>
         </div>
-        <div id="market_status_filters" class="col-md-3">
-            <h4>Status: {{current_status[1]}}</h4>
+        <div id="market_status_filters" class="col-md-4">
+            <h3>Status: {{current_status[1]}}</h3>
+            <h4>Set status:</h4>
             <select class="form-control" ng-model="current_status" ng-options="i as i[1] for i in statuses">
             </select>
         </div>
