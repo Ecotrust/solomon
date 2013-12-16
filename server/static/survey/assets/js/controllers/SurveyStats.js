@@ -56,8 +56,10 @@ angular.module('askApp')
             $scope.surveyor_total = {
                 labels: _.pluck(data.graph_data, 'name'),
                 yLabel: "Surveys Collected",
+                title: "Total Surveys Collected by Surveyor",
+                type: "bar",
                 data: bar_data,
-                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + ".csv"),
                 unit: "surveys"
             }
         });
