@@ -50,7 +50,7 @@ angular.module('askApp')
         $scope.getRespondents();
 
         var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
-        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
         url += '?start_date=' + start_date;
         url += '&end_date=' + end_date;
@@ -208,7 +208,7 @@ angular.module('askApp')
             url = url + '&ts__gte=' + str;
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            var str = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
             location_obj.ts__lte = new Date($scope.filter.endDate).valueOf();
             url = url + '&ts__lte=' + str;
         }
