@@ -175,12 +175,12 @@ angular.module('askApp')
 
         var location_obj = {};
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            var str = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.startDate).add(-1).day().toString('yyyy-MM-dd');
             location_obj.ts__gte = new Date($scope.filter.startDate).valueOf();
             url = url + '&ts__gte=' + str;
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            var str = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
             location_obj.ts__lte = new Date($scope.filter.endDate).valueOf();
             url = url + '&ts__lte=' + str;
         }

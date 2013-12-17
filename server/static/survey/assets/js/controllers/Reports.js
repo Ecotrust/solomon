@@ -134,10 +134,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+            url = url + '&ts__gte=' + new Date($scope.filter.startDate).add(-1).day().toString('yyyy-MM-dd');
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            url = url + '&ts__lte=' + new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
         }
 
         $http.get(url).success(function(data) {
