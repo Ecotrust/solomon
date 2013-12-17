@@ -100,6 +100,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
         // FIXME: Actually pull these charts from the DB or something.
         if ($scope.activePage == 'economic') {
+            $scope.subtitle = "Socio-Economic Information"
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);
         } else if ($scope.activePage == 'biological') {
