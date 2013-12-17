@@ -119,7 +119,7 @@ def bootstrap(username=None):
     #run('test -e %s || ln -s /vagrant/marco %s' % (env.code_dir, env.code_dir))
     with cd(env.code_dir):
         with _virtualenv():
-            run('pip install -r requirements.txt')
+            run('pip install -r server/requirements.txt')
             _manage_py('syncdb --noinput')
             # _manage_py('add_srid 99996')
             _manage_py('migrate')
@@ -213,7 +213,7 @@ def deploy(branch="master"):
 
     with cd(env.code_dir):
         with _virtualenv():
-            run('pip install -r requirements.txt')
+            run('pip install -r server/requirements.txt')
             _manage_py('collectstatic --noinput --settings=config.environments.staging')
             _manage_py('syncdb --noinput --settings=config.environments.staging')
             # _manage_py('add_srid 99996')
