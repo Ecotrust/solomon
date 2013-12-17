@@ -132,10 +132,6 @@ directory "/usr/local/venv" do
     mode 0770
 end
 
-# ssh  ------------------------------------------------------------------------
-
-
-
 if platform?("debian", "ubuntu")
     cookbook_file "/etc/ssh/sshd_config" do
         source "sshd_config"
@@ -171,6 +167,24 @@ if platform?("centos", "rhel")
         EOH
     end
 end
+
+#ssl 
+directory "/etc/nginx/ssl" do
+    owner "root"
+    group "root"
+    mode 0600
+end
+
+
+cookbook_file "server.crt" do
+  path "/etc/nginx/ssl/server.crt"
+  action :create_if_missing
+end
+cookbook_file "server.key" do
+  path "/etc/nginx/ssl/server.key"
+  action :create_if_missing
+end
+
 
 package "mercurial"
 package "subversion"
@@ -209,6 +223,9 @@ include_recipe "git"
 include_recipe "nginx"
 package "python-kombu"
 package "python-imaging"
+
+
+
 
 
 case node["platform_family"]
