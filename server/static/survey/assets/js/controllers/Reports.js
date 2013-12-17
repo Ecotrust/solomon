@@ -123,8 +123,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         var start_date = $scope.dateFromISO($scope.survey.response_date_start);
         var end_date = $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            startDate: start_date.add(-1).day().valueOf(),
-            endDate: end_date.add(1).day().valueOf()
+            startDate: start_date.day().valueOf(),
+            endDate: end_date.day().valueOf()
         }
     });
 
@@ -134,10 +134,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
         }
         if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + new Date($scope.filter.startDate).add(-1).day().toString('yyyy-MM-dd');
+            url = url + '&ts__gte=' + new Date($scope.filter.startDate).day().toString('yyyy-MM-dd');
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + new Date($scope.filter.endDate).add(1).day().toString('yyyy-MM-dd');
+            url = url + '&ts__lte=' + new Date($scope.filter.endDate).day().toString('yyyy-MM-dd');
         }
 
         $http.get(url).success(function(data) {

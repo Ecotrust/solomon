@@ -148,10 +148,10 @@ angular.module('askApp')
             new Date(parseInt($location.search().ts__lte)) :
             $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            min: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
-            max: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf(),
-            startDate: start_date.add(-1).day().valueOf(),
-            endDate: end_date.add(2).day().valueOf()
+            min: $scope.dateFromISO($scope.survey.response_date_start).day().valueOf(),
+            max: $scope.dateFromISO($scope.survey.response_date_end).day().valueOf(),
+            startDate: start_date.day().valueOf(),
+            endDate: end_date.day().valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {
