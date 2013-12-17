@@ -79,6 +79,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 seriesNames: data.seriesNames,
                 type: data.type,
                 data: data.crosstab,
+                unit: 'kg',
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
                 yLabel: 'Total Weight (kg)',
@@ -104,6 +105,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);
         } else if ($scope.activePage == 'biological') {
+            $scope.subtitle = "Biologic Information"
             fish_weight_by_province($scope.charts, start_date, end_date,
                 surveySlug);
             fish_weight_by_market($scope.charts, start_date, end_date,
