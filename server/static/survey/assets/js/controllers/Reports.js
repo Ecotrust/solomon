@@ -73,12 +73,23 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         url = url + '&group=week';
 
         return $http.get(url).success(function(data) {
+            var sdate = new Date($scope.filter.startDate);
+            var edate = new Date($scope.filter.endDate);
+
+            var filtered = _.map(data.crosstab, function(answer) {
+                answer.value = _.filter(answer.value, function(x) {
+                    var d = $scope.dateFromISO(x.date);
+                    return (d >= sdate && d <= edate);
+                });
+                return answer;
+            });
+
             charts.push({
                 title: "Total Weight for Week by Market",
-                labels: _.pluck(data.crosstab, 'name'),
+                labels: _.pluck(filtered, 'name'),
                 seriesNames: data.seriesNames,
                 type: data.type,
-                data: data.crosstab,
+                data: filtered,
                 unit: 'kg',
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
