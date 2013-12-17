@@ -38,7 +38,7 @@ angular.module('askApp')
                 }
             }
         }
-        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; });
+        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; }).sort();
         return [
             {
                 name: "Surveys Taken",
