@@ -119,7 +119,7 @@ def bootstrap(username=None):
     #run('test -e %s || ln -s /vagrant/marco %s' % (env.code_dir, env.code_dir))
     with cd(env.code_dir):
         with _virtualenv():
-            run('pip install -r server/requirements.txt')
+            run('pip install -r requirements.txt')
             _manage_py('syncdb --noinput')
             # _manage_py('add_srid 99996')
             _manage_py('migrate')
@@ -168,12 +168,12 @@ def push():
     Update application code on the server
     """
     with settings(warn_only=True):
-        remote_result = local('git remote | grep %s' % env.remote)
+        remote_result = local('git remote | grep %s' % env.host)
         if not remote_result.succeeded:
             local('git remote add %s ssh://%s@%s:%s%s' %
-                (env.remote, env.user, env.host, env.port, env.root_dir))
+                (env.host, env.user, env.host, env.port, env.root_dir))
 
-        result = local("git push %s %s" % (env.remote, env.branch))
+        result = local("git push %s %s" % (env.host, env.branch))
 
         # if push didn't work, the repository probably doesn't exist
         # 1. create an empty repo
@@ -189,7 +189,7 @@ def push():
             with cd(env.root_dir):
                 run("git init")
                 run("git config --bool receive.denyCurrentBranch false")
-                local("git push %s -u %s" % (env.remote, env.branch))
+                local("git push %s -u %s" % (env.host, env.branch))
 
     with cd(env.root_dir):
         # Really, git?  Really?
@@ -213,7 +213,7 @@ def deploy(branch="master"):
 
     with cd(env.code_dir):
         with _virtualenv():
-            run('pip install -r server/requirements.txt')
+            run('pip install -r requirements.txt')
             _manage_py('collectstatic --noinput --settings=config.environments.staging')
             _manage_py('syncdb --noinput --settings=config.environments.staging')
             # _manage_py('add_srid 99996')
