@@ -227,8 +227,10 @@ angular.module('askApp')
         }
         $location.search(location_obj);
         // hue hue hue:
-        $scope.filtered_list_url = "filtered_list_url=" + btoa("#/RespondantList/" + $scope.survey.slug + "?" +
-            _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&"));
+        var params = _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&");
+        var b64_url = btoa("#/RespondantList/" + $scope.survey.slug + "?" + params);
+        var encoded_url = escape(b64_url);
+        $scope.filtered_list_url = "filtered_list_url=" + encoded_url;
 
         $http.get(url).success(function(data) {
             $scope.respondentsLoading = false;
