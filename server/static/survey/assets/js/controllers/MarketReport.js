@@ -1,25 +1,6 @@
 angular.module('askApp')
     .controller('MarketReportCtrl', function($scope, $http, $routeParams, $location, reportsCommon) {
 
-    function setup_market_dropdown() {
-        var market_site_id = _.find($scope.survey.questions, function(x) {
-            return x.slug == 'survey-site';
-        }).id;
-        var url = '/api/v1/response?format=json&question=' + market_site_id;
-
-        $http.get(url).success(function(data) {
-            $scope.markets = [];
-            var markets_with_dupes = _.map(data.objects,
-                function(x) { return x.answer; });
-
-            _.each(markets_with_dupes, function (x) {
-                if (_.indexOf($scope.markets, x) === -1) {
-                    $scope.markets.push(x);
-                }
-            });
-        });
-    }
-
     function filters_changed(surveySlug) {
         $scope.getRespondents();
 
@@ -102,7 +83,7 @@ angular.module('askApp')
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
-        setup_market_dropdown();
+        reportsCommon.setup_market_dropdown($scope);
         var start_date = $location.search().ts__gte ?
             new Date(parseInt($location.search().ts__gte)) :
             reportsCommon.dateFromISO($scope.survey.response_date_start);

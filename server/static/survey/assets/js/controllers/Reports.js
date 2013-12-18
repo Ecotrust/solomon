@@ -134,7 +134,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
-        var start_date = reportsCommon.datefromiso($scope.survey.response_date_start);
+        var start_date = reportsCommon.dateFromISO($scope.survey.response_date_start);
         var end_date = reportsCommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
             startDate: start_date.valueOf(),

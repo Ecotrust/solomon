@@ -3,25 +3,6 @@
 angular.module('askApp')
     .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location, reportsCommon) {
 
-    function setup_market_dropdown() {
-        var market_site_id = _.find($scope.survey.questions, function(x) {
-            return x.slug == 'survey-site';
-        }).id;
-        var url = '/api/v1/response?format=json&question=' + market_site_id;
-
-        $http.get(url).success(function(data) {
-            $scope.markets = [];
-            var markets_with_dupes = _.map(data.objects,
-                function(x) { return x.answer; });
-
-            _.each(markets_with_dupes, function (x) {
-                if (_.indexOf($scope.markets, x) === -1) {
-                    $scope.markets.push(x);
-                }
-            });
-        });
-    }
-
     function build_survey_total_data(data) {
         var new_data = {};
         for (var i in data.graph_data) {
@@ -131,7 +112,7 @@ angular.module('askApp')
         window.location = "#/RespondantDetail/" + $scope.survey.slug +
             "/" + respondent.uuid + "?" + $scope.filtered_list_url;
     }
-    $scope.market = $location.search().market || "";
+    $scope.market = $location.search().survey_site || "";
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
@@ -167,10 +148,10 @@ angular.module('askApp')
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
-        setup_market_dropdown();
+        reportsCommon.setup_market_dropdown($scope);
         var start_date = $location.search().ts__gte ?
             new Date(parseInt($location.search().ts__gte)) :
-            reportsCommonr.dateFromISO($scope.survey.response_date_start);
+            reportsCommon.dateFromISO($scope.survey.response_date_start);
         var end_date = $location.search().ts__lte ?
             new Date(parseInt($location.search().ts__lte)) :
             reportsCommon.dateFromISO($scope.survey.response_date_end);
@@ -202,4 +183,8 @@ angular.module('askApp')
     $scope.getQuestionBySlug = function (slug) {
         return _.findWhere($scope.survey.questions, {'slug': slug});
     };
+    $scope.getRespondents = function(url) {
+        // Higher order function to make the next/prve buttons work.
+        return reportsCommon.getRespondents(url, $scope);
+    }
 });

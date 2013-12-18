@@ -1,6 +1,25 @@
 angular.module('askApp').factory('reportsCommon', function($http, $routeParams, $location) {
     var factory = {};
 
+    factory.setup_market_dropdown = function($scope) {
+        var market_site_id = _.find($scope.survey.questions, function(x) {
+            return x.slug == 'survey-site';
+        }).id;
+        var url = '/api/v1/response?format=json&question=' + market_site_id;
+
+        $http.get(url).success(function(data) {
+            $scope.markets = [];
+            var markets_with_dupes = _.map(data.objects,
+                function(x) { return x.answer; });
+
+            _.each(markets_with_dupes, function (x) {
+                if (_.indexOf($scope.markets, x) === -1) {
+                    $scope.markets.push(x);
+                }
+            });
+        });
+    }
+
     factory.getRespondents = function (url, $scope) {
         $scope.respondentsLoading = true;
         if (! url) {
@@ -8,23 +27,28 @@ angular.module('askApp').factory('reportsCommon', function($http, $routeParams, 
         }
 
         var location_obj = {};
-        if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            var str = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
-            location_obj.ts__gte = new Date($scope.filter.startDate).valueOf();
+        var start_date = ($scope.filter.startDate || $location.search().ts__gte);
+        var end_date = ($scope.filter.endDate || $location.search().ts__lte);
+        var status_single = ($scope.status_single || $location.search().review_status);
+        var market = ($scope.market || $location.search().survey_site);
+
+        if (start_date && url.indexOf("&ts__gte=") == -1) {
+            var str = new Date(start_date).toString('yyyy-MM-dd');
+            location_obj.ts__gte = new Date(start_date).valueOf();
             url = url + '&ts__gte=' + str;
         }
-        if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            var str = new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
-            location_obj.ts__lte = new Date($scope.filter.endDate).valueOf();
+        if (end_date && url.indexOf("&ts__lte=") == -1) {
+            var str = new Date(end_date).add(2).day().toString('yyyy-MM-dd');
+            location_obj.ts__lte = new Date(end_date).valueOf();
             url = url + '&ts__lte=' + str;
         }
-        if ($scope.market && url.indexOf("&survey_site=") == -1) {
-            location_obj.survey_site = $scope.market;
-            url = url + '&survey_site=' + $scope.market;
+        if (market && url.indexOf("&survey_site=") == -1) {
+            location_obj.survey_site = market;
+            url = url + '&survey_site=' + market;
         }
-        if ($scope.status_single && url.indexOf("&status=") == -1) {
-            location_obj.status = $scope.status_single;
-            url = url + '&review_status=' + $scope.status_single;
+        if (status_single && url.indexOf("&status=") == -1) {
+            location_obj.status = status_single;
+            url = url + '&review_status=' + status_single;
         }
         if ($scope.currentColumn && url.indexOf("&order_by=") == -1) {
             var str = $scope.sortDescending ? "-" + $scope.currentColumn.field : $scope.currentColumn.field;
