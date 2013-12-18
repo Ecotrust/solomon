@@ -54,7 +54,7 @@ angular.module('askApp')
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
-    $scope.activePage = 'survey-stats';
+    $scope.activePage = 'market-report';
     $scope.statuses = [];
     $scope.status_single = $location.search().status || null;
 
