@@ -35,6 +35,7 @@
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-10">
+        <h2>Total Weight for Market: {{total_market_weight}}</h2>
         <p ng-show="message">{{message}}</p>
         <div>
             <div class="btn-group print-hide">
@@ -56,9 +57,6 @@
                     ng-click="surveyorTimeFilter='month'">Month</button>
             </div>
             <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
-            <div id="surveyor_total_chart">
-                <div bar-chart chart="surveyor_total"></div>
-            </div>
             <div id="surveyor_by_time_chart">
                 <div time-series chart="surveyor_by_time"></div>
             </div>

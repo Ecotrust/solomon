@@ -29,20 +29,7 @@ angular.module('askApp')
     }
     function filters_changed(surveySlug) {
         reportsCommon.getRespondents(null, $scope);
-
-        var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
-        var end_date = new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
-        var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
-        url += '?start_date=' + start_date;
-        url += '&end_date=' + end_date;
-
-        if ($scope.market) {
-            url += '&market=' + $scope.market;
-        }
-
-        if ($scope.status_single) {
-            url += '&status=' + $scope.status_single;
-        }
+        var url = reportsCommon.build_survey_stats_url($scope);
 
         $http.get(url).success(function(data) {
             var new_data = build_survey_total_data(data);
@@ -52,25 +39,6 @@ angular.module('askApp')
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
-            //$scope.surveyor_by_time = {
-            //    yLabel: "Survey Responses",
-            //    raw_data: data.graph_data,
-            //    download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
-            //    unit: "surveys"
-            //}
-            // map reduuuuuuce
-            //var bar_data = _.map(data.graph_data,
-            //    function (x) {
-            //        return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
-            //    }
-            //);
-            //$scope.surveyor_total = {
-            //    labels: _.pluck(data.graph_data, 'name'),
-            //    yLabel: "Surveys Collected",
-            //    data: bar_data,
-            //    download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
-            //    unit: "surveys"
-            //}
         });
     }
 

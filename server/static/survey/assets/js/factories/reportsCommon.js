@@ -1,6 +1,22 @@
 angular.module('askApp').factory('reportsCommon', function($http, $routeParams, $location) {
     var factory = {};
 
+    factory.build_survey_stats_url = function($scope) {
+        var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+        var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
+        url += '?start_date=' + start_date;
+        url += '&end_date=' + end_date;
+
+        if ($scope.market) {
+            url += '&market=' + $scope.market;
+        }
+
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
+        return url;
+    }
     factory.setup_market_dropdown = function($scope) {
         var market_site_id = _.find($scope.survey.questions, function(x) {
             return x.slug == 'survey-site';
@@ -27,10 +43,10 @@ angular.module('askApp').factory('reportsCommon', function($http, $routeParams, 
         }
 
         var location_obj = {};
-        var start_date = ($scope.filter.startDate || $location.search().ts__gte);
-        var end_date = ($scope.filter.endDate || $location.search().ts__lte);
-        var status_single = ($scope.status_single || $location.search().review_status);
-        var market = ($scope.market || $location.search().survey_site);
+        var start_date = $scope.filter.startDate;
+        var end_date = $scope.filter.endDate;
+        var status_single = $scope.status_single;
+        var market = $scope.market;
 
         if (start_date && url.indexOf("&ts__gte=") == -1) {
             var str = new Date(start_date).toString('yyyy-MM-dd');

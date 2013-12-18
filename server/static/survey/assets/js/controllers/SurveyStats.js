@@ -3,20 +3,7 @@ angular.module('askApp')
 
     function filters_changed(surveySlug) {
         reportsCommon.getRespondents(null, $scope);
-
-        var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
-        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
-        var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
-        url += '?start_date=' + start_date;
-        url += '&end_date=' + end_date;
-
-        if ($scope.market) {
-            url += '&market=' + $scope.market;
-        }
-
-        if ($scope.status_single) {
-            url += '&status=' + $scope.status_single;
-        }
+        var url = reportsCommon.build_survey_stats_url($scope);
 
         $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {
@@ -82,13 +69,13 @@ angular.module('askApp')
         window.location = "#/RespondantDetail/" + $scope.survey.slug +
             "/" + respondent.uuid + "?" + $scope.filtered_list_url;
     }
-    $scope.market = $location.search().market || "";
+    $scope.market = $location.search().survey_site || null;
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = 'survey-stats';
     $scope.statuses = [];
-    $scope.status_single = $location.search().status || "";
+    $scope.status_single = $location.search().status || null;
     setup_columns();
 
     $scope.$watch('filter', function (newValue) {
