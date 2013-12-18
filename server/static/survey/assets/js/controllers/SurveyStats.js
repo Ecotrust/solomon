@@ -1,7 +1,7 @@
 //'use strict';
 
 angular.module('askApp')
-    .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location) {
+    .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location) {
 
     function setup_market_dropdown() {
         var market_site_id = _.find($scope.survey.questions, function(x) {
@@ -22,30 +22,6 @@ angular.module('askApp')
         });
     }
 
-    function build_survey_total_data(data) {
-        var new_data = {};
-        for (var i in data.graph_data) {
-            for (var j in data.graph_data[i].data) {
-                var current_date = data.graph_data[i].data[j][0];
-                var surveys_taken = data.graph_data[i].data[j][1];
-                if (!new_data[current_date]) {
-                    new_data[current_date] = {
-                        name: current_date,
-                        data: surveys_taken
-                    }
-                } else {
-                    new_data[current_date].data += surveys_taken;
-                }
-            }
-        }
-        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; });
-        return [
-            {
-                name: "Surveys Taken",
-                data: tuples
-            }
-        ]
-    }
     function filters_changed(surveySlug) {
         $scope.getRespondents();
 
@@ -64,32 +40,28 @@ angular.module('askApp')
         }
 
         $http.get(url).success(function(data) {
-            var new_data = build_survey_total_data(data);
-            $scope.total_surveys = {
-                title: "Total Surveys Collected by Date",
-                raw_data: new_data,
+            $scope.surveyor_by_time = {
+                yLabel: "Surveys Collected",
+                title: "Surveys Collected by Date",
+                raw_data: data.graph_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
-            //$scope.surveyor_by_time = {
-            //    yLabel: "Survey Responses",
-            //    raw_data: data.graph_data,
-            //    download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
-            //    unit: "surveys"
-            //}
             // map reduuuuuuce
-            //var bar_data = _.map(data.graph_data,
-            //    function (x) {
-            //        return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
-            //    }
-            //);
-            //$scope.surveyor_total = {
-            //    labels: _.pluck(data.graph_data, 'name'),
-            //    yLabel: "Surveys Collected",
-            //    data: bar_data,
-            //    download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
-            //    unit: "surveys"
-            //}
+            var bar_data = _.map(data.graph_data,
+                function (x) {
+                    return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
+                }
+            );
+            $scope.surveyor_total = {
+                labels: _.pluck(data.graph_data, 'name'),
+                yLabel: "Surveys Collected",
+                title: "Total Surveys Collected by Surveyor",
+                type: "bar",
+                data: bar_data,
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + ".csv"),
+                unit: "surveys"
+            }
         });
     }
 
@@ -136,7 +108,7 @@ angular.module('askApp')
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
-    $scope.activePage = 'overview';
+    $scope.activePage = 'survey-stats';
     $scope.statuses = [];
     $scope.status_single = $location.search().status || "";
     setup_columns();

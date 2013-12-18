@@ -1,3 +1,8 @@
+#print_button {
+    margin-top: 2em;
+    float: right;
+    display: inline-block;
+}
 #global-navbar {
     margin-bottom: 0;
 }

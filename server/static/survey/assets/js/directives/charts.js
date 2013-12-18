@@ -35,11 +35,11 @@ angular.module('askApp')
 
                         element.find(".chart").highcharts({
                             chart: {
-                                type: 'column'
+                                type: scope.chart.type || 'column'
                             },
                             backgroundColor: 'rgba(255, 255, 255, 0)',
                             title: {
-                                text: false
+                                text: scope.chart.title || false
                             },
                             tooltip: {
                                 formatter: function() {
@@ -220,7 +220,7 @@ angular.module('askApp')
                             chart: {
                                 type: 'line'
                             },
-                            title: false,
+                            title: { text: scope.chart.title } || false,
                             subtitle: false,
                             xAxis: {
                                 type: 'datetime',
