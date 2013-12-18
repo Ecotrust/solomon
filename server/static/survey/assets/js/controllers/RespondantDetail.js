@@ -27,7 +27,7 @@ angular.module('askApp')
 
     $scope.statuses = [];
     // We don't want to show a non-functioning back button if we have no url to go back to:
-    $scope.filtered_list_url = $location.search().filtered_list_url ? atob($location.search().filtered_list_url) : "";
+    $scope.filtered_list_url = $location.search().filtered_list_url ? atob(unescape($location.search().filtered_list_url)) : "";
     $scope.viewPath = app.viewPath;
     $http.get('/api/v1/reportrespondantdetails/'  + $routeParams.uuidSlug + '/?format=json&survey__slug=' + $routeParams.surveySlug).success(function(data) {
         //order responses to reflect the order in which they were presented in the survey

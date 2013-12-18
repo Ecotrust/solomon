@@ -38,7 +38,7 @@ angular.module('askApp')
                 }
             }
         }
-        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; });
+        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; }).sort();
         return [
             {
                 name: "Surveys Taken",
@@ -50,7 +50,7 @@ angular.module('askApp')
         $scope.getRespondents();
 
         var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
-        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
         url += '?start_date=' + start_date;
         url += '&end_date=' + end_date;
@@ -176,10 +176,10 @@ angular.module('askApp')
             new Date(parseInt($location.search().ts__lte)) :
             $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            min: $scope.dateFromISO($scope.survey.response_date_start).add(-1).day().valueOf(),
-            max: $scope.dateFromISO($scope.survey.response_date_end).add(2).day().valueOf(),
-            startDate: start_date.add(-1).day().valueOf(),
-            endDate: end_date.add(2).day().valueOf()
+            min: $scope.dateFromISO($scope.survey.response_date_start).valueOf(),
+            max: $scope.dateFromISO($scope.survey.response_date_end).valueOf(),
+            startDate: start_date.valueOf(),
+            endDate: end_date.valueOf()
         }
 
         _.each($scope.survey.questions, function (question) {
@@ -208,7 +208,7 @@ angular.module('askApp')
             url = url + '&ts__gte=' + str;
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            var str = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+            var str = new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
             location_obj.ts__lte = new Date($scope.filter.endDate).valueOf();
             url = url + '&ts__lte=' + str;
         }
@@ -227,8 +227,10 @@ angular.module('askApp')
         }
         $location.search(location_obj);
         // hue hue hue:
-        $scope.filtered_list_url = "filtered_list_url=" + btoa("#/RespondantList/" + $scope.survey.slug + "?" +
-            _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&"));
+        var params = _.map(_.keys(location_obj), function(x) { return x + "=" + location_obj[x]; }).join("&");
+        var b64_url = btoa("#/RespondantList/" + $scope.survey.slug + "?" + params);
+        var encoded_url = escape(b64_url);
+        $scope.filtered_list_url = "filtered_list_url=" + encoded_url;
 
         $http.get(url).success(function(data) {
             $scope.respondentsLoading = false;

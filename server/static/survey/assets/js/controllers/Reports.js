@@ -73,12 +73,24 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         url = url + '&group=week';
 
         return $http.get(url).success(function(data) {
+            var sdate = new Date($scope.filter.startDate);
+            var edate = new Date($scope.filter.endDate);
+
+            var filtered = _.map(data.crosstab, function(answer) {
+                answer.value = _.filter(answer.value, function(x) {
+                    var d = $scope.dateFromISO(x.date);
+                    return (d >= sdate && d <= edate);
+                });
+                return answer;
+            });
+
             charts.push({
                 title: "Total Weight for Week by Market",
-                labels: _.pluck(data.crosstab, 'name'),
+                labels: _.pluck(filtered, 'name'),
                 seriesNames: data.seriesNames,
                 type: data.type,
-                data: data.crosstab,
+                data: filtered,
+                unit: 'kg',
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
                 yLabel: 'Total Weight (kg)',
@@ -100,9 +112,11 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
         // FIXME: Actually pull these charts from the DB or something.
         if ($scope.activePage == 'economic') {
+            $scope.subtitle = "Socio-Economic Information"
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);
         } else if ($scope.activePage == 'biological') {
+            $scope.subtitle = "Biologic Information"
             fish_weight_by_province($scope.charts, start_date, end_date,
                 surveySlug);
             fish_weight_by_market($scope.charts, start_date, end_date,
@@ -123,8 +137,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         var start_date = $scope.dateFromISO($scope.survey.response_date_start);
         var end_date = $scope.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            startDate: start_date.add(-1).day().valueOf(),
-            endDate: end_date.add(1).day().valueOf()
+            startDate: start_date.valueOf(),
+            endDate: end_date.valueOf()
         }
     });
 
@@ -137,7 +151,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             url = url + '&ts__gte=' + new Date($scope.filter.startDate).add(-1).day().toString('yyyy-MM-dd');
         }
         if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + new Date($scope.filter.endDate).add(1).day().toString('yyyy-MM-dd');
+            url = url + '&ts__lte=' + new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
         }
 
         $http.get(url).success(function(data) {
