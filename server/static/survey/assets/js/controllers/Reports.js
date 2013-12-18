@@ -1,5 +1,5 @@
 
-angular.module('askApp').controller('ReportCtrl', function($scope, $http, $routeParams) {
+angular.module('askApp').controller('ReportCtrl', function($scope, $http, $routeParams, reportsCommon) {
     function fish_weight_by_market(charts, start_date, end_date, slug) {
         var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
             url = url + '?startdate=' + start_date;
@@ -78,7 +78,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
             var filtered = _.map(data.crosstab, function(answer) {
                 answer.value = _.filter(answer.value, function(x) {
-                    var d = $scope.dateFromISO(x.date);
+                    var d = reportsCommon.dateFromISO(x.date);
                     return (d >= sdate && d <= edate);
                 });
                 return answer;
@@ -134,8 +134,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
         data.questions.reverse();
         $scope.survey = data;
-        var start_date = $scope.dateFromISO($scope.survey.response_date_start);
-        var end_date = $scope.dateFromISO($scope.survey.response_date_end);
+        var start_date = reportsCommon.datefromiso($scope.survey.response_date_start);
+        var end_date = reportsCommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
             startDate: start_date.valueOf(),
             endDate: end_date.valueOf()
@@ -166,14 +166,4 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             filters_changed($routeParams.surveySlug);
         }
     }, true);
-
-    $scope.dateFromISO = function (iso_str) {
-        // IE8 and lower can't parse ISO strings into dates. See this
-        // Stack Overflow question: http://stackoverflow.com/a/17593482
-        if ($("html").is(".lt-ie9")) {
-            var s = iso_str.split(/\D/);
-            return new Date(Date.UTC(s[0], --s[1]||'', s[2]||'', s[3]||'', s[4]||'', s[5]||'', s[6]||''));
-        }
-        return new Date(iso_str);
-    };
 });

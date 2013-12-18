@@ -1,5 +1,5 @@
 angular.module('askApp')
-    .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location) {
+    .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location, reportsCommon) {
 
     function filters_changed(surveySlug) {
         $scope.getRespondents();
@@ -122,13 +122,13 @@ angular.module('askApp')
         setup_market_dropdown();
         var start_date = $location.search().ts__gte ?
             new Date(parseInt($location.search().ts__gte)) :
-            $scope.dateFromISO($scope.survey.response_date_start);
+            reportsCommon.dateFromISO($scope.survey.response_date_start);
         var end_date = $location.search().ts__lte ?
             new Date(parseInt($location.search().ts__lte)) :
-            $scope.dateFromISO($scope.survey.response_date_end);
+            reportscommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            min: $scope.dateFromISO($scope.survey.response_date_start).valueOf(),
-            max: $scope.dateFromISO($scope.survey.response_date_end).valueOf(),
+            min: reportsCommon.dateFromISO($scope.survey.response_date_start).valueOf(),
+            max: reportsCommon.dateFromISO($scope.survey.response_date_end).valueOf(),
             startDate: start_date.valueOf(),
             endDate: end_date.valueOf()
         }
@@ -195,15 +195,5 @@ angular.module('askApp')
 
     $scope.getQuestionBySlug = function (slug) {
         return _.findWhere($scope.survey.questions, {'slug': slug});
-    };
-
-    $scope.dateFromISO = function (iso_str) {
-        // IE8 and lower can't parse ISO strings into dates. See this
-        // Stack Overflow question: http://stackoverflow.com/a/17593482
-        if ($("html").is(".lt-ie9")) {
-            var s = iso_str.split(/\D/);
-            return new Date(Date.UTC(s[0], --s[1]||'', s[2]||'', s[3]||'', s[4]||'', s[5]||'', s[6]||''));
-        }
-        return new Date(iso_str);
     };
 });
