@@ -15,6 +15,9 @@ server {
     <% if node[:ssl_certificate] %>
     ssl_certificate <%= node[:ssl_certificate] %>;
     ssl_certificate_key <%= node[:ssl_certificate_key] %>; 
+    if ($ssl_protocol = "") {
+        rewrite ^   https://$server_name$request_uri? permanent;
+    }
     <% else %>
     # default self signed cert
     ssl_certificate /etc/nginx/ssl/server.crt;

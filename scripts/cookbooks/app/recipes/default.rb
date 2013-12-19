@@ -169,10 +169,16 @@ if platform?("centos", "rhel")
 end
 
 #ssl 
+directory "/etc/nginx" do
+    owner "root"
+    group "root"
+    mode 0751
+end
+
 directory "/etc/nginx/ssl" do
     owner "root"
     group "root"
-    mode 0600
+    mode 0700
 end
 
 
