@@ -7,28 +7,19 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
-    depends_on = (
-        ('account', '0002_api_keys'),
-    )
-
     def forwards(self, orm):
-        # Adding field 'Respondant.surveyor'
-        db.add_column(u'survey_respondant', 'surveyor',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['account.UserProfile'], null=True, blank=True),
+        # Adding field 'Respondant.review_comment'
+        db.add_column(u'survey_respondant', 'review_comment',
+                      self.gf('django.db.models.fields.TextField')(null=True, blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'Respondant.surveyor'
-        db.delete_column(u'survey_respondant', 'surveyor_id')
+        # Deleting field 'Respondant.review_comment'
+        db.delete_column(u'survey_respondant', 'review_comment')
 
 
     models = {
-        u'account.userprofile': {
-            'Meta': {'object_name': 'UserProfile'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'unique': 'True'})
-        },
         u'auth.group': {
             'Meta': {'object_name': 'Group'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -65,6 +56,24 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
+        u'survey.block': {
+            'Meta': {'object_name': 'Block'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '254', 'null': 'True', 'blank': 'True'}),
+            'skip_condition': ('django.db.models.fields.CharField', [], {'max_length': '254', 'null': 'True', 'blank': 'True'}),
+            'skip_question': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['survey.Question']", 'null': 'True', 'blank': 'True'})
+        },
+        u'survey.gridanswer': {
+            'Meta': {'object_name': 'GridAnswer'},
+            'answer_number': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '2', 'blank': 'True'}),
+            'answer_text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'col_label': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'col_text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'response': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['survey.Response']"}),
+            'row_label': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'row_text': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
+        },
         u'survey.location': {
             'Meta': {'object_name': 'Location'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -91,6 +100,8 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Option'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'label': ('django.db.models.fields.SlugField', [], {'max_length': '64'}),
+            'max': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'min': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'order': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'required': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'rows': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
@@ -106,6 +117,7 @@ class Migration(SchemaMigration):
         u'survey.question': {
             'Meta': {'ordering': "['order']", 'object_name': 'Question'},
             'allow_other': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'blocks': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': u"orm['survey.Block']", 'null': 'True', 'blank': 'True'}),
             'cols': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'filterBy': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'filter_questions': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'filter_questions_rel_+'", 'null': 'True', 'to': u"orm['survey.Question']"}),
@@ -114,8 +126,8 @@ class Migration(SchemaMigration):
             'hoist_answers': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'hoisted'", 'null': 'True', 'to': u"orm['survey.Question']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'info': ('django.db.models.fields.CharField', [], {'max_length': '254', 'null': 'True', 'blank': 'True'}),
-            'integer_max': ('django.db.models.fields.IntegerField', [], {'default': '365', 'null': 'True', 'blank': 'True'}),
-            'integer_min': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
+            'integer_max': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
+            'integer_min': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'null': 'True', 'blank': 'True'}),
             'label': ('django.db.models.fields.CharField', [], {'max_length': '254'}),
             'lat': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '7', 'blank': 'True'}),
             'lng': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '7', 'blank': 'True'}),
@@ -140,27 +152,34 @@ class Migration(SchemaMigration):
         },
         u'survey.respondant': {
             'Meta': {'object_name': 'Respondant'},
+            'buy_or_catch': ('django.db.models.fields.CharField', [], {'max_length': '240', 'null': 'True', 'blank': 'True'}),
             'complete': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'county': ('django.db.models.fields.CharField', [], {'max_length': '240', 'null': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'default': 'None', 'max_length': '254', 'null': 'True', 'blank': 'True'}),
+            'how_sold': ('django.db.models.fields.CharField', [], {'max_length': '240', 'null': 'True', 'blank': 'True'}),
             'last_question': ('django.db.models.fields.CharField', [], {'max_length': '240', 'null': 'True', 'blank': 'True'}),
             'locations': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'responses': ('django.db.models.fields.related.ManyToManyField', [], {'blank': 'True', 'related_name': "'responses'", 'null': 'True', 'symmetrical': 'False', 'to': u"orm['survey.Response']"}),
-            'state': ('django.db.models.fields.CharField', [], {'max_length': '240', 'null': 'True', 'blank': 'True'}),
+            'review_comment': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'review_status': ('django.db.models.fields.CharField', [], {'default': "u'needs review'", 'max_length': '20'}),
             'status': ('django.db.models.fields.CharField', [], {'default': 'None', 'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'survey': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['survey.Survey']"}),
-            'surveyor': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['account.UserProfile']", 'null': 'True', 'blank': 'True'}),
-            'ts': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 7, 10, 0, 0)'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'dfbc3aa8-2814-42bc-848c-4143f82cf5ff'", 'max_length': '36', 'primary_key': 'True'})
+            'survey_site': ('django.db.models.fields.CharField', [], {'max_length': '240', 'null': 'True', 'blank': 'True'}),
+            'surveyor': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']", 'null': 'True', 'blank': 'True'}),
+            'test_data': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'ts': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'d4441a61-187d-4f88-b67a-61dd0bc537ed'", 'max_length': '36', 'primary_key': 'True'}),
+            'vendor': ('django.db.models.fields.CharField', [], {'max_length': '240', 'null': 'True', 'blank': 'True'})
         },
         u'survey.response': {
             'Meta': {'object_name': 'Response'},
-            'answer': ('django.db.models.fields.TextField', [], {}),
-            'answer_raw': ('django.db.models.fields.TextField', [], {}),
+            'answer': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'answer_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
+            'answer_number': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '10', 'decimal_places': '2', 'blank': 'True'}),
+            'answer_raw': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'question': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['survey.Question']"}),
             'respondant': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['survey.Respondant']", 'null': 'True', 'blank': 'True'}),
-            'ts': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2013, 7, 10, 0, 0)'})
+            'ts': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'})
         },
         u'survey.survey': {
             'Meta': {'object_name': 'Survey'},

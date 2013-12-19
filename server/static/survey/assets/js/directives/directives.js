@@ -1,5 +1,18 @@
 
 angular.module('askApp')
+    .directive('printButton', function() {
+        return {
+            template: '<button id="print_button" class="btn btn-warning" ng-click="print()"><i class="icon-print"></i> Print</button>',
+            restrict: 'EA',
+            transclude: true,
+            replace: true,
+            link: function(scope) {
+                scope.print = function() { window.print(); };
+            }
+        }
+    }
+);
+angular.module('askApp')
     .directive('datePicker', function() {
 
     return {
@@ -24,7 +37,6 @@ angular.module('askApp')
             });
 
             if (scope.answer) {
-                console.log(scope.answer);
                 scroller.scroller('setValue', scope.answer, true);
             }
         }

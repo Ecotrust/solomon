@@ -9,11 +9,13 @@ from django.db.models import Avg, Count, Sum
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 
+from ordereddict import OrderedDict
 
 from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer
 from .decorators import api_user_passes_test
-from .models import QuestionReport
 from .forms import SurveyorStatsForm
+from .models import QuestionReport
+from .utils import SlugCSVWriter
 
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
@@ -160,14 +162,19 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         return _error('No records for this range.', __all__=err.message)
 
 
+def _create_csv_response(filename):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="{0}"'.format(filename)
+    return response
+
+
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def get_crosstab_csv(request, survey_slug, question_a_slug, question_b_slug):
     obj = _get_crosstab(request, survey_slug, question_a_slug, question_b_slug)
     if isinstance(obj, HttpResponse):
         return obj
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="crosstab-{0}-{1}.csv"'.format(question_a_slug, question_b_slug)
+    response = _create_csv_response('crosstab-{0}-{1}.csv'.format(question_a_slug, question_b_slug))
     if obj['type'] == 'stacked-column':
         fields = obj['seriesNames']
         fields.insert(0, obj['question_a'])
@@ -267,8 +274,7 @@ def surveyor_stats_csv(request, survey_slug, interval):
                       'timestamp')
               .annotate(count=Count('pk')))
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="raw_surveyor_stats.csv"'
+    response = _create_csv_response('raw_surveyor_stats.csv')
     writer = csv.writer(response)
     writer.writerow(('Surveyor', 'timestamp', 'count'))
     for row in res:
@@ -285,12 +291,27 @@ def surveyor_stats_raw_data_csv(request, survey_slug):
 
     res = (Respondant.stats_report_filter(survey_slug, **form.cleaned_data)
                      .select_related('surveyor'))
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="surveyor_stats.csv"'
+
+    response = _create_csv_response('surveyor_stats.csv')
     writer = csv.writer(response)
     writer.writerow(('Surveyor', 'market', 'timestamp', 'status'))
     for row in res:
         writer.writerow((row.surveyor.get_full_name() if row.surveyor else '',
                          row.survey_site, row.ts, row.review_status))
 
+    return response
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def full_data_dump_csv(request, survey_slug):
+    survey = Survey.objects.get(slug=survey_slug)
+    response = _create_csv_response('full_dump_{0}.csv'.format(
+        datetime.date.today().strftime('%d-%m-%Y')))
+    fields = OrderedDict(Respondant.get_field_names().items() +
+                         survey.generate_field_names().items())
+
+    writer = SlugCSVWriter(response, fields)
+    writer.writeheader()
+    for resp in survey.respondant_set.all():
+        writer.writerow(resp.generate_flat_dict())
     return response

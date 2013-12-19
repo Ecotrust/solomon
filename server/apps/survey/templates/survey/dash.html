@@ -22,14 +22,15 @@
     <link href="https://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/select2/select2.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/angular-grid/ng-grid.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}survey/styles/main.css">
+    
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/styles/map.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/leaflet/dist/leaflet.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/lib/css/leaflet.awesome-markers.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/jquery-ui-bootstrap/jquery.ui.theme.font-awesome.css">
-
+    <link rel="stylesheet" media="screen" href="{{ STATIC_URL }}survey/styles/main.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/assets/lib/css/iThing.css">
-    <link rel="stylesheet" href="{{ STATIC_URL }}survey/lib/css/main.css">
+    <link rel="stylesheet" media="screen" href="{{ STATIC_URL }}survey/lib/css/main.css">
+    <link rel="stylesheet" media="print" href="{{ STATIC_URL }}survey/styles/print.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/assets/lib/css/mobiscroll-2.0.full.min.css">
 
     <!--[if lt IE 9]>
@@ -102,8 +103,12 @@
     <script src="{{ STATIC_URL }}survey/assets/js/services/offlineSurvey.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/controllers/mapView.js"></script>
 
+    <script src="{{ STATIC_URL }}survey/assets/js/factories/reportsCommon.js"></script>
+    <script src="{{ STATIC_URL }}survey/assets/js/factories/survey.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/controllers/Reports.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/controllers/RespondantList.js"></script>
+    <script src="{{ STATIC_URL }}survey/assets/js/controllers/SurveyStats.js"></script>
+    <script src="{{ STATIC_URL }}survey/assets/js/controllers/MarketReport.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/controllers/RespondantDetail.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/controllers/complete.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/controllers/crosstab.js"></script>
@@ -114,6 +119,7 @@
     <script src="{{ STATIC_URL }}survey/assets/js/directives/distribution.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/directives/charts.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/directives/rangeslider.js"></script>
+    <script src="{{ STATIC_URL }}survey/assets/js/directives/directives.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/mobiscroll-2.0.full.min.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/directives/directives.js"></script>
     <!-- endbuild -->

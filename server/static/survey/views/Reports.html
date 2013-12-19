@@ -1,9 +1,20 @@
 <div class="container">
     <div ng-include="viewPath + 'views/sideNav.html'"></div>
     <div class="col-md-10">
-        <div class="center-text col-md-2">
+        <div class="col-md-10">
+            <h2>
+                {{ subtitle }}
+                <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small>
+            </h2>
+        </div>
+        <div class="print-hide col-md-2">
+            <button print-button></button>
+        </div>
+    </div>
+    <div id="filter_row" class="col-md-10 print-hide">
+        <div  id="responses_found" class="center-text col-md-2">
             <h2>{{meta.total_count}}</h2>
-            <p>Responses Found</p>
+            <P>RESPONSES FOUND</P>
         </div>
         <div class="col-md-10">
             <div start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>

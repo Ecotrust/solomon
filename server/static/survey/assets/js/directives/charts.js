@@ -35,11 +35,13 @@ angular.module('askApp')
 
                         element.find(".chart").highcharts({
                             chart: {
-                                type: 'column'
+                                // 'bar-chart' isn't a chart highcharts understands, so we map it
+                                // to just 'bar'. This is easier than fixing it all the way down.
+                                type: scope.chart.type == 'bar-chart' ? 'column' : 'bar'
                             },
                             backgroundColor: 'rgba(255, 255, 255, 0)',
                             title: {
-                                text: false
+                                text: scope.chart.title || false
                             },
                             tooltip: {
                                 formatter: function() {
@@ -56,7 +58,10 @@ angular.module('askApp')
                                     text: scope.chart.yLabel
                                 }
                             },
-                            series: series
+                            series: series,
+                            credits: {
+                                enabled: false
+                            }
                         });
                     }
                 })
@@ -155,7 +160,10 @@ angular.module('askApp')
                                 }
                             },
                             // Display something when there is no data:
-                            series: (series && series.length != 0) ? series : [{ name: "No Data", data: [] }]
+                            series: (series && series.length != 0) ? series : [{
+                                name: "No Data",
+                                data: []
+                            }]
                         });
                     }
                 });
@@ -185,12 +193,12 @@ angular.module('askApp')
                         var data = null;
 
                         if (scope.chart.data && scope.chart.data.length != 0) {
-                            data = _.map(scope.chart.data, function (item) {
+                            data = _.map(scope.chart.data, function(item) {
                                 return {
                                     name: item.name,
-                                    data: _.map(item.value, function (value) {
+                                    data: _.map(item.value, function(value) {
                                         var current = parseFloat(value.sum);
-                                        if (_.isNumber(current) && ! _.isNaN(current)) {
+                                        if (_.isNumber(current) && !_.isNaN(current)) {
                                             return [
                                                 new Date(value.date).getTime(),
                                                 parseFloat(current)
@@ -205,13 +213,16 @@ angular.module('askApp')
                                 }
                             });
                         } else {
-                            data = [{name: "No Data", data: [] }];
+                            data = [{
+                                name: "No Data",
+                                data: []
+                            }];
                         }
                         element.find(".chart").highcharts({
                             chart: {
                                 type: 'line'
                             },
-                            title: false,
+                            title: { text: scope.chart.title } || false,
                             subtitle: false,
                             xAxis: {
                                 type: 'datetime',
@@ -241,7 +252,10 @@ angular.module('askApp')
                                         Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' ' + scope.chart.unit || 'kg';
                                 }
                             },
-                            series: scope.chart.raw_data ? scope.chart.raw_data : data
+                            series: scope.chart.raw_data ? scope.chart.raw_data : data,
+                            credits: {
+                                enabled: false
+                            }
                         });
                     }
                 });

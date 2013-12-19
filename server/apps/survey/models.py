@@ -8,6 +8,8 @@ import uuid
 import simplejson
 import caching.base
 
+from ordereddict import OrderedDict
+
 
 def make_uuid():
     return str(uuid.uuid4())
@@ -17,14 +19,14 @@ STATE_CHOICES = (
     ('terminate', 'Terminate'),
 )
 
-REVIEW_STATE_NEEDED = 'needs review'
-REVIEW_STATE_FLAGGED = 'flagged'
-REVIEW_STATE_ACCEPTED = 'accepted'
+REVIEW_STATE_NEEDED = u'needs review'
+REVIEW_STATE_FLAGGED = u'flagged'
+REVIEW_STATE_ACCEPTED = u'accepted'
 
 REVIEW_STATE_CHOICES = (
-    (REVIEW_STATE_NEEDED, 'Needs Review'),
-    (REVIEW_STATE_FLAGGED, 'Flagged'),
-    (REVIEW_STATE_ACCEPTED, 'Accepted')
+    (REVIEW_STATE_NEEDED, u'Needs Review'),
+    (REVIEW_STATE_FLAGGED, u'Flagged'),
+    (REVIEW_STATE_ACCEPTED, u'Accepted')
 )
 
 
@@ -33,8 +35,9 @@ class Respondant(caching.base.CachingMixin, models.Model):
     survey = models.ForeignKey('Survey')
     responses = models.ManyToManyField('Response', related_name='responses', null=True, blank=True)
     complete = models.BooleanField(default=False)
-    review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=REVIEW_STATE_NEEDED)
     status = models.CharField(max_length=20, choices=STATE_CHOICES, default=None, null=True, blank=True)
+    review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=REVIEW_STATE_NEEDED)
+    review_comment = models.TextField(null=True, blank=True)
     last_question = models.CharField(max_length=240, null=True, blank=True)
 
     vendor = models.CharField(max_length=240, null=True, blank=True)
@@ -64,6 +67,28 @@ class Respondant(caching.base.CachingMixin, models.Model):
             self.uuid = self.uuid.replace(":", "_")
         self.locations = self.location_set.all().count()
         super(Respondant, self).save(*args, **kwargs)
+
+    @classmethod
+    def get_field_names(cls):
+        return OrderedDict((
+            ('model-surveyor', 'Surveyor'),
+            ('model-timestamp', 'Date of survey'),
+            ('model-email', 'Email'),
+            ('model-complete', 'Complete'),
+            ('model-review-status', 'Review Status'),
+        ))
+
+    def generate_flat_dict(self):
+        flat = {
+            'model-surveyor': self.surveyor.get_full_name() if self.surveyor else '',
+            'model-timestamp': str(self.ts),
+            'model-email': self.email,
+            'model-complete': self.complete,
+            'model-review-status': self.get_review_status_display(),
+        }
+        for response in self.responses.all().select_related('question'):
+            flat.update(response.generate_flat_dict())
+        return flat
 
     @classmethod
     def stats_report_filter(cls, survey_slug, start_date=None,
@@ -149,6 +174,31 @@ class Survey(caching.base.CachingMixin, models.Model):
                                           datetime.datetime.min.time())
         tomorrow = today + datetime.timedelta(days=1)
         return self.respondant_set.filter(ts__gte=today, ts__lt=tomorrow).count()
+
+    def generate_field_names(self):
+        fields = OrderedDict()
+        for q in self.questions.all().order_by('order'):
+            if q.type == 'grid':
+                if q.rows:
+                    for row in q.rows.splitlines():
+                        row_slug = (row.lower().replace(' ', '-')
+                                               .replace('(', '')
+                                               .replace(')', '')
+                                               .replace('/', ''))
+                        field_slug = q.slug + '-' + row_slug
+                        field_name = q.label + ' - ' + row
+                        fields[field_slug] = field_name
+                else:
+                    rows = (q.response_set
+                             .exclude(gridanswer__row_label__isnull=True)
+                             .values_list('gridanswer__row_label',
+                                          'gridanswer__row_text')
+                             .distinct())
+                    for slug, text in rows:
+                        fields[q.slug + '-' + slug] = q.label + ' - ' + text
+            else:
+                fields[q.slug] = q.label
+        return fields
 
     def __str__(self):
         return "%s" % self.name
@@ -333,37 +383,58 @@ class Response(caching.base.CachingMixin, models.Model):
     ts = models.DateTimeField(auto_now_add=True)
     objects = caching.base.CachingManager()
 
+    def generate_flat_dict(self):
+        flat = {}
+        if self.answer_raw:
+            if self.question.type in ('info', 'text', 'textarea', 'yes-no',
+                                      'single-select', 'auto-single-select',
+                                      'timepicker', 'multi-select'):
+                flat[self.question.slug] = self.answer
+            elif self.question.type in ('currency', 'integer', 'number'):
+                flat[self.question.slug] = str(self.answer_number)
+            elif self.question.type == 'datepicker':
+                flat[self.question.slug] = self.answer_date.strftime('%d/%m/%Y')
+            elif self.question.type == 'grid':
+                for answer in self.gridanswer_set.all():
+                    flat[self.question.slug + '-' + answer.row_label] = answer.answer_text
+            else:
+                raise NotImplementedError(
+                    ('Found unknown question type of {0} while processing '
+                     'response id {1}').format(self.question.type, self.id)
+                )
+            return flat
+
     def save_related(self):
         if self.answer_raw:
             self.answer = simplejson.loads(self.answer_raw)
             if self.question.type in ['datepicker']:
                 self.answer_date = datetime.datetime.strptime(self.answer, '%d/%m/%Y')
-            if self.question.type in ['currency', 'integer', 'number']:
+            elif self.question.type in ['currency', 'integer', 'number']:
                 if isinstance(self.answer, (int, long, float, complex)):
                     self.answer_number = self.answer
                 else:
                     self.answer = None
-            if self.question.type in ['auto-single-select', 'single-select', 'yes-no']:
+            elif self.question.type in ['auto-single-select', 'single-select', 'yes-no']:
 
                 answer = simplejson.loads(self.answer_raw)
-                if answer.get('text'):
-                    self.answer = answer['text'].strip()
                 if answer.get('name'):
                     self.answer = answer['name'].strip()
-            if self.question.type in ['auto-multi-select', 'multi-select']:
+                elif answer.get('text'):
+                    self.answer = answer['text'].strip()
+            elif self.question.type in ['auto-multi-select', 'multi-select']:
                 answers = []
                 self.multianswer_set.all().delete()
                 for answer in simplejson.loads(self.answer_raw):
-                    if answer.get('text'):
-                        answer_text = answer['text'].strip()
                     if answer.get('name'):
                         answer_text = answer['name'].strip()
+                    elif answer.get('text'):
+                        answer_text = answer['text'].strip()
                     answers.append(answer_text)
                     answer_label = answer.get('label', None)
                     multi_answer = MultiAnswer(response=self, answer_text=answer_text, answer_label=answer_label)
                     multi_answer.save()
                 self.answer = ", ".join(answers)
-            if self.question.type in ['map-multipoint'] and self.id:
+            elif self.question.type in ['map-multipoint'] and self.id:
                 answers = []
                 self.location_set.all().delete()
                 for point in simplejson.loads(simplejson.loads(self.answer_raw)):
@@ -375,7 +446,7 @@ class Response(caching.base.CachingMixin, models.Model):
                             answer.save()
                         location.save()
                 self.answer = ", ".join(answers)
-            if self.question.type == 'grid':
+            elif self.question.type == 'grid':
                 self.gridanswer_set.all().delete()
                 for answer in self.answer:
                     for grid_col in self.question.grid_cols.all():

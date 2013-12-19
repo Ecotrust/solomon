@@ -2,6 +2,7 @@
   <div class="container">
     <div class="navbar-header">
         <a href="#/"><img src="{{user.static_url}}survey/assets/img/hapifis-small.jpg"></img></a>
+        <h1 ng-show="getSurveyName()">{{getSurveyName()}}</h1>
     </div>
     <a class="navbar-btn navbar-right btn btn-default" href="{{user.logout_url}}">Sign Out</a>
     <a ng-show="user.is_staff" class="navbar-btn navbar-right btn btn-info" href="{{user.admin_url}}">Admin</a>

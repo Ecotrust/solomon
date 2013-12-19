@@ -1,7 +1,8 @@
 from django.conf.urls import patterns, url
-from reports.views import (get_crosstab_json, get_crosstab_csv,
-                           get_distribution, get_geojson, surveyor_stats_csv,
-                           surveyor_stats_json, surveyor_stats_raw_data_csv)
+from reports.views import (full_data_dump_csv, get_crosstab_json,
+                           get_crosstab_csv, get_distribution, get_geojson,
+                           surveyor_stats_csv, surveyor_stats_json,
+                           surveyor_stats_raw_data_csv)
 
 
 urlpatterns = patterns('',
@@ -12,4 +13,5 @@ urlpatterns = patterns('',
     url(r'/surveyor-stats/(?P<survey_slug>[\w\d-]+).csv', surveyor_stats_raw_data_csv, name='reports_surveyor_stats_raw_data_csv'),
     url(r'/surveyor-stats/(?P<survey_slug>[\w\d-]+)/(?P<interval>[\w]+).csv', surveyor_stats_csv, name='reports_surveyor_stats_csv'),
     url(r'/surveyor-stats/(?P<survey_slug>[\w\d-]+)/(?P<interval>[\w]+)', surveyor_stats_json, name='reports_surveyor_stats_json'),
+    url(r'/full-survey-data/(?P<survey_slug>[\w\d-]+)', full_data_dump_csv, name='reports_full_data_dump_csv'),
 )

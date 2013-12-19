@@ -1,14 +1,25 @@
 <div class="container main-container">
     <div ng-include="viewPath + 'views/sideNav.html'"></div>
     <div class="col-md-10">
-        <h1>{{ survey.name }}</h1>
-        <h2>Overview</h2>
+        <div class="col-md-6">
+        </div>
     </div>
-    <div class="col-md-2"></div>
-    <div class="col-md-10">
-        <div class="center-text col-md-2">
+
+    <div class="col-md-10 print-hide">
+        <div class="col-md-10">
+            <h2>
+                Overview
+                <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small>
+            </h2>
+        </div>
+        <div class="print-hide col-md-2">
+            <button print-button></button>
+        </div>
+    </div>
+    <div id="filter_row" class="col-md-10 print-hide">
+        <div id="responses_found" class="center-text col-md-2">
             <h2>{{meta.total_count}}</h2>
-            <p>Responses Found</p>
+            <P >RESPONSES FOUND</P>
         </div>
         <div class="col-md-8">
             <div min="filter.min" max="filter.max" start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
@@ -26,7 +37,7 @@
     <div class="col-md-10">
         <p ng-show="message">{{message}}</p>
         <div>
-            <div class="btn-group">
+            <div class="btn-group print-hide">
                 <button ng-class="{'active': surveyorTimeFilter == 'hour'}"
                     type="button"
                     class="btn btn-default"
@@ -45,14 +56,17 @@
                     ng-click="surveyorTimeFilter='month'">Month</button>
             </div>
             <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
-            <div id="surveyor_total_chart">
+            <div id="total_surveys_chart">
+                <div time-series chart="total_surveys"></div>
+            </div>
+            <!-- <div id="surveyor_total_chart">
                 <div bar-chart chart="surveyor_total"></div>
             </div>
             <div id="surveyor_by_time_chart">
                 <div time-series chart="surveyor_by_time"></div>
-            </div>
+            </div> -->
         </div>
-        <div class="respondent-table">
+        <div class="respondent-table print-hide">
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
                     <tr>
@@ -79,7 +93,7 @@
                 </tbody>
             </table>
         </div>
-        <div id="respondant_list_survey_buttons" class="pull-right">
+        <div id="respondant_list_survey_buttons" class="pull-right print-hide">
             <span ng-hide="respondentsLoading">
                 Records {{meta.offset}} to 
                 <span ng-show="(meta.offset+meta.limit) <= meta.total_count">{{meta.offset+meta.limit}}</span>
