@@ -9,7 +9,10 @@
 #filter_row {
     margin-top: 2em;
 }
-#responses_found { 
+#responses_found {
+    background-color: #ddd;
+}
+#responses_found p {
     font-size: 10px;
 }
 #global-navbar {
