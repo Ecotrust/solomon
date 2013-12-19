@@ -6,6 +6,12 @@
     float: right;
     display: inline-block;
 }
+#filter_row {
+    margin-top: 2em;
+}
+#responses_found { 
+    font-size: 10px;
+}
 #global-navbar {
     margin-bottom: 0;
 }
