@@ -76,6 +76,34 @@
     border-bottom: solid 1px #000;
     padding: 5px;
 }
+#side_total, #side_flagged, #side_reviews_needed{
+    color: #FFF;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+#side_total p, #side_flagged p, #side_reviews_needed p {
+    font-size: 10px;
+}
+#side_total {
+    background-color: #68A1D6;
+    margin-left: 6.5%;
+    width: 87%;
+    padding-bottom: 10px;
+    padding-top: 15px;
+}
+#side_total h1 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+#side_flagged {
+    width: 43.5%;
+    background-color: #F6C43F;
+}
+#side_reviews_needed {
+    margin-left: 6.5%;
+    background-color: #ED7369;
+    width: 43.5%;
+}
 
 #market_status_filters select {
     margin-top: 20px;
