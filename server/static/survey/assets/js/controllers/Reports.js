@@ -65,6 +65,27 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             charts.sort(function (a,b) { return a-b;})
         });
     }
+    function expenses_over_time(charts, start_date, end_date, slug) {
+        var url = ['/reports/crosstab', slug, 'date-of-interview', 'cost'].join('/');
+            url = url + '?startdate=' + start_date;
+            url = url + '&enddate=' + end_date;
+
+        return $http.get(url).success(function(data) {
+            //charts.push({
+            //    title: "Expenses Over Time",
+            //    labels: _.pluck(data.crosstab, 'name'),
+            //    seriesNames: data.seriesNames,
+            //    type: data.type,
+            //    data: data.crosstab,
+            //    download_url: url.replace("cost", "cost" + '.csv'),
+            //    xLabel: 'Market',
+            //    yLabel: 'Average Trip Costs',
+            //    order: 1,
+            //    message: data.message
+            //});
+            charts.sort(function (a,b) { return a-b;})
+        });
+    }
 
     function total_weight_for_market(charts, start_date, end_date, slug) {
         var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
@@ -114,6 +135,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         if ($scope.activePage == 'economic') {
             $scope.subtitle = "Socio-Economic Information"
             average_trip_costs_by_market($scope.charts, start_date, end_date,
+                surveySlug);
+            expenses_over_time($scope.charts, start_date, end_date,
                 surveySlug);
         } else if ($scope.activePage == 'biological') {
             $scope.subtitle = "Biologic Information"
