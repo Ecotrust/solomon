@@ -1,42 +1,31 @@
-//'use strict';
-
 angular.module('askApp')
-    .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
+    .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
 
-    function build_survey_total_data(data) {
-        var new_data = {};
-        for (var i in data.graph_data) {
-            for (var j in data.graph_data[i].data) {
-                var current_date = data.graph_data[i].data[j][0];
-                var surveys_taken = data.graph_data[i].data[j][1];
-                if (!new_data[current_date]) {
-                    new_data[current_date] = {
-                        name: current_date,
-                        data: surveys_taken
-                    }
-                } else {
-                    new_data[current_date].data += surveys_taken;
-                }
-            }
-        }
-        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; }).sort();
-        return [
-            {
-                name: "Surveys Taken",
-                data: tuples
-            }
-        ]
-    }
     function filters_changed(surveySlug) {
         reportsCommon.getRespondents(null, $scope);
         var url = reportsCommon.build_survey_stats_url($scope);
 
         $http.get(url).success(function(data) {
-            var new_data = build_survey_total_data(data);
-            $scope.total_surveys = {
-                title: "Total Surveys Collected by Date",
-                raw_data: new_data,
+            $scope.surveyor_by_time = {
+                yLabel: "Surveys Collected",
+                title: "Surveys Collected by Date",
+                raw_data: data.graph_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
+                unit: "surveys"
+            }
+            // map reduuuuuuce
+            var bar_data = _.map(data.graph_data,
+                function (x) {
+                    return _.reduce(x.data, function (attr, val) { return attr + val[1]; }, 0);
+                }
+            );
+            $scope.surveyor_total = {
+                labels: _.pluck(data.graph_data, 'name'),
+                yLabel: "Surveys Collected",
+                title: "Total Surveys Collected by Surveyor",
+                type: "bar",
+                data: bar_data,
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + ".csv"),
                 unit: "surveys"
             }
         });
@@ -80,13 +69,13 @@ angular.module('askApp')
         window.location = "#/RespondantDetail/" + $scope.survey.slug +
             "/" + respondent.uuid + "?" + $scope.filtered_list_url;
     }
-    $scope.market = $location.search().survey_site || "";
+    $scope.market = $location.search().survey_site || null;
     $scope.filter = null;
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
-    $scope.activePage = 'overview';
+    $scope.activePage = 'survey-stats';
     $scope.statuses = [];
-    $scope.status_single = $location.search().status || "";
+    $scope.status_single = $location.search().status || null;
     setup_columns();
 
     $scope.$watch('filter', function (newValue) {
@@ -143,7 +132,6 @@ angular.module('askApp')
         });
     });
 
-
     $scope.getQuestionByUri = function (uri) {
         return _.findWhere($scope.survey.questions, {'resource_uri': uri});
     };
@@ -151,8 +139,4 @@ angular.module('askApp')
     $scope.getQuestionBySlug = function (slug) {
         return _.findWhere($scope.survey.questions, {'slug': slug});
     };
-    $scope.getRespondents = function(url) {
-        // Higher order function to make the next/prve buttons work.
-        return reportsCommon.getRespondents(url, $scope);
-    }
 });

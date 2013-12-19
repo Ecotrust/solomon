@@ -1,4 +1,17 @@
 angular.module('askApp')
+    .directive('printButton', function() {
+            return {
+                template: '<button id="print_button" class="btn btn-warning" ng-click="print()"><i class="icon-print"></i> Print</button>',
+                restrict: 'EA',
+                transclude: true,
+                replace: true,
+                link: function(scope) {
+                    scope.print = function() { window.print(); };
+                }
+            }
+        }
+    );
+angular.module('askApp')
     .directive('dateRangePicker', function() {
 
         return {
@@ -15,7 +28,6 @@ angular.module('askApp')
             },
             link: function(scope, element, attrs) {
                 var min, max;
-
                 var initializePicker = _.once(function(start, end) {
                     // element.val(_.string.sprintf("%s - %s", start, end));
                     element.daterangepicker({
@@ -59,7 +71,6 @@ angular.module('askApp')
                             initializePicker(min, max);
                         }
                     }
-
                 });
             }
         }

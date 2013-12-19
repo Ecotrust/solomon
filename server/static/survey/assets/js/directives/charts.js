@@ -35,11 +35,13 @@ angular.module('askApp')
 
                         element.find(".chart").highcharts({
                             chart: {
-                                type: 'column'
+                                // 'bar-chart' isn't a chart highcharts understands, so we map it
+                                // to just 'bar'. This is easier than fixing it all the way down.
+                                type: scope.chart.type == 'bar-chart' ? 'column' : 'bar'
                             },
                             backgroundColor: 'rgba(255, 255, 255, 0)',
                             title: {
-                                text: false
+                                text: scope.chart.title || false
                             },
                             tooltip: {
                                 formatter: function() {
@@ -220,7 +222,7 @@ angular.module('askApp')
                             chart: {
                                 type: 'line'
                             },
-                            title: false,
+                            title: { text: scope.chart.title } || false,
                             subtitle: false,
                             xAxis: {
                                 type: 'datetime',

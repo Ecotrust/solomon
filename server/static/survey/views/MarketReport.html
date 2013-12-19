@@ -1,0 +1,61 @@
+<div class="container main-container">
+    <div ng-include="viewPath + 'views/sideNav.html'"></div>
+    <div class="col-md-10">
+        <div class="col-md-10">
+        <h2>
+            Market Report
+            <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small>
+        </h2>
+        </div>
+        <div class="print-hide col-md-2">
+            <button print-button></button>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+    <div id="filter_row" class="col-md-10 print-hide">
+        <div  id="responses_found" class="center-text col-md-2">
+            <h2>{{meta.total_count}}</h2>
+            <P>RESPONSES FOUND</P>
+        </div>
+        <div class="col-md-8">
+            <div min="filter.min" max="filter.max" start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
+        </div>
+        <div id="market_status_filters" class="col-md-2">
+            <select class="form-control" ng-model="market" ng-options="m for m in markets">
+                <option value="">All Markets</option>
+            </select>
+            <select class="form-control" ng-model="status_single" ng-options="i[0] as i[1] for i in statuses">
+                <option value="">All Statuses</option>
+            </select>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
+        <h2 id="total_market_weight">Total Weight Surveyed: {{total_market_weight || 0}} Kg</h2>
+        <p ng-show="message">{{message}}</p>
+        <div>
+            <div class="btn-group print-hide">
+                <button ng-class="{'active': surveyorTimeFilter == 'hour'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='hour'">Hourly</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'day'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='day'">Day</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'week'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='week'">Week</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'month'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='month'">Month</button>
+            </div>
+            <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
+            <!-- <div id="surveyor_by_time_chart">
+                <div time-series chart="surveyor_by_time"></div>
+            </div> -->
+        </div>
+    </div>
+</div>

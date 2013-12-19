@@ -1,7 +1,7 @@
 //'use strict';
 
 angular.module('askApp')
-    .controller('SurveyListMenuCtrl', function($scope, $http, $routeParams, $location) {
+    .controller('SurveyListMenuCtrl', function($scope, $http, $routeParams, $location, surveyShared) {
 
     $scope.confirmDelete = false;
     $scope.path = $location.path().slice(1,5);
@@ -30,6 +30,17 @@ angular.module('askApp')
         })
 
     }
+
+    $scope.getSurveyName = function() {
+        if ($scope.last_url != $location.$$path) {
+            // We want to clear the survey when we change pages, otherwise it can
+            // persist to the wrong areas, like the author page.
+            $scope.last_url = $location.$$path;
+            surveyShared.survey = {};
+        } else {
+            return surveyShared.survey.name;
+        }
+    };
 
     $scope.delete_survey = function (survey) {
         var survey_to_be_deleted = survey;
