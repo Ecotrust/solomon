@@ -32,7 +32,14 @@ angular.module('askApp')
     }
 
     $scope.getSurveyName = function() {
-        return surveyShared.survey.name;
+        if ($scope.last_url != $location.$$path) {
+            // We want to clear the survey when we change pages, otherwise it can
+            // persist to the wrong areas, like the author page.
+            $scope.last_url = $location.$$path;
+            surveyShared.survey = {};
+        } else {
+            return surveyShared.survey.name;
+        }
     };
 
     $scope.delete_survey = function (survey) {

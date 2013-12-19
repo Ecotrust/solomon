@@ -7,6 +7,8 @@ angular.module('askApp').factory('surveyShared', function($http, $routeParams) {
                 $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
                     self.survey = data;
                 }).success(callback);
+            } else {
+                self.survey = null;
             }
         }
     }
