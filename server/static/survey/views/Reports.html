@@ -11,10 +11,10 @@
             <button print-button></button>
         </div>
     </div>
-    <div class="print-hide col-md-10">
+    <div id="filter_row" class="col-md-10 print-hide">
         <div class="center-text col-md-2">
             <h2>{{meta.total_count}}</h2>
-            <P>RESPONSES FOUND</P>
+            <P id="responses_found" >RESPONSES FOUND</P>
         </div>
         <div class="col-md-10">
             <div start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>
