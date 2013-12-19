@@ -1,7 +1,7 @@
 //'use strict';
 
 angular.module('askApp')
-    .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location, reportsCommon) {
+    .controller('RespondantListCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
 
     function build_survey_total_data(data) {
         var new_data = {};
@@ -113,7 +113,7 @@ angular.module('askApp')
         }
     }, true);
 
-    $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
+    surveyShared.getSurvey(function(data) {
         data.questions.reverse();
         $scope.survey = data;
         reportsCommon.setup_market_dropdown($scope);

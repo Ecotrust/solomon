@@ -1,7 +1,7 @@
 //'use strict';
 
 angular.module('askApp')
-    .controller('SurveyListMenuCtrl', function($scope, $http, $routeParams, $location) {
+    .controller('SurveyListMenuCtrl', function($scope, $http, $routeParams, $location, surveyShared) {
 
     $scope.confirmDelete = false;
     $scope.path = $location.path().slice(1,5);
@@ -30,6 +30,10 @@ angular.module('askApp')
         })
 
     }
+
+    $scope.getSurveyName = function() {
+        return surveyShared.survey.name;
+    };
 
     $scope.delete_survey = function (survey) {
         var survey_to_be_deleted = survey;

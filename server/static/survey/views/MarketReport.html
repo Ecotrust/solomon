@@ -1,25 +1,21 @@
 <div class="container main-container">
     <div ng-include="viewPath + 'views/sideNav.html'"></div>
     <div class="col-md-10">
-        <div class="col-md-6">
-            <h1>{{ survey.name }}</h1>
+        <div class="col-md-10">
+        <h2>
+            Market Report
+            <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small>
+        </h2>
         </div>
-        <div class="col-md-6">
+        <div class="print-hide col-md-2">
             <button print-button></button>
         </div>
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-10 print-hide">
-        <h2>
-            Market Report
-            <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small>
-        </h2>
-    </div>
-    <div class="col-md-2"></div>
-    <div class="col-md-10 print-hide">
         <div class="center-text col-md-2">
             <h2>{{meta.total_count}}</h2>
-            <p>Responses Found</p>
+            <P>RESPONSES FOUND</P>
         </div>
         <div class="col-md-8">
             <div min="filter.min" max="filter.max" start="filter.startDate" end="filter.endDate" editable-date-range-slider></div>

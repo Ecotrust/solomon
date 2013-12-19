@@ -1,5 +1,5 @@
 
-angular.module('askApp').controller('ReportCtrl', function($scope, $http, $routeParams, reportsCommon) {
+angular.module('askApp').controller('ReportCtrl', function($scope, $http, $routeParams, reportsCommon, surveyShared) {
     function fish_weight_by_market(charts, start_date, end_date, slug) {
         var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
             url = url + '?startdate=' + start_date;
@@ -154,7 +154,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = $routeParams.reportName.toLowerCase();
 
-    $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
+    surveyShared.getSurvey(function(data) {
         data.questions.reverse();
         $scope.survey = data;
         var start_date = reportsCommon.dateFromISO($scope.survey.response_date_start);

@@ -1,5 +1,5 @@
 angular.module('askApp')
-    .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location, reportsCommon) {
+    .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
 
     function filters_changed(surveySlug) {
         reportsCommon.getRespondents(null, $scope);
@@ -102,7 +102,7 @@ angular.module('askApp')
         }
     }, true);
 
-    $http.get('/api/v1/surveyreport/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
+    surveyShared.getSurvey(function(data) {
         data.questions.reverse();
         $scope.survey = data;
         reportsCommon.setup_market_dropdown($scope);
