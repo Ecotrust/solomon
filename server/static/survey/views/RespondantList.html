@@ -9,7 +9,7 @@
         <div class="col-md-10">
             <h2>
                 Overview
-                <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small>
+                <!-- <small>{{ filter.startDate|validDate: 'dd-MM-yyyy'  }} to {{ filter.endDate|validDate: 'dd-MM-yyyy' }}</small> -->
             </h2>
         </div>
         <div class="print-hide col-md-2">
@@ -81,8 +81,8 @@
                     </tr>
                     <tr ng-click="goToResponse(respondent)" class="highlightable_row" ng-repeat="respondent in respondents">
                         <td>{{ respondent.user.username }}</td>
-                        <td>{{ respondent.ts|validDate: 'dd-MM-yyyy' }}</td>
-                        <td>{{ respondent.ts|validDate: 'HH:mm' }}</td>
+                        <!-- <td>{{ respondent.ts|validDate: 'dd-MM-yyyy' }}</td>
+                        <td>{{ respondent.ts|validDate: 'HH:mm' }}</td> -->
                         <td>{{ respondent.survey_site }}</td>
                         <td>{{ respondent.vendor }}</td>
                         <td>{{ respondent.buy_or_catch }}</td>

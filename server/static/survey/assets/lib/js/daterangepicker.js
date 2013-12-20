@@ -269,7 +269,7 @@
                     start = moment(split[0], this.format);
                     end = moment(split[1], this.format);
                 }
-                if (start != null && end != null) {
+                if (start !== null && end !== null) {
                     this.startDate = start;
                     this.endDate = end;
                 }
