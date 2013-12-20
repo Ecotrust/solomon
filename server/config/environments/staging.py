@@ -10,6 +10,8 @@ DATABASES = {
     }
 }
 
+ALLOWED_HOSTS = ['*']
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
