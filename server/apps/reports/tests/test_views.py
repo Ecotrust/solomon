@@ -236,4 +236,3 @@ class TestGridStandardDeviation(TestCase, GridMixin):
         body = json.loads(res.content)
         self.assertIn('labels', body)
         self.assertIn('graph_data', body)
-
