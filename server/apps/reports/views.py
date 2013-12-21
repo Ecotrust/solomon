@@ -274,7 +274,8 @@ def surveyor_stats_csv(request, survey_slug, interval):
 
     res = Respondant.stats_report_filter(survey_slug, **form.cleaned_data)
 
-    res = (res.extra(select={'timestamp': "date_trunc('%s', ts)" % interval})
+    res = (res.extra(select={'timestamp': "date_trunc(%s, ts)"},
+                     select_params=(interval,))
               .values('surveyor__first_name', 'surveyor__last_name',
                       'timestamp')
               .annotate(count=Count('pk')))
