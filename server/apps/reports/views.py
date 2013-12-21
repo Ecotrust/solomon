@@ -3,9 +3,10 @@ import csv
 import datetime
 import json
 from collections import defaultdict
+from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Avg, Count, Sum
+from django.db.models import Avg, Count, Min, Max, Sum
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 
@@ -123,13 +124,14 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                                           .order_by('row_label')
                                           .distinct()
                                           .annotate(average=Avg('answer_number')))
-                obj['seriesNames'] = [row['row_text'] for row in rows]
+                obj['seriesNames'] = rows.values_list('row_text', flat=True)
                 for row in rows:
                     row['average'] = int(row['average'])
                 crosstab.append({
                     'name': question_a_answer['answer'],
                     'value': list(rows)
                 })
+
             elif question_b.type in ['currency', 'integer', 'number']:
                 if group is None:
                     obj['type'] = 'bar-chart'
@@ -141,7 +143,8 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                 else:
                     obj['type'] = 'time-series'
                     values = (Response.objects.filter(respondant__in=respondants, question=question_b)
-                                              .extra(select={'date': "date_trunc('%s', ts)" % group})
+                                              .extra(select={'date': "date_trunc(%s, ts)"},
+                                                     select_params=(group,))
                                               .order_by('date')
                                               .values('date')
                                               .annotate(sum=Sum('answer_number')))
@@ -210,11 +213,13 @@ def get_crosstab_json(request, survey_slug, question_a_slug, question_b_slug):
                         content_type='application/json')
 
 
-class DateTimeJSONEncoder(json.JSONEncoder):
+class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
-        return super(DateTimeJSONEncoder, self).default(obj)
+        elif isinstance(obj, Decimal):
+            return str(obj)
+        return super(CustomJSONEncoder, self).default(obj)
 
 
 def _get_fullname(data):
@@ -234,7 +239,8 @@ def surveyor_stats_json(request, survey_slug, interval):
     if not res.exists():
         return _error('No records for these filters.')
 
-    res = (res.extra(select={'timestamp': "date_trunc('%s', ts)" % interval})
+    res = (res.extra(select={'timestamp': "date_trunc(%s, ts)"},
+                     select_params=(interval,))
               .values('surveyor__first_name', 'surveyor__last_name',
                       'timestamp')
               .annotate(count=Count('pk')))
@@ -257,7 +263,7 @@ def surveyor_stats_json(request, survey_slug, interval):
     return HttpResponse(json.dumps({
         'success': True,
         'graph_data': graph_data
-    }, cls=DateTimeJSONEncoder), content_type='application/json')
+    }, cls=CustomJSONEncoder), content_type='application/json')
 
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
@@ -299,6 +305,35 @@ def surveyor_stats_raw_data_csv(request, survey_slug):
                          row.survey_site, row.ts, row.review_status))
 
     return response
+
+
+def _grid_standard_deviation(interval, question_slug, row_label=None):
+    rows = (GridAnswer.objects.filter(response__question__slug=question_slug)
+                              .extra(select={'date': "date_trunc(%s, survey_response.ts)"},
+                                     select_params=(interval,),
+                                     tables=('survey_response',)))
+    if row_label is not None:
+        rows = rows.filter(row_label=row_label)
+    labels = rows.values_list('row_label', flat=True)
+    rows = (rows.values('row_text', 'row_label', 'date')
+                .order_by('date')
+                .annotate(minimum=Min('answer_number'),
+                          average=Avg('answer_number'),
+                          maximum=Max('answer_number')))
+    return rows, labels
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def grid_standard_deviation_json(request, question_slug, interval):
+    rows, labels = _grid_standard_deviation(interval, question_slug)
+    for row in rows:
+        row['date'] = calendar.timegm(row['date'].utctimetuple()) * 1000
+
+    return HttpResponse(json.dumps({
+        'success': True,
+        'graph_data': list(rows),
+        'labels': list(labels),
+    }, cls=CustomJSONEncoder), content_type='application/json')
 
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
