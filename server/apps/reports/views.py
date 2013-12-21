@@ -117,24 +117,19 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
             respondants = respondants.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
             if question_b.type == 'grid':
                 obj['type'] = 'stacked-column'
-                try:
-                    rows = (GridAnswer.objects.filter(response__respondant__in=respondants,
-                                                      response__question=question_b)
-                                              .values('row_text', 'row_label')
-                                              .order_by('row_label')
-                                              .distinct())
-                    obj['seriesNames'] = [row['row_text'] for row in rows]
-                    rows = rows.annotate(average=Avg('answer_number'))
-                    for row in rows:
-                        row['average'] = int(row['average'])
-                    crosstab.append({
-                        'name': question_a_answer['answer'],
-                        'value': list(rows)
-                    })
-
-                except IndexError as e:
-                    print "not found"
-                    print e
+                rows = (GridAnswer.objects.filter(response__respondant__in=respondants,
+                                                  response__question=question_b)
+                                          .values('row_text', 'row_label')
+                                          .order_by('row_label')
+                                          .distinct()
+                                          .annotate(average=Avg('answer_number')))
+                obj['seriesNames'] = [row['row_text'] for row in rows]
+                for row in rows:
+                    row['average'] = int(row['average'])
+                crosstab.append({
+                    'name': question_a_answer['answer'],
+                    'value': list(rows)
+                })
             elif question_b.type in ['currency', 'integer', 'number']:
                 if group is None:
                     obj['type'] = 'bar-chart'
