@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 
 from ordereddict import OrderedDict
 
-from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer
+from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer, GridAnswer
 from .decorators import api_user_passes_test
 from .forms import SurveyorStatsForm
 from .models import QuestionReport
@@ -77,10 +77,10 @@ def _error(message='An error occurred.', **kwargs):
     }))
 
 
-def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
-    start_date = request.GET.get('startdate', None)
-    end_date = request.GET.get('enddate', None)
-    group = request.GET.get('group', None)
+def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
+    start_date = filters.get('startdate', None)
+    end_date = filters.get('enddate', None)
+    group = filters.get('group', None)
     try:
         if start_date is not None:
             start_date = datetime.datetime.strptime(start_date, '%Y%m%d') - datetime.timedelta(days=1)
@@ -95,7 +95,7 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         question_a_responses = Response.objects.filter(question=question_a)
 
         if start_date is not None and end_date is not None:
-            question_a_responses = question_a_responses.filter(respondant__ts__lte=end_date, respondant__ts__gte=start_date)
+            question_a_responses = question_a_responses.filter(respondant__ts__range=(start_date, end_date))
         crosstab = []
         obj = {
             'question_a': question_a.title,
@@ -109,22 +109,21 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
                 respondants = respondants.filter(ts__lte=end_date, ts__gte=start_date)
 
             respondants = respondants.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
-            if question_b.type in ['grid']:
+            if question_b.type == 'grid':
                 obj['type'] = 'stacked-column'
-                try:
-                    rows = (Response.objects.filter(respondant__in=respondants, question=question_b)[0]
-                                            .gridanswer_set
-                                            .all()
-                                            .values('row_text', 'row_label')
-                                            .order_by('row_label'))
-                    obj['seriesNames'] = [row['row_text'] for row in rows]
-                    crosstab.append({
-                        'name': question_a_answer['answer'],
-                        'value': list(rows.annotate(average=Avg('answer_number')))
-                    })
-                except IndexError as e:
-                    print "not found"
-                    print e
+                rows = (GridAnswer.objects.filter(response__respondant__in=respondants,
+                                                  response__question=question_b)
+                                          .values('row_text', 'row_label')
+                                          .order_by('row_label')
+                                          .distinct()
+                                          .annotate(average=Avg('answer_number')))
+                obj['seriesNames'] = [row['row_text'] for row in rows]
+                for row in rows:
+                    row['average'] = int(row['average'])
+                crosstab.append({
+                    'name': question_a_answer['answer'],
+                    'value': list(rows)
+                })
             elif question_b.type in ['currency', 'integer', 'number']:
                 if group is None:
                     obj['type'] = 'bar-chart'
@@ -153,7 +152,7 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         return obj
     except Exception, err:
         print Exception, err
-        return _error('No records for this range.', __all__=err.message)
+        return _error('No records for this range.', __all__=str(err))
 
 
 def _create_csv_response(filename):
@@ -164,7 +163,7 @@ def _create_csv_response(filename):
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def get_crosstab_csv(request, survey_slug, question_a_slug, question_b_slug):
-    obj = _get_crosstab(request, survey_slug, question_a_slug, question_b_slug)
+    obj = _get_crosstab(request.GET, survey_slug, question_a_slug, question_b_slug)
     if isinstance(obj, HttpResponse):
         return obj
 
@@ -198,7 +197,7 @@ def get_crosstab_csv(request, survey_slug, question_a_slug, question_b_slug):
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def get_crosstab_json(request, survey_slug, question_a_slug, question_b_slug):
-    obj = _get_crosstab(request, survey_slug, question_a_slug, question_b_slug)
+    obj = _get_crosstab(request.GET, survey_slug, question_a_slug, question_b_slug)
     if isinstance(obj, HttpResponse):
         return obj
     return HttpResponse(json.dumps(obj, cls=DjangoJSONEncoder),
