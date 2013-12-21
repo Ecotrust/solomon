@@ -320,7 +320,8 @@ def _grid_standard_deviation(interval, question_slug, row_label=None):
                 .order_by('date')
                 .annotate(minimum=Min('answer_number'),
                           average=Avg('answer_number'),
-                          maximum=Max('answer_number')))
+                          maximum=Max('answer_number'),
+                          total=Sum('answer_number')))
     return rows, labels
 
 
