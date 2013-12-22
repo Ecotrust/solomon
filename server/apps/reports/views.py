@@ -308,13 +308,15 @@ def surveyor_stats_raw_data_csv(request, survey_slug):
     return response
 
 
-def _grid_standard_deviation(interval, question_slug, row_label=None):
+def _grid_standard_deviation(interval, question_slug, row_label=None, market=None):
     rows = (GridAnswer.objects.filter(response__question__slug=question_slug)
                               .extra(select={'date': "date_trunc(%s, survey_response.ts)"},
                                      select_params=(interval,),
                                      tables=('survey_response',)))
     if row_label is not None:
         rows = rows.filter(row_label=row_label)
+    if market is not None:
+        rows = rows.filter(response__respondant__survey_site=market)
     labels = rows.values_list('row_label', flat=True)
     rows = (rows.values('row_text', 'row_label', 'date')
                 .order_by('date')

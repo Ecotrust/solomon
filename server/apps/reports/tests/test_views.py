@@ -102,7 +102,7 @@ class TestSurveyorStatsRawDataCsv(BaseSurveyorStatsCase):
                                  self.respondant_user.get_full_name())
 
 
-class GridMixin(object):
+class ResponseMixin(object):
     cost_grid = """
     [
         {{"text":"Ice","label":"ice","checked":false,"isGroupName":false,"activitySlug":"ice","activityText":"Ice","cost":{0}}},
@@ -116,15 +116,19 @@ class GridMixin(object):
     """
 
     def create_grid_response(self, question, respondant, when, prices):
-        grid_response = Response(question=question,
-                                 respondant=respondant,
-                                 ts=when)
-        grid_response.answer_raw = self.cost_grid.format(*prices)
+        grid_response = Response(question=question, respondant=respondant,
+                                 ts=when, answer_raw=self.cost_grid.format(*prices))
         grid_response.save()
         return grid_response
 
+    def create_text_response(self, question, respondant, when, text):
+        text_response = Response(question=question, respondant=respondant,
+                                 ts=when, answer_raw=json.dumps({'text': text}))
+        text_response.save()
+        return text_response
 
-class TestCrossTabGrid(TestCase, GridMixin):
+
+class TestCrossTabGrid(TestCase, ResponseMixin):
     fixtures = ['reef.json', 'users.json']
     question_a_slug = 'survey-site'
     question_b_slug = 'cost'
@@ -141,15 +145,15 @@ class TestCrossTabGrid(TestCase, GridMixin):
                                 ts=when,
                                 surveyor=self.user)
 
-        response_a = Response(question=self.question_a,
-                              respondant=respondant,
-                              ts=when)
-        response_a.answer_raw = json.dumps({'text': market})
-
         respondant.save()
-        response_a.save()
+
+        response_a = self.create_text_response(self.question_a,
+                                               respondant, when, market)
         respondant.responses.add(response_a)
-        respondant.responses.add(self.create_grid_response(self.question_b, respondant, when, prices))
+
+        response_b = self.create_grid_response(self.question_b,
+                                               respondant, when, prices)
+        respondant.responses.add(response_b)
         respondant.save()
         return respondant
 
@@ -172,7 +176,7 @@ class TestCrossTabGrid(TestCase, GridMixin):
                     self.assertEqual(row['average'], 14)
 
 
-class TestGridStandardDeviation(TestCase, GridMixin):
+class TestGridStandardDeviation(TestCase, ResponseMixin):
     fixtures = ['reef.json', 'users.json']
     survey_slug = 'reef-fish-market-survey'
     question_slug = 'cost'
@@ -181,17 +185,24 @@ class TestGridStandardDeviation(TestCase, GridMixin):
         self.user = User.objects.get(username='superuser_alpha')
         self.survey = Survey.objects.get(slug=self.survey_slug)
         self.question = Question.objects.get(slug=self.question_slug)
+        self.market_question = Question.objects.get(slug='survey-site')
 
-    def create_respondant(self, when, prices):
+    def create_respondant(self, when, prices, market=None):
         respondant = Respondant(survey=self.survey,
                                 ts=when,
                                 surveyor=self.user)
         respondant.save()
-        respondant.responses.add(self.create_grid_response(self.question, respondant, when, prices))
+        grid_response = self.create_grid_response(self.question, respondant,
+                                                  when, prices)
+        respondant.responses.add(grid_response)
+        if market is not None:
+            market_response = self.create_text_response(self.market_question,
+                                                        respondant, when, market)
+            respondant.responses.add(market_response)
         respondant.save()
 
-    def request(self, interval):
-        return _grid_standard_deviation(interval, self.question_slug)
+    def request(self, interval, market=None):
+        return _grid_standard_deviation(interval, self.question_slug, market=market)
 
     def test_time_series(self):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -211,6 +222,28 @@ class TestGridStandardDeviation(TestCase, GridMixin):
                 # Replace is used to truncate to day.
                 if row['date'] == now.replace(hour=0, minute=0, second=0, microsecond=0):
                     self.assertEqual(row['average'], 14)
+                    count += 1
+                elif row['date'] == (now - week).replace(hour=0, minute=0, second=0, microsecond=0):
+                    self.assertEqual(row['average'], 21)
+                    count += 1
+        self.assertEqual(count, expected)
+
+    def test_time_series_market_filter(self):
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        week = datetime.timedelta(days=7)
+        self.create_respondant(now, range(1, 8), market='Ball Beach')
+        self.create_respondant(now, range(3, 24, 3), market='Maro Maro')
+        self.create_respondant(now - week, range(1, 8), market='Ball Beach')
+        self.create_respondant(now - week, range(5, 40, 5), market='Ball Beach')
+
+        rows, labels = self.request('day', market='Ball Beach')
+        expected = 2
+        count = 0
+        for row in rows:
+            if row['row_label'] == 'air-transport-ticket':
+                # Replace is used to truncate to day.
+                if row['date'] == now.replace(hour=0, minute=0, second=0, microsecond=0):
+                    self.assertEqual(row['average'], 7)
                     count += 1
                 elif row['date'] == (now - week).replace(hour=0, minute=0, second=0, microsecond=0):
                     self.assertEqual(row['average'], 21)
