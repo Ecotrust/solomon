@@ -18,21 +18,10 @@ angular.module('askApp').factory('reportsCommon', function($http, $routeParams, 
         return url;
     }
     factory.setup_market_dropdown = function($scope) {
-        var market_site_id = _.find($scope.survey.questions, function(x) {
-            return x.slug == 'survey-site';
-        }).id;
-        var url = '/api/v1/response?format=json&question=' + market_site_id;
+        var url = "/report/distribution/" + $routeParams.surveySlug + "/survey-site"
 
         $http.get(url).success(function(data) {
-            $scope.markets = [];
-            var markets_with_dupes = _.map(data.objects,
-                function(x) { return x.answer; });
-
-            _.each(markets_with_dupes, function (x) {
-                if (_.indexOf($scope.markets, x) === -1) {
-                    $scope.markets.push(x);
-                }
-            });
+            $scope.markets = _.pluck(data.answer_domain, "answer");
         });
     }
 
