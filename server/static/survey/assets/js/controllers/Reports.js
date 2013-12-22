@@ -148,6 +148,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 surveySlug);
         }
     }
+    $scope.surveyorTimeFilter = 'week';
     $scope.filter = null;
     $scope.charts = [];
     $scope.viewPath = app.viewPath;
@@ -186,6 +187,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
+            filters_changed($routeParams.surveySlug);
+        }
+    }, true);
+
+    $scope.$watch('surveyorTimeFilter', function (newValue) {
+        if ($scope.filter) {
             filters_changed($routeParams.surveySlug);
         }
     }, true);

@@ -22,6 +22,37 @@
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-10">
+        <p ng-show="message">{{message}}</p>
+        <div>
+            <div class="btn-group print-hide">
+                <button ng-class="{'active': surveyorTimeFilter == 'hour'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='hour'">Hourly</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'day'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='day'">Day</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'week'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='week'">Week</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'month'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='month'">Month</button>
+            </div>
+            <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
+            <div id="surveyor_total_chart">
+                <div bar-chart chart="surveyor_total"></div>
+            </div>
+            <div id="surveyor_by_time_chart">
+                <div time-series chart="surveyor_by_time"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
         <div ng-repeat="chart in charts" class="dash-chart">
             <h2>{{ chart.title }}</h2>
             <div class="error">{{ chart.message }}</div>

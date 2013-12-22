@@ -118,7 +118,7 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                                           .order_by('row_label')
                                           .distinct()
                                           .annotate(average=Avg('answer_number')))
-                obj['seriesNames'] = rows.values_list('row_text', flat=True)
+                obj['seriesNames'] = list(rows.values_list('row_text', flat=True))
                 for row in rows:
                     row['average'] = int(row['average'])
                 crosstab.append({
