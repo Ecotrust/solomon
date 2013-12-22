@@ -65,12 +65,6 @@ def get_distribution(request, survey_slug, question_slug):
 
     filter_list = []
 
-    if request.GET:
-        filters = request.GET.get('filters', None)
-
-    if filters is not None:
-        filter_list = json.loads(filters)
-
     answer_domain = question.get_answer_domain(survey, filter_list)
     return HttpResponse(json.dumps({'success': "true", "answer_domain": list(answer_domain)}))
 

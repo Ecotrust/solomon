@@ -132,10 +132,6 @@ directory "/usr/local/venv" do
     mode 0770
 end
 
-# ssh  ------------------------------------------------------------------------
-
-
-
 if platform?("debian", "ubuntu")
     cookbook_file "/etc/ssh/sshd_config" do
         source "sshd_config"
@@ -172,6 +168,30 @@ if platform?("centos", "rhel")
     end
 end
 
+#ssl 
+directory "/etc/nginx" do
+    owner "root"
+    group "root"
+    mode 0751
+end
+
+directory "/etc/nginx/ssl" do
+    owner "root"
+    group "root"
+    mode 0700
+end
+
+
+cookbook_file "server.crt" do
+  path "/etc/nginx/ssl/server.crt"
+  action :create_if_missing
+end
+cookbook_file "server.key" do
+  path "/etc/nginx/ssl/server.key"
+  action :create_if_missing
+end
+
+
 package "mercurial"
 package "subversion"
 package "unzip"
@@ -189,6 +209,8 @@ when "debian"
     package "mailutils"
     package "postgresql-#{node[:postgresql][:version]}-postgis"
     package "vim"
+    package "munin-node"
+    package "munin"
     include_recipe "apt"
     include_recipe "build-essential"
 when "rhel"
@@ -209,6 +231,9 @@ include_recipe "git"
 include_recipe "nginx"
 package "python-kombu"
 package "python-imaging"
+
+
+
 
 
 case node["platform_family"]
@@ -334,4 +359,25 @@ end
 
 link "/usr/include/Python.h" do
     to "/usr/include/python2.6/Python.h"
+end
+
+script 'create swapfile' do
+  interpreter 'bash'
+  not_if { File.exists?('/var/swapfile') }
+  code <<-eof
+    dd if=/dev/zero of=/var/swapfile bs=1024 count=512k
+    chmod 600 /var/swapfile &&
+    mkswap /var/swapfile
+  eof
+end
+
+mount '/dev/null' do  # swap file entry for fstab
+  action :enable  # cannot mount; only add to fstab
+  device '/var/swapfile'
+  fstype 'swap'
+end
+
+script 'activate swap' do
+  interpreter 'bash'
+  code 'swapon -a'
 end

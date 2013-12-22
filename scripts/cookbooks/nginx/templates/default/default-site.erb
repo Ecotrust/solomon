@@ -6,10 +6,27 @@ upstream example-vagrant {
 
 server {
     listen 80;
+    listen 443 default ssl;
     server_name <%= node[:servername] %>;
 
     access_log /var/log/nginx/<%= node[:project] %>-access.log;
     error_log /var/log/nginx/<%= node[:project] %>-error.log;
+    
+    <% if node[:ssl_certificate] %>
+    ssl_certificate <%= node[:ssl_certificate] %>;
+    ssl_certificate_key <%= node[:ssl_certificate_key] %>; 
+    if ($ssl_protocol = "") {
+        rewrite ^   https://$server_name$request_uri? permanent;
+    }
+    <% else %>
+    # default self signed cert
+    ssl_certificate /etc/nginx/ssl/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/server.key; 
+    <% end %>
+    ssl_session_timeout  5m;
+    ssl_protocols  SSLv2 SSLv3 TLSv1;
+    ssl_ciphers  ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP;
+    ssl_prefer_server_ciphers   on;
     
     location / {
         <% if node[:user] == "vagrant" %>

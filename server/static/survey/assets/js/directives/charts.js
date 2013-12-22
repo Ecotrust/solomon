@@ -16,13 +16,13 @@ angular.module('askApp')
                     var labels, data, series;
 
                     if (newValue && !newValue.message) {
-                        if (scope.chart.data && scope.chart.data.length != 0) {
+                        if (scope.chart.data && scope.chart.data.length !== 0) {
                             series = _.map(scope.chart.data, function(item, index) {
                                 return {
                                     name: scope.chart.labels[index],
                                     data: [parseFloat(item) || 0],
                                     dataLabels: {
-                                        enabled: true,
+                                        enabled: true
                                     }
                                 };
                             });
@@ -160,7 +160,7 @@ angular.module('askApp')
                                 }
                             },
                             // Display something when there is no data:
-                            series: (series && series.length != 0) ? series : [{
+                            series: (series && series.length !== 0) ? series : [{
                                 name: "No Data",
                                 data: []
                             }]
@@ -192,7 +192,7 @@ angular.module('askApp')
                         var chart;
                         var data = null;
 
-                        if (scope.chart.data && scope.chart.data.length != 0) {
+                        if (scope.chart.data && scope.chart.data.length !== 0) {
                             data = _.map(scope.chart.data, function(item) {
                                 return {
                                     name: item.name,
