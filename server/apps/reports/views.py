@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 
 from ordereddict import OrderedDict
 
-from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer, GridAnswer
+from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer, GridAnswer, MultiAnswer
 from .decorators import api_user_passes_test
 from .forms import SurveyorStatsForm
 from .models import QuestionReport
@@ -131,7 +131,18 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                     'name': question_a_answer['answer'],
                     'value': list(rows)
                 })
-
+            elif question_b.type == 'multi-select':
+                obj['type'] = 'stacked-column-count'
+                rows = (MultiAnswer.objects.filter(response__respondant__in=respondants,
+                                                   response__question=question_b)
+                                           .values('answer_text', 'answer_label')
+                                           .order_by('answer_text')
+                                           .annotate(count=Count('answer_text')))
+                obj['seriesNames'] = rows.values_list('answer_text', flat=True)
+                crosstab.append({
+                    'name': question_a_answer['answer'],
+                    'value': list(rows)
+                })
             elif question_b.type in ['currency', 'integer', 'number']:
                 if group is None:
                     obj['type'] = 'bar-chart'

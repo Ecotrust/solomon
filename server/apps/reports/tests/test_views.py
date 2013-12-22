@@ -127,6 +127,15 @@ class ResponseMixin(object):
         text_response.save()
         return text_response
 
+    def create_multi_select_response(self, question, respondant, when, answers):
+        raw_answer = [{'text': a.title(), 'label': a.lower(),
+                       'checked': True, 'isGroupName': False}
+                      for a in answers]
+        ms_response = Response(question=question, respondant=respondant,
+                               ts=when, answer_raw=json.dumps(raw_answer))
+        ms_response.save()
+        return ms_response
+
 
 class TestCrossTabGrid(TestCase, ResponseMixin):
     fixtures = ['reef.json', 'users.json']
@@ -170,10 +179,67 @@ class TestCrossTabGrid(TestCase, ResponseMixin):
 
         obj = self.request({})
         self.assertIn('crosstab', obj)
+        expected = 1
+        count = 0
         for market in obj['crosstab']:
             for row in market['value']:
                 if row['row_label'] == 'air-transport-ticket':
                     self.assertEqual(row['average'], 14)
+                    count += 1
+        self.assertEqual(expected, count)
+
+
+class TestCrossTabMultiSelect(TestCase, ResponseMixin):
+    fixtures = ['reef.json', 'users.json']
+    survey_slug = 'reef-fish-market-survey'
+    question_a_slug = 'survey-site'
+    question_b_slug = 'buy-or-catch'
+
+    def setUp(self):
+        self.user = User.objects.get(username='superuser_alpha')
+        self.survey = Survey.objects.get(slug=self.survey_slug)
+        self.question_a = Question.objects.get(slug=self.question_a_slug)
+        self.question_b = Question.objects.get(slug=self.question_b_slug)
+
+    def request(self, filters):
+        return _get_crosstab(filters, self.survey_slug, self.question_a_slug,
+                             self.question_b_slug)
+
+    def create_respondant(self, when, market, answers):
+        respondant = Respondant(survey=self.survey,
+                                ts=when,
+                                surveyor=self.user)
+
+        respondant.save()
+
+        response_a = self.create_text_response(self.question_a,
+                                               respondant, when, market)
+        respondant.responses.add(response_a)
+
+        response_b = self.create_multi_select_response(self.question_b,
+                                                       respondant, when, answers)
+        respondant.responses.add(response_b)
+        respondant.save()
+        return respondant
+
+    def test_stacked_column(self):
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        self.create_respondant(now, 'Ball Beach', ('caught',))
+        self.create_respondant(now, 'Ball Beach', ('caught', 'bought'))
+
+        obj = self.request({})
+        self.assertIn('crosstab', obj)
+        expected = 2
+        count = 0
+        for market in obj['crosstab']:
+            for row in market['value']:
+                if row['answer_label'] == 'caught':
+                    self.assertEqual(row['count'], 2)
+                    count += 1
+                elif row['answer_label'] == 'bought':
+                    self.assertEqual(row['count'], 1)
+                    count += 1
+        self.assertEqual(expected, count)
 
 
 class TestGridStandardDeviation(TestCase, ResponseMixin):
