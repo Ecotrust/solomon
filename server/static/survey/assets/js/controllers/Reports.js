@@ -187,57 +187,30 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             charts.sort(function (a,b) { return a-b;})
         });
     }
-    function total_expenses_over_time(charts, start_date, end_date, slug) {
+    function min_max_charts(charts, start_date, end_date, slug) {
         var url = "/reports/grid-standard-deviation/cost/" + $scope.surveyorTimeFilter
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
 
         return $http.get(url).success(function(data) {
-            var to_graph = {
-                min: { name: "Minimum", data: {}},
-                average: { name: "Average", data: {}},
-                max: { name: "Maximum", data: {}}
-            }
-
+            var to_graph = {}
             for (var i in data.graph_data) {
                 var current = data.graph_data[i];
-                if (to_graph.min.data[current.date]) {
-                    to_graph.min.data[current.date] += parseFloat(current.minimum);
-                } else {
-                    to_graph.min.data[current.date] = parseFloat(current.minimum);
-                }
-
-                if (to_graph.max.data[current.date]) {
-                    to_graph.max.data[current.date] += parseFloat(current.maximum);
-                } else {
-                    to_graph.max.data[current.date] = parseFloat(current.maximum);
-                }
-
-                if (to_graph.average.data[current.date]) {
-                    to_graph.average.data[current.date] += parseFloat(current.average);
-                } else {
-                    to_graph.average.data[current.date] = parseFloat(current.average);
-                }
+                debugger;
             }
-            to_graph.min.data = _.map(_.keys(to_graph.min.data),
-                    function (x) { return [parseInt(x), to_graph.min.data[x]]; });
-
-            to_graph.max.data = _.map(_.keys(to_graph.max.data),
-                    function (x) { return [parseInt(x), to_graph.max.data[x]]; });
-
-            to_graph.average.data = _.map(_.keys(to_graph.average.data),
-                    function (x) { return [parseInt(x), to_graph.average.data[x]]; });
-            charts.push({
-                title: "Expenses Over Time",
-                labels: ["Minimum", "Average", "Maximum"],
-                seriesNames: ["Minimum", "Average", "Maximum"],
-                type: "time-series",
-                raw_data: [to_graph.min, to_graph.average, to_graph.max],
-                download_url: url.replace("cost", "cost" + '.csv'),
-                xLabel: 'Market',
-                yLabel: 'Average Trip Costs',
-                order: 1,
-                message: data.message
+            _.map(_.keys(to_graph), function(x) {
+                charts.push({
+                    title: "Expenses Over Time",
+                    labels: ["Minimum", "Average", "Maximum"],
+                    seriesNames: data.seriesNames,
+                    type: "time-series",
+                    raw_data: to_graph[x],
+                    download_url: url.replace("cost", "cost" + '.csv'),
+                    xLabel: 'Market',
+                    yLabel: 'Average Trip Costs',
+                    order: 1,
+                    message: data.message
+                });
             });
             charts.sort(function (a,b) { return a-b;})
         });
@@ -298,6 +271,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 surveySlug);
             expenses_over_time($scope.charts, start_date, end_date,
                 surveySlug);
+            min_max_charts($scope.charts, start_date, end_date, surveySlug);
         } else if ($scope.activePage == 'biological') {
             $scope.subtitle = "Biologic Information"
             occurrence_of_resource($scope.charts, start_date, end_date,
