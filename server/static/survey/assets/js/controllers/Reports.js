@@ -44,6 +44,27 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         });
     }
 
+    function occurrence_of_sales(charts, start_date, end_date, slug) {
+        var url = ['/reports/crosstab', slug, 'survey-site', 'how-sold'].join('/');
+            url = url + '?startdate=' + start_date;
+            url = url + '&enddate=' + end_date;
+
+        return $http.get(url).success(function(data) {
+            charts.push({
+                title: "Frequency of Sales Types",
+                type: "stacked-column",
+                labels: _.pluck(data.crosstab, 'name'),
+                data: data.crosstab,
+                download_url: url.replace("how-sold", "how-sold" + '.csv'),
+                order: 1,
+                seriesNames: data.seriesNames,
+                message: data.message,
+                unit: ''
+            });
+            charts.sort(function (a,b) { return a-b;})
+        });
+    }
+
     function occurrence_of_resource(charts, start_date, end_date, slug) {
         var url = ['/reports/crosstab', slug, 'survey-site', 'type-of-fish'].join('/');
             url = url + '?startdate=' + start_date;
@@ -270,6 +291,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         if ($scope.activePage == 'economic') {
             $scope.subtitle = "Socio-Economic Information"
             occurrence_of_bought_vs_caught($scope.charts, start_date, end_date,
+                surveySlug);
+            occurrence_of_sales($scope.charts, start_date, end_date,
                 surveySlug);
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);
