@@ -155,23 +155,14 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
         return $http.get(url).success(function(data) {
             var to_graph = {};
-            for (var i in data.graph_data) {
-                current = data.graph_data[i];
-                if (to_graph[current.row_text]) {
-                    if (to_graph[current.row_text].data[current.date]) {
-                        to_graph[current.row_text].data[current.date] += parseFloat(current.average);
-                    } else {
-                        to_graph[current.row_text].data[current.date] = parseFloat(current.average);
-                    }
-                } else {
-                    to_graph[current.row_text] = { name: current.row_text, data: {} };
-                    to_graph[current.row_text].data[current.date] = parseFloat(current.average);
+            _.each(_.keys(data.graph_data), function(item) {
+                to_graph[item] = {
+                    name: item,
+                    data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.total)];
+                    })
                 }
-            }
-            for (var i in to_graph) {
-                to_graph[i].data = _.map(_.keys(to_graph[i].data),
-                        function (x) { return [parseInt(x), to_graph[i].data[x]]; });
-            }
+            });
             charts.push({
                 title: "Expenses Over Time",
                 unit: '$',
