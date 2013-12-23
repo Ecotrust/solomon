@@ -22,7 +22,7 @@ angular.module('askApp')
             'Content-Type': 'application/json;charset=utf-8',
             'X-CSRFToken': getCookie('csrftoken')
         }
-        $httpProvider.defaults.headers.delete = {
+        $httpProvider.defaults.headers['delete'] = {
             'X-CSRFToken': getCookie('csrftoken')
         }
     }])

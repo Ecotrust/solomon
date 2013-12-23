@@ -24,9 +24,6 @@
         <div class="col-md-4 col-md-offset-4">
             <div class="form-control date-range-picker" date-range-picker min="filter.min" max="filter.max" start="filter.startDate" end="filter.endDate"></div>
             <!-- <div style="display: none" min="filter.min" max="filter.max" start="filter.startDate" end="filter.endDate" editable-date-range-slider></div> -->
-            
-                
-            
         </div>
         <div id="market_status_filters" class="col-md-2">
             <select class="form-control" ng-model="market" ng-options="m for m in markets">
@@ -82,8 +79,8 @@
                     </tr>
                     <tr ng-click="goToResponse(respondent)" class="highlightable_row" ng-repeat="respondent in respondents">
                         <td>{{ respondent.user.username }}</td>
-                        <!-- <td>{{ respondent.ts|validDate: 'dd-MM-yyyy' }}</td>
-                        <td>{{ respondent.ts|validDate: 'HH:mm' }}</td> -->
+                        <td>{{ respondent.ts|validDate: 'dd-MM-yyyy' }}</td>
+                        <td>{{ respondent.ts|validDate: 'HH:mm' }}</td>
                         <td>{{ respondent.survey_site }}</td>
                         <td>{{ respondent.vendor }}</td>
                         <td>{{ respondent.buy_or_catch }}</td>
