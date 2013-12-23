@@ -347,7 +347,7 @@ def grid_standard_deviation_json(request, question_slug, interval):
     graph_data = defaultdict(list)
     for row in rows:
         row['date'] = calendar.timegm(row['date'].utctimetuple()) * 1000
-        graph_data[row['row_text']] = row
+        graph_data[row['row_text']].append(row)
 
     return HttpResponse(json.dumps({
         'success': True,
