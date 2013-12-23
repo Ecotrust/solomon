@@ -44,6 +44,27 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         });
     }
 
+    function occurrence_of_sales(charts, start_date, end_date, slug) {
+        var url = ['/reports/crosstab', slug, 'survey-site', 'how-sold'].join('/');
+            url = url + '?startdate=' + start_date;
+            url = url + '&enddate=' + end_date;
+
+        return $http.get(url).success(function(data) {
+            charts.push({
+                title: "Frequency of Sales Types",
+                type: "stacked-column",
+                labels: _.pluck(data.crosstab, 'name'),
+                data: data.crosstab,
+                download_url: url.replace("how-sold", "how-sold" + '.csv'),
+                order: 1,
+                seriesNames: data.seriesNames,
+                message: data.message,
+                unit: ''
+            });
+            charts.sort(function (a,b) { return a-b;})
+        });
+    }
+
     function occurrence_of_resource(charts, start_date, end_date, slug) {
         var url = ['/reports/crosstab', slug, 'survey-site', 'type-of-fish'].join('/');
             url = url + '?startdate=' + start_date;
@@ -134,23 +155,14 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
         return $http.get(url).success(function(data) {
             var to_graph = {};
-            for (var i in data.graph_data) {
-                current = data.graph_data[i];
-                if (to_graph[current.row_text]) {
-                    if (to_graph[current.row_text].data[current.date]) {
-                        to_graph[current.row_text].data[current.date] += parseFloat(current.average);
-                    } else {
-                        to_graph[current.row_text].data[current.date] = parseFloat(current.average);
-                    }
-                } else {
-                    to_graph[current.row_text] = { name: current.row_text, data: {} };
-                    to_graph[current.row_text].data[current.date] = parseFloat(current.average);
+            _.each(_.keys(data.graph_data), function(item) {
+                to_graph[item] = {
+                    name: item,
+                    data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.total)];
+                    })
                 }
-            }
-            for (var i in to_graph) {
-                to_graph[i].data = _.map(_.keys(to_graph[i].data),
-                        function (x) { return [parseInt(x), to_graph[i].data[x]]; });
-            }
+            });
             charts.push({
                 title: "Expenses Over Time",
                 unit: '$',
@@ -166,57 +178,45 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             charts.sort(function (a,b) { return a-b;})
         });
     }
-    function total_expenses_over_time(charts, start_date, end_date, slug) {
+    function min_max_charts(charts, start_date, end_date, slug) {
         var url = "/reports/grid-standard-deviation/cost/" + $scope.surveyorTimeFilter
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
 
         return $http.get(url).success(function(data) {
-            var to_graph = {
-                min: { name: "Minimum", data: {}},
-                average: { name: "Average", data: {}},
-                max: { name: "Maximum", data: {}}
-            }
-
-            for (var i in data.graph_data) {
-                var current = data.graph_data[i];
-                if (to_graph.min.data[current.date]) {
-                    to_graph.min.data[current.date] += parseFloat(current.minimum);
-                } else {
-                    to_graph.min.data[current.date] = parseFloat(current.minimum);
+            var to_graph = {}
+            _.each(_.keys(data.graph_data), function(item) {
+                to_graph[item] = {
+                    name: item,
+                    min_data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.minimum)];
+                    }),
+                    max_data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.maximum)];
+                    })
                 }
-
-                if (to_graph.max.data[current.date]) {
-                    to_graph.max.data[current.date] += parseFloat(current.maximum);
-                } else {
-                    to_graph.max.data[current.date] = parseFloat(current.maximum);
+            });
+            _.each(_.keys(to_graph), function(x) {
+                var min_struct = {
+                    name: to_graph[x].name + " Minimum",
+                    data: to_graph[x].min_data
                 }
-
-                if (to_graph.average.data[current.date]) {
-                    to_graph.average.data[current.date] += parseFloat(current.average);
-                } else {
-                    to_graph.average.data[current.date] = parseFloat(current.average);
+                var max_struct = {
+                    name: to_graph[x].name + " Maximum",
+                    data: to_graph[x].max_data
                 }
-            }
-            to_graph.min.data = _.map(_.keys(to_graph.min.data),
-                    function (x) { return [parseInt(x), to_graph.min.data[x]]; });
-
-            to_graph.max.data = _.map(_.keys(to_graph.max.data),
-                    function (x) { return [parseInt(x), to_graph.max.data[x]]; });
-
-            to_graph.average.data = _.map(_.keys(to_graph.average.data),
-                    function (x) { return [parseInt(x), to_graph.average.data[x]]; });
-            charts.push({
-                title: "Expenses Over Time",
-                labels: ["Minimum", "Average", "Maximum"],
-                seriesNames: ["Minimum", "Average", "Maximum"],
-                type: "time-series",
-                raw_data: [to_graph.min, to_graph.average, to_graph.max],
-                download_url: url.replace("cost", "cost" + '.csv'),
-                xLabel: 'Market',
-                yLabel: 'Average Trip Costs',
-                order: 1,
-                message: data.message
+                charts.push({
+                    title: "Minimum and Maximum Expenses for " + x,
+                    labels: ["Minimum", "Maximum"],
+                    seriesNames: data.seriesNames,
+                    type: "time-series",
+                    raw_data: [ min_struct, max_struct],
+                    xLabel: 'Date',
+                    yLabel: 'Cost',
+                    order: 1,
+                    message: data.message,
+                    unit: "$"
+                });
             });
             charts.sort(function (a,b) { return a-b;})
         });
@@ -271,10 +271,14 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             $scope.subtitle = "Socio-Economic Information"
             occurrence_of_bought_vs_caught($scope.charts, start_date, end_date,
                 surveySlug);
+            occurrence_of_sales($scope.charts, start_date, end_date,
+                surveySlug);
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);
             expenses_over_time($scope.charts, start_date, end_date,
                 surveySlug);
+            $scope.sectioned_charts["Max / Min Reported Market Prices "] = [];
+            min_max_charts($scope.sectioned_charts["Max / Min Reported Market Prices "], start_date, end_date, surveySlug);
         } else if ($scope.activePage == 'biological') {
             $scope.subtitle = "Biologic Information"
             occurrence_of_resource($scope.charts, start_date, end_date,
@@ -292,6 +296,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     $scope.surveyorTimeFilter = 'week';
     $scope.filter = null;
     $scope.charts = [];
+    $scope.sectioned_charts = {};
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = $routeParams.reportName.toLowerCase();
