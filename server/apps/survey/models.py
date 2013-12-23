@@ -47,7 +47,7 @@ class Respondant(caching.base.CachingMixin, models.Model):
 
     locations = models.IntegerField(null=True, blank=True)
 
-    ts = models.DateTimeField(auto_now_add=True)
+    ts = models.DateTimeField(default=datetime.datetime.utcnow)
     email = models.EmailField(max_length=254, null=True, blank=True, default=None)
 
     surveyor = models.ForeignKey(User, null=True, blank=True)
@@ -380,7 +380,7 @@ class Response(caching.base.CachingMixin, models.Model):
     answer_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     answer_raw = models.TextField(null=True, blank=True)
     answer_date = models.DateTimeField(null=True, blank=True)
-    ts = models.DateTimeField(auto_now_add=True)
+    ts = models.DateTimeField(default=datetime.datetime.utcnow)
     objects = caching.base.CachingManager()
 
     def generate_flat_dict(self):

@@ -3,6 +3,7 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils.timezone import utc
 
 from tastypie.test import ResourceTestCase
 
@@ -53,7 +54,7 @@ class TestReportRespondantResource(SolomonResourceTestCase):
         self.survey = Survey.objects.get(slug='reef-fish-market-survey')
         self.question = self.survey.questions.get(slug='survey-site')
         self.respondant = Respondant(survey=self.survey,
-                                     ts=datetime.datetime.now(),
+                                     ts=datetime.datetime.utcnow().replace(tzinfo=utc),
                                      surveyor=self.user)
         response = Response(question=self.question,
                             respondant=self.respondant)
@@ -88,7 +89,7 @@ class TestReportRepondantDetailsResource(SolomonResourceTestCase):
         self.survey = Survey.objects.get(slug='reef-fish-market-survey')
         self.question = self.survey.questions.get(slug='survey-site')
         self.respondant = Respondant(survey=self.survey,
-                                     ts=datetime.datetime.now(),
+                                     ts=datetime.datetime.utcnow().replace(tzinfo=utc),
                                      surveyor=self.user)
         response = Response(question=self.question,
                             respondant=self.respondant)
