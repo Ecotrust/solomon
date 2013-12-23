@@ -344,12 +344,14 @@ def _grid_standard_deviation(interval, question_slug, row_label=None, market=Non
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def grid_standard_deviation_json(request, question_slug, interval):
     rows, labels = _grid_standard_deviation(interval, question_slug)
+    graph_data = defaultdict(list)
     for row in rows:
         row['date'] = calendar.timegm(row['date'].utctimetuple()) * 1000
+        graph_data[row['row_text']] = row
 
     return HttpResponse(json.dumps({
         'success': True,
-        'graph_data': list(rows),
+        'graph_data': graph_data,
         'labels': list(labels),
     }, cls=CustomJSONEncoder), content_type='application/json')
 
