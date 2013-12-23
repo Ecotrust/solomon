@@ -126,6 +126,7 @@
     app.user = {
         username: "{{user.username}}",
         is_staff: {{user.is_staff|lower}},
+        is_superuser: {{user.is_superuser|lower}},
         admin_url: "{% url "admin:index" %}",
         logout_url: "{% url "admin:logout" %}",
         static_url: "{{STATIC_URL}}",
