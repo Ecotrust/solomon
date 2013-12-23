@@ -196,7 +196,6 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             var to_graph = {}
             for (var i in data.graph_data) {
                 var current = data.graph_data[i];
-                debugger;
             }
             _.map(_.keys(to_graph), function(x) {
                 charts.push({
