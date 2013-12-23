@@ -44,7 +44,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         });
     }
 
-    function occurence_of_resource(charts, start_date, end_date, slug) {
+    function occurrence_of_resource(charts, start_date, end_date, slug) {
         var url = ['/reports/crosstab', slug, 'survey-site', 'type-of-fish'].join('/');
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
@@ -56,8 +56,47 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 labels: _.pluck(data.crosstab, 'name'),
                 data: data.crosstab,
                 download_url: url.replace("type-of-fish", "type-of-fish" + '.csv'),
-                xLabel: 'Province',
-                yLabel: 'Resource',
+                order: 1,
+                seriesNames: data.seriesNames,
+                message: data.message,
+                unit: ''
+            });
+            charts.sort(function (a,b) { return a-b;})
+        });
+    }
+
+    function occurrence_of_bought_vs_caught(charts, start_date, end_date, slug) {
+        var url = ['/reports/crosstab', slug, 'survey-site', 'buy-or-catch'].join('/');
+            url = url + '?startdate=' + start_date;
+            url = url + '&enddate=' + end_date;
+
+        return $http.get(url).success(function(data) {
+            charts.push({
+                title: "Occurrence of Bought vs. Caught",
+                type: "stacked-column",
+                labels: _.pluck(data.crosstab, 'name'),
+                data: data.crosstab,
+                download_url: url.replace("buy-or-catch", "buy-or-catch" + '.csv'),
+                order: 1,
+                seriesNames: data.seriesNames,
+                message: data.message,
+                unit: ''
+            });
+            charts.sort(function (a,b) { return a-b;})
+        });
+    }
+    function occurrence_per_family(charts, start_date, end_date, slug) {
+        var url = ['/reports/crosstab', slug, 'survey-site', 'fish-per-family'].join('/');
+            url = url + '?startdate=' + start_date;
+            url = url + '&enddate=' + end_date;
+
+        return $http.get(url).success(function(data) {
+            charts.push({
+                title: "Fish Families Per Market",
+                type: "stacked-column",
+                labels: _.pluck(data.crosstab, 'name'),
+                data: data.crosstab,
+                download_url: url.replace("fish-per-family", "fish-per-family" + '.csv'),
                 order: 1,
                 seriesNames: data.seriesNames,
                 message: data.message,
@@ -230,13 +269,17 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         // FIXME: Actually pull these charts from the DB or something.
         if ($scope.activePage == 'economic') {
             $scope.subtitle = "Socio-Economic Information"
+            occurrence_of_bought_vs_caught($scope.charts, start_date, end_date,
+                surveySlug);
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);
             expenses_over_time($scope.charts, start_date, end_date,
                 surveySlug);
         } else if ($scope.activePage == 'biological') {
             $scope.subtitle = "Biologic Information"
-            occurence_of_resource($scope.charts, start_date, end_date,
+            occurrence_of_resource($scope.charts, start_date, end_date,
+                surveySlug);
+            occurrence_per_family($scope.charts, start_date, end_date,
                 surveySlug);
             fish_weight_by_province($scope.charts, start_date, end_date,
                 surveySlug);
