@@ -132,7 +132,7 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                                            .values('answer_text', 'answer_label')
                                            .order_by('answer_text')
                                            .annotate(count=Count('answer_text')))
-                obj['seriesNames'] = rows.values_list('answer_text', flat=True)
+                obj['seriesNames'] = list(rows.values_list('answer_text', flat=True))
                 crosstab.append({
                     'name': question_a_answer['answer'],
                     'value': list(rows)
@@ -322,7 +322,7 @@ def _grid_standard_deviation(interval, question_slug, row_label=None, market=Non
         rows = rows.filter(row_label=row_label)
     if market is not None:
         rows = rows.filter(response__respondant__survey_site=market)
-    labels = rows.values_list('row_label', flat=True)
+    labels = list(rows.values_list('row_label', flat=True))
     rows = (rows.values('row_text', 'row_label', 'date')
                 .order_by('date')
                 .annotate(minimum=Min('answer_number'),
