@@ -1,11 +1,15 @@
-
+.download_cog {
+    position: absolute;
+    z-index: 10;
+    right: 2em;
+    top: -2em;
+}
 .date-range-picker {
     margin-top: 20px;
     font-size: 16px;
     text-align: center;
     color: rgb(100,100,100) !important;
 }
-
 #total_market_weight {
     margin-bottom: 1em;
 }
@@ -28,7 +32,7 @@
     margin-bottom: 0;
 }
 #global-navbar .container {
-    border-bottom: solid 5px #000;
+    border-bottom: solid 5px #2f3577;
     padding-left: 0;
 }
 #global-navbar img {
@@ -93,8 +97,8 @@
     text-align: center;
 }
 #sidenav_respondants #respondant_stats {
-    border-top: solid 5px #000;
-    border-bottom: solid 5px #000;
+    border-top: solid 5px #2f3577;
+    border-bottom: solid 5px #2f3577;
     padding: 5px;
 }
 #side_total, #side_flagged, #side_reviews_needed{
@@ -118,11 +122,11 @@
 }
 #side_flagged {
     width: 43.5%;
-    background-color: #F6C43F;
+    background-color: #ED7369;
 }
 #side_reviews_needed {
+    background-color: #F6C43F;
     margin-left: 6.5%;
-    background-color: #ED7369;
     width: 43.5%;
 }
 

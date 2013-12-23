@@ -91,9 +91,9 @@ angular.module('askApp')
                                 data: _.map(scope.chart.data, function(item) {
                                     var found = _.findWhere(item.value, {
                                         row_text: name
-                                    });
+                                    }) || _.findWhere(item.value, { answer_text: name });
                                     if (found) {
-                                        return found.average === 0 ? null : found.average;
+                                        return found.average === 0 ? null : (found.average || found.count);
                                     } else {
                                         return null;
                                     }

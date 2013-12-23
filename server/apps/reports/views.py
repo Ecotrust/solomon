@@ -118,7 +118,7 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                                           .order_by('row_label')
                                           .distinct()
                                           .annotate(average=Avg('answer_number')))
-                obj['seriesNames'] = rows.values_list('row_text', flat=True)
+                obj['seriesNames'] = list(rows.values_list('row_text', flat=True))
                 for row in rows:
                     row['average'] = int(row['average'])
                 crosstab.append({
@@ -132,7 +132,15 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                                            .values('answer_text', 'answer_label')
                                            .order_by('answer_text')
                                            .annotate(count=Count('answer_text')))
-                obj['seriesNames'] = rows.values_list('answer_text', flat=True)
+
+                row_vals = rows.values_list('answer_text', flat=True)
+                # For some reason I was occasionally getting answers to questions that weren't complete, or something.
+                # For instance: If everyone only answers 'Caught' to bought or caught and it happens to be the last
+                # question, it'll overwrite the series names for all the others and we're left with just 'Caught'
+                # which messes up the graph. This will work for now, ideally something smarter should happen here. -QWP
+                if obj.get('seriesNames', None) is None or (len(row_vals) > obj['seriesNames']):
+                    obj['seriesNames'] = list(row_vals)
+
                 crosstab.append({
                     'name': question_a_answer['answer'],
                     'value': list(rows)
@@ -322,7 +330,7 @@ def _grid_standard_deviation(interval, question_slug, row_label=None, market=Non
         rows = rows.filter(row_label=row_label)
     if market is not None:
         rows = rows.filter(response__respondant__survey_site=market)
-    labels = rows.values_list('row_label', flat=True)
+    labels = list(rows.values_list('row_label', flat=True))
     rows = (rows.values('row_text', 'row_label', 'date')
                 .order_by('date')
                 .annotate(minimum=Min('answer_number'),

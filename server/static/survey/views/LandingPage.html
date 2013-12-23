@@ -28,7 +28,7 @@
                             <div class="btn-group">
                                 <a target="_blank" class="btn btn-default icon-plus" href="/respond/{{survey.slug}}"></a>
                                 <a target="_blank" class="btn btn-default icon-mobile-phone" href="/static/survey/mobile.html#/survey/{{survey.slug}}/online"></a>
-                                <a class="btn btn-default icon-edit" href="#/author/{{ survey.slug }}"></a>
+                                <a ng-show="user.is_superuser" class="btn btn-default icon-edit" href="#/author/{{ survey.slug }}"></a>
                                 <a ng-show="user.is_staff" class="btn btn-default icon-trash" ng-click="confirmDelete = true"></a>
                             </div>
                         </td>
@@ -42,7 +42,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="col-md-2">
+        <div ng-show="user.is_superuser" class="col-md-2">
             <a href="#/author"><button class="btn btn-warning">New Survey</button></a>
         </div>
     </div>

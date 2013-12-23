@@ -22,6 +22,9 @@ angular.module('askApp')
             'Content-Type': 'application/json;charset=utf-8',
             'X-CSRFToken': getCookie('csrftoken')
         }
+        $httpProvider.defaults.headers['delete'] = {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
     }])
     .controller('RespondantDetailCtrl', function($scope, $routeParams, $http, $location) {
 
@@ -50,6 +53,11 @@ angular.module('askApp')
         $scope.survey = data;
     });
 
+    if (app.user) {
+        $scope.user = app.user;
+    } else {
+        $location.path('/');
+    }
     $scope.uuid = $routeParams.uuidSlug;
     $scope.surveySlug = $routeParams.surveySlug;
 
@@ -80,6 +88,14 @@ angular.module('askApp')
         });
     }
 
+    $scope.delete_respondent = function () {
+        $http({
+            method: 'DELETE',
+            url: "/api/v1/respondant/" + $scope.uuid + "/"
+        }).success(function (data) {
+            window.location = "#/RespondantList/" + $scope.surveySlug;
+        });
+    };
     $scope.getResponseBySlug = function(slug) {
         var question = _.filter($scope.response.responses, function(item) {
             return item.question.slug === slug;

@@ -22,6 +22,31 @@
     </div>
     <div class="col-md-2"></div>
     <div class="col-md-10">
+        <p ng-show="message">{{message}}</p>
+        <div>
+            <div class="btn-group print-hide">
+                <button ng-class="{'active': surveyorTimeFilter == 'hour'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='hour'">Hourly</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'day'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='day'">Day</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'week'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='week'">Week</button>
+                <button ng-class="{'active': surveyorTimeFilter == 'month'}"
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="surveyorTimeFilter='month'">Month</button>
+            </div>
+            <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
+        </div>
+    </div>
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
         <div ng-repeat="chart in charts" class="dash-chart">
             <h2>{{ chart.title }}</h2>
             <div class="error">{{ chart.message }}</div>
@@ -32,5 +57,15 @@
                 <div ng-switch-default bar-chart chart="chart"></div>
             </div>
         </div>
+        <div ng-repeat="(chart_key,chart_val) in sectioned_charts" class="dash-chart">
+            <h2>{{ chart_key }}</h2>
+            <div ng-repeat="chart in chart_val" class="dash-chart">
+                <div ng-switch on="chart.type">
+                    <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
+                    <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
+                    <div ng-switch-when="time-series" time-series chart="chart"></div>
+                    <div ng-switch-default bar-chart chart="chart"></div>
+                </div>
+            </div>
     </div>
 </div>
