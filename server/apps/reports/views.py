@@ -138,8 +138,7 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                 # For instance: If everyone only answers 'Caught' to bought or caught and it happens to be the last
                 # question, it'll overwrite the series names for all the others and we're left with just 'Caught'
                 # which messes up the graph. This will work for now, ideally something smarter should happen here. -QWP
-                if obj.get('seriesNames', None) is None or \
-                    (len(row_vals) > obj['seriesNames']):
+                if obj.get('seriesNames', None) is None or (len(row_vals) > obj['seriesNames']):
                     obj['seriesNames'] = list(row_vals)
 
                 crosstab.append({
