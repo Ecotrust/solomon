@@ -7,6 +7,8 @@ Vagrant.configure("2") do |config|
     config.vm.box = "opscode_centos-6.4_provisionerless"
     config.vm.box_url = "https://opscode-vm-bento.s3.amazonaws.com/vagrant/opscode_centos-6.4_provisionerless.box"
     config.vm.network :forwarded_port, guest: 8000, host: 8000  # django dev server
+    config.vm.network :forwarded_port, guest: 80, host: 8080  # nginx
+    config.vm.network :forwarded_port, guest: 443, host: 8443  # nginx
     config.vm.network :forwarded_port, guest: 5432, host: 15432  # postgresql
 
     #config.vm.synced_folder "~/.pip/downloads", "/tmp/pip-cache", disabled: true

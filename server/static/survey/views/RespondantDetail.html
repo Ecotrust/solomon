@@ -5,7 +5,12 @@
         </div>
         <div class="col-md-6">
             <div id="review_buttons">
-                <a ng-show="filtered_list_url" class="btn btn-default" href="{{filtered_list_url}}">&laquo; Back</a>
+                <a ng-show="filtered_list_url" href="{{filtered_list_url}}" class="btn btn-default">&laquo; Back</a>
+                <button ng-show="!confirmDelete && user.is_staff" class="btn btn-danger" ng-click="confirmDelete = true">Delete</button>
+                <div ng-show="confirmDelete && user.is_staff" class="btn-group">
+                    <a class="btn btn-default btn-danger" ng-click="delete_respondent()">Delete</a>
+                    <a class="btn btn-default" ng-click="confirmDelete = false">Cancel</a>
+                </div>
                 <button ng-click="updateStatus()" class="btn btn-default" type="button">Save and Review Next &raquo;</button>
             </div>
         </div>

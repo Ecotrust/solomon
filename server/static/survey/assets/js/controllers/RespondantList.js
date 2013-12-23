@@ -19,7 +19,7 @@ angular.module('askApp')
                 }
             }
         }
-        var tuples = _.map(new_data, function(x) { return [parseInt(x.name), x.data]; }).sort();
+        var tuples = _.map(new_data, function(x) { return [parseInt(x.name, 10), x.data]; }).sort();
         return [
             {
                 name: "Surveys Taken",
@@ -34,7 +34,6 @@ angular.module('askApp')
         $http.get(url).success(function(data) {
             var new_data = build_survey_total_data(data);
             $scope.total_surveys = {
-                title: "Total Surveys Collected by Date",
                 raw_data: new_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
@@ -118,10 +117,10 @@ angular.module('askApp')
         $scope.survey = data;
         reportsCommon.setup_market_dropdown($scope);
         var start_date = $location.search().ts__gte ?
-            new Date(parseInt($location.search().ts__gte)) :
+            new Date(parseInt($location.search().ts__gte), 10) :
             reportsCommon.dateFromISO($scope.survey.response_date_start);
         var end_date = $location.search().ts__lte ?
-            new Date(parseInt($location.search().ts__lte)) :
+            new Date(parseInt($location.search().ts__lte), 10) :
             reportsCommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
             min: reportsCommon.dateFromISO($scope.survey.response_date_start).valueOf(),

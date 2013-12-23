@@ -16,7 +16,7 @@ angular.module('askApp')
                     var labels, data, series;
 
                     if (newValue && !newValue.message) {
-                        if (scope.chart.data && scope.chart.data.length != 0) {
+                        if (scope.chart.data && scope.chart.data.length !== 0) {
                             series = _.map(scope.chart.data, function(item, index) {
                                 return {
                                     name: scope.chart.labels[index],
@@ -91,9 +91,9 @@ angular.module('askApp')
                                 data: _.map(scope.chart.data, function(item) {
                                     var found = _.findWhere(item.value, {
                                         row_text: name
-                                    });
+                                    }) || _.findWhere(item.value, { answer_text: name });
                                     if (found) {
-                                        return found.average === 0 ? null : found.average;
+                                        return found.average === 0 ? null : (found.average || found.count);
                                     } else {
                                         return null;
                                     }
@@ -160,7 +160,7 @@ angular.module('askApp')
                                 }
                             },
                             // Display something when there is no data:
-                            series: (series && series.length != 0) ? series : [{
+                            series: (series && series.length !== 0) ? series : [{
                                 name: "No Data",
                                 data: []
                             }]
@@ -192,7 +192,7 @@ angular.module('askApp')
                         var chart;
                         var data = null;
 
-                        if (scope.chart.data && scope.chart.data.length != 0) {
+                        if (scope.chart.data && scope.chart.data.length !== 0) {
                             data = _.map(scope.chart.data, function(item) {
                                 return {
                                     name: item.name,

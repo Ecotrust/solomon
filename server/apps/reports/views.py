@@ -3,15 +3,16 @@ import csv
 import datetime
 import json
 from collections import defaultdict
+from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import Avg, Count, Sum
+from django.db.models import Avg, Count, Min, Max, Sum
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404
 
 from ordereddict import OrderedDict
 
-from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer
+from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer, GridAnswer, MultiAnswer
 from .decorators import api_user_passes_test
 from .forms import SurveyorStatsForm
 from .models import QuestionReport
@@ -65,12 +66,6 @@ def get_distribution(request, survey_slug, question_slug):
 
     filter_list = []
 
-    if request.GET:
-        filters = request.GET.get('filters', None)
-
-    if filters is not None:
-        filter_list = json.loads(filters)
-
     answer_domain = question.get_answer_domain(survey, filter_list)
     return HttpResponse(json.dumps({'success': "true", "answer_domain": list(answer_domain)}))
 
@@ -83,10 +78,10 @@ def _error(message='An error occurred.', **kwargs):
     }))
 
 
-def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
-    start_date = request.GET.get('startdate', None)
-    end_date = request.GET.get('enddate', None)
-    group = request.GET.get('group', None)
+def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
+    start_date = filters.get('startdate', None)
+    end_date = filters.get('enddate', None)
+    group = filters.get('group', None)
     try:
         if start_date is not None:
             start_date = datetime.datetime.strptime(start_date, '%Y%m%d') - datetime.timedelta(days=1)
@@ -101,7 +96,7 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         question_a_responses = Response.objects.filter(question=question_a)
 
         if start_date is not None and end_date is not None:
-            question_a_responses = question_a_responses.filter(respondant__ts__lte=end_date, respondant__ts__gte=start_date)
+            question_a_responses = question_a_responses.filter(respondant__ts__range=(start_date, end_date))
         crosstab = []
         obj = {
             'question_a': question_a.title,
@@ -115,22 +110,42 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
                 respondants = respondants.filter(ts__lte=end_date, ts__gte=start_date)
 
             respondants = respondants.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
-            if question_b.type in ['grid']:
+            if question_b.type == 'grid':
                 obj['type'] = 'stacked-column'
-                try:
-                    rows = (Response.objects.filter(respondant__in=respondants, question=question_b)[0]
-                                            .gridanswer_set
-                                            .all()
-                                            .values('row_text', 'row_label')
-                                            .order_by('row_label'))
-                    obj['seriesNames'] = [row['row_text'] for row in rows]
-                    crosstab.append({
-                        'name': question_a_answer['answer'],
-                        'value': list(rows.annotate(average=Avg('answer_number')))
-                    })
-                except IndexError as e:
-                    print "not found"
-                    print e
+                rows = (GridAnswer.objects.filter(response__respondant__in=respondants,
+                                                  response__question=question_b)
+                                          .values('row_text', 'row_label')
+                                          .order_by('row_label')
+                                          .distinct()
+                                          .annotate(average=Avg('answer_number')))
+                obj['seriesNames'] = list(rows.values_list('row_text', flat=True))
+                for row in rows:
+                    row['average'] = int(row['average'])
+                crosstab.append({
+                    'name': question_a_answer['answer'],
+                    'value': list(rows)
+                })
+            elif question_b.type == 'multi-select':
+                obj['type'] = 'stacked-column-count'
+                rows = (MultiAnswer.objects.filter(response__respondant__in=respondants,
+                                                   response__question=question_b)
+                                           .values('answer_text', 'answer_label')
+                                           .order_by('answer_text')
+                                           .annotate(count=Count('answer_text')))
+
+                row_vals = rows.values_list('answer_text', flat=True)
+                # For some reason I was occasionally getting answers to questions that weren't complete, or something.
+                # For instance: If everyone only answers 'Caught' to bought or caught and it happens to be the last
+                # question, it'll overwrite the series names for all the others and we're left with just 'Caught'
+                # which messes up the graph. This will work for now, ideally something smarter should happen here. -QWP
+                if obj.get('seriesNames', None) is None or \
+                    (len(row_vals) > obj['seriesNames']):
+                    obj['seriesNames'] = list(row_vals)
+
+                crosstab.append({
+                    'name': question_a_answer['answer'],
+                    'value': list(rows)
+                })
             elif question_b.type in ['currency', 'integer', 'number']:
                 if group is None:
                     obj['type'] = 'bar-chart'
@@ -142,7 +157,8 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
                 else:
                     obj['type'] = 'time-series'
                     values = (Response.objects.filter(respondant__in=respondants, question=question_b)
-                                              .extra(select={'date': "date_trunc('%s', ts)" % group})
+                                              .extra(select={'date': "date_trunc(%s, ts)"},
+                                                     select_params=(group,))
                                               .order_by('date')
                                               .values('date')
                                               .annotate(sum=Sum('answer_number')))
@@ -159,7 +175,7 @@ def _get_crosstab(request, survey_slug, question_a_slug, question_b_slug):
         return obj
     except Exception, err:
         print Exception, err
-        return _error('No records for this range.', __all__=err.message)
+        return _error('No records for this range.', __all__=str(err))
 
 
 def _create_csv_response(filename):
@@ -170,7 +186,7 @@ def _create_csv_response(filename):
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def get_crosstab_csv(request, survey_slug, question_a_slug, question_b_slug):
-    obj = _get_crosstab(request, survey_slug, question_a_slug, question_b_slug)
+    obj = _get_crosstab(request.GET, survey_slug, question_a_slug, question_b_slug)
     if isinstance(obj, HttpResponse):
         return obj
 
@@ -204,18 +220,20 @@ def get_crosstab_csv(request, survey_slug, question_a_slug, question_b_slug):
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def get_crosstab_json(request, survey_slug, question_a_slug, question_b_slug):
-    obj = _get_crosstab(request, survey_slug, question_a_slug, question_b_slug)
+    obj = _get_crosstab(request.GET, survey_slug, question_a_slug, question_b_slug)
     if isinstance(obj, HttpResponse):
         return obj
     return HttpResponse(json.dumps(obj, cls=DjangoJSONEncoder),
                         content_type='application/json')
 
 
-class DateTimeJSONEncoder(json.JSONEncoder):
+class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
             return obj.isoformat()
-        return super(DateTimeJSONEncoder, self).default(obj)
+        elif isinstance(obj, Decimal):
+            return str(obj)
+        return super(CustomJSONEncoder, self).default(obj)
 
 
 def _get_fullname(data):
@@ -235,7 +253,8 @@ def surveyor_stats_json(request, survey_slug, interval):
     if not res.exists():
         return _error('No records for these filters.')
 
-    res = (res.extra(select={'timestamp': "date_trunc('%s', ts)" % interval})
+    res = (res.extra(select={'timestamp': "date_trunc(%s, ts)"},
+                     select_params=(interval,))
               .values('surveyor__first_name', 'surveyor__last_name',
                       'timestamp')
               .annotate(count=Count('pk')))
@@ -258,7 +277,7 @@ def surveyor_stats_json(request, survey_slug, interval):
     return HttpResponse(json.dumps({
         'success': True,
         'graph_data': graph_data
-    }, cls=DateTimeJSONEncoder), content_type='application/json')
+    }, cls=CustomJSONEncoder), content_type='application/json')
 
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
@@ -269,7 +288,8 @@ def surveyor_stats_csv(request, survey_slug, interval):
 
     res = Respondant.stats_report_filter(survey_slug, **form.cleaned_data)
 
-    res = (res.extra(select={'timestamp': "date_trunc('%s', ts)" % interval})
+    res = (res.extra(select={'timestamp': "date_trunc(%s, ts)"},
+                     select_params=(interval,))
               .values('surveyor__first_name', 'surveyor__last_name',
                       'timestamp')
               .annotate(count=Count('pk')))
@@ -300,6 +320,38 @@ def surveyor_stats_raw_data_csv(request, survey_slug):
                          row.survey_site, row.ts, row.review_status))
 
     return response
+
+
+def _grid_standard_deviation(interval, question_slug, row_label=None, market=None):
+    rows = (GridAnswer.objects.filter(response__question__slug=question_slug)
+                              .extra(select={'date': "date_trunc(%s, survey_response.ts)"},
+                                     select_params=(interval,),
+                                     tables=('survey_response',)))
+    if row_label is not None:
+        rows = rows.filter(row_label=row_label)
+    if market is not None:
+        rows = rows.filter(response__respondant__survey_site=market)
+    labels = list(rows.values_list('row_label', flat=True))
+    rows = (rows.values('row_text', 'row_label', 'date')
+                .order_by('date')
+                .annotate(minimum=Min('answer_number'),
+                          average=Avg('answer_number'),
+                          maximum=Max('answer_number'),
+                          total=Sum('answer_number')))
+    return rows, labels
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def grid_standard_deviation_json(request, question_slug, interval):
+    rows, labels = _grid_standard_deviation(interval, question_slug)
+    for row in rows:
+        row['date'] = calendar.timegm(row['date'].utctimetuple()) * 1000
+
+    return HttpResponse(json.dumps({
+        'success': True,
+        'graph_data': list(rows),
+        'labels': list(labels),
+    }, cls=CustomJSONEncoder), content_type='application/json')
 
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
