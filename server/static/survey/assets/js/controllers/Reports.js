@@ -185,21 +185,45 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
         return $http.get(url).success(function(data) {
             var to_graph = {}
-            for (var i in data.graph_data) {
-                var current = data.graph_data[i];
-            }
-            _.map(_.keys(to_graph), function(x) {
+            _.each(_.keys(data.graph_data), function(item) {
+                to_graph[item] = {
+                    name: item,
+                    min_data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.minimum)];
+                    }),
+                    average_data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.average)];
+                    }),
+                    max_data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.maximum)];
+                    })
+                }
+            });
+            _.each(_.keys(to_graph), function(x) {
+                var min_struct = {
+                    name: to_graph[x].name + " Minimum",
+                    data: to_graph[x].min_data
+                }
+                var average_struct = {
+                    name: to_graph[x].name + " Average",
+                    data: to_graph[x].average_data
+                }
+                var max_struct = {
+                    name: to_graph[x].name + " Maximum",
+                    data: to_graph[x].max_data
+                }
                 charts.push({
-                    title: "Expenses Over Time",
+                    title: "Minimum, Average and Maximum Expenses for " + x,
                     labels: ["Minimum", "Average", "Maximum"],
                     seriesNames: data.seriesNames,
                     type: "time-series",
-                    raw_data: to_graph[x],
+                    raw_data: [ min_struct, average_struct, max_struct],
                     download_url: url.replace("cost", "cost" + '.csv'),
                     xLabel: 'Market',
                     yLabel: 'Average Trip Costs',
                     order: 1,
-                    message: data.message
+                    message: data.message,
+                    unit: "$"
                 });
             });
             charts.sort(function (a,b) { return a-b;})
