@@ -57,5 +57,15 @@
                 <div ng-switch-default bar-chart chart="chart"></div>
             </div>
         </div>
+        <div ng-repeat="(chart_key,chart_val) in sectioned_charts" class="dash-chart">
+            <h2>{{ chart_key }}</h2>
+            <div ng-repeat="chart in chart_val" class="dash-chart">
+                <div ng-switch on="chart.type">
+                    <div ng-switch-when="bar-chart" bar-chart chart="chart"></div>
+                    <div ng-switch-when="stacked-column" stacked-column chart="chart"></div>
+                    <div ng-switch-when="time-series" time-series chart="chart"></div>
+                    <div ng-switch-default bar-chart chart="chart"></div>
+                </div>
+            </div>
     </div>
 </div>

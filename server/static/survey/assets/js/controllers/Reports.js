@@ -191,9 +191,6 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                     min_data: _.map(data.graph_data[item], function(x) {
                         return [parseInt(x.date), parseFloat(x.minimum)];
                     }),
-                    average_data: _.map(data.graph_data[item], function(x) {
-                        return [parseInt(x.date), parseFloat(x.average)];
-                    }),
                     max_data: _.map(data.graph_data[item], function(x) {
                         return [parseInt(x.date), parseFloat(x.maximum)];
                     })
@@ -204,23 +201,18 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                     name: to_graph[x].name + " Minimum",
                     data: to_graph[x].min_data
                 }
-                var average_struct = {
-                    name: to_graph[x].name + " Average",
-                    data: to_graph[x].average_data
-                }
                 var max_struct = {
                     name: to_graph[x].name + " Maximum",
                     data: to_graph[x].max_data
                 }
                 charts.push({
-                    title: "Minimum, Average and Maximum Expenses for " + x,
-                    labels: ["Minimum", "Average", "Maximum"],
+                    title: "Minimum and Maximum Expenses for " + x,
+                    labels: ["Minimum", "Maximum"],
                     seriesNames: data.seriesNames,
                     type: "time-series",
-                    raw_data: [ min_struct, average_struct, max_struct],
-                    download_url: url.replace("cost", "cost" + '.csv'),
-                    xLabel: 'Market',
-                    yLabel: 'Average Trip Costs',
+                    raw_data: [ min_struct, max_struct],
+                    xLabel: 'Date',
+                    yLabel: 'Cost',
                     order: 1,
                     message: data.message,
                     unit: "$"
@@ -285,7 +277,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 surveySlug);
             expenses_over_time($scope.charts, start_date, end_date,
                 surveySlug);
-            min_max_charts($scope.charts, start_date, end_date, surveySlug);
+            $scope.sectioned_charts["Max / Min Reported Market Prices "] = [];
+            min_max_charts($scope.sectioned_charts["Max / Min Reported Market Prices "], start_date, end_date, surveySlug);
         } else if ($scope.activePage == 'biological') {
             $scope.subtitle = "Biologic Information"
             occurrence_of_resource($scope.charts, start_date, end_date,
@@ -303,6 +296,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     $scope.surveyorTimeFilter = 'week';
     $scope.filter = null;
     $scope.charts = [];
+    $scope.sectioned_charts = {};
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = $routeParams.reportName.toLowerCase();
