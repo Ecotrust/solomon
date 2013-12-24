@@ -366,5 +366,5 @@ def full_data_dump_csv(request, survey_slug):
     writer = SlugCSVWriter(response, fields)
     writer.writeheader()
     for resp in survey.respondant_set.all():
-        writer.writerow(resp.generate_flat_dict())
+        writer.writerow(json.loads(resp.csv_row.json_data))
     return response

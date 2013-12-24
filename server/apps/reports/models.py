@@ -1,4 +1,7 @@
+from django.db import models
 from django.db.models import Count, Sum
+
+import caching.base
 
 from apps.survey.models import Question, LocationAnswer, MultiAnswer
 
@@ -35,3 +38,8 @@ class QuestionReport(Question):
         else:
             return (answers.values('answer')
                            .annotate(locations=Sum('respondant__locations'), surveys=Count('answer')))
+
+
+class CSVRow(caching.base.CachingMixin, models.Model):
+    json_data = models.TextField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
