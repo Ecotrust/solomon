@@ -1523,7 +1523,7 @@ angular.module('askApp')
             }
 
             if ($scope.question && $scope.question.type === 'datepicker') {
-                $scope.now = new Date();
+                $scope.now = (new Date()).toString("dd/MM/yyyy");
                 // if ($scope.answer) {
                 //     $scope.answer = new Date($scope.answer);
                 // }
