@@ -182,6 +182,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         var url = "/reports/grid-standard-deviation/price-per-pound/" + $scope.surveyorTimeFilter
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
+            url = url + '&col=Day1';
 
         return $http.get(url).success(function(data) {
             var to_graph = {}
