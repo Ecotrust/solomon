@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.utils.timezone import utc
 from django.test import TestCase
 
-from survey.models import Question, Respondant, Response, Survey
+from survey.models import Question, Respondant, Response, Survey, REVIEW_STATE_ACCEPTED, REVIEW_STATE_NEEDED
 from ..views import _get_crosstab, _grid_standard_deviation
 
 
@@ -205,10 +205,12 @@ class TestCrossTabMultiSelect(TestCase, ResponseMixin):
         return _get_crosstab(filters, self.survey_slug, self.question_a_slug,
                              self.question_b_slug)
 
-    def create_respondant(self, when, market, answers):
+    def create_respondant(self, when, market, answers, status=None):
         respondant = Respondant(survey=self.survey,
                                 ts=when,
                                 surveyor=self.user)
+        if status is not None:
+            respondant.review_status = status
 
         respondant.save()
 
@@ -241,6 +243,34 @@ class TestCrossTabMultiSelect(TestCase, ResponseMixin):
                     count += 1
         self.assertEqual(expected, count)
 
+    def test_market_filter(self):
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        self.create_respondant(now, 'Ball Beach', ('caught',))
+        self.create_respondant(now, 'Maro Maro', ('bought',))
+
+        obj = self.request({'market': 'Ball Beach'})
+        self.assertIn('crosstab', obj)
+        expected = 1
+        count = 0
+        for market in obj['crosstab']:
+            self.assertEqual('Ball Beach', market['name'])
+            count += 1
+        self.assertEqual(expected, count)
+
+    def test_status_filter(self):
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        self.create_respondant(now, 'Ball Beach', ('caught',), status=REVIEW_STATE_NEEDED)
+        self.create_respondant(now, 'Maro Maro', ('bought',), status=REVIEW_STATE_ACCEPTED)
+
+        obj = self.request({'status': REVIEW_STATE_ACCEPTED})
+        self.assertIn('crosstab', obj)
+        expected = 1
+        count = 0
+        for market in obj['crosstab']:
+            self.assertEqual('Maro Maro', market['name'])
+            count += 1
+        self.assertEqual(expected, count)
+
 
 class TestGridStandardDeviation(TestCase, ResponseMixin):
     fixtures = ['reef.json', 'users.json']
@@ -253,11 +283,15 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
         self.question = Question.objects.get(slug=self.question_slug)
         self.market_question = Question.objects.get(slug='survey-site')
 
-    def create_respondant(self, when, prices, market=None):
+    def create_respondant(self, when, prices, market=None, status=None):
         respondant = Respondant(survey=self.survey,
                                 ts=when,
                                 surveyor=self.user)
+        if status is not None:
+            respondant.review_status = status
+
         respondant.save()
+
         grid_response = self.create_grid_response(self.question, respondant,
                                                   when, prices)
         respondant.responses.add(grid_response)
@@ -267,8 +301,8 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
             respondant.responses.add(market_response)
         respondant.save()
 
-    def request(self, interval, market=None):
-        return _grid_standard_deviation(interval, self.question_slug, market=market)
+    def request(self, interval, **kwargs):
+        return _grid_standard_deviation(interval, self.question_slug, **kwargs)
 
     def test_time_series(self):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
@@ -303,6 +337,28 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
         self.create_respondant(now - week, range(5, 40, 5), market='Ball Beach')
 
         rows, labels = self.request('day', market='Ball Beach')
+        expected = 2
+        count = 0
+        for row in rows:
+            if row['row_label'] == 'air-transport-ticket':
+                # Replace is used to truncate to day.
+                if row['date'] == now.replace(hour=0, minute=0, second=0, microsecond=0):
+                    self.assertEqual(row['average'], 7)
+                    count += 1
+                elif row['date'] == (now - week).replace(hour=0, minute=0, second=0, microsecond=0):
+                    self.assertEqual(row['average'], 21)
+                    count += 1
+        self.assertEqual(count, expected)
+
+    def test_time_series_status_filter(self):
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        week = datetime.timedelta(days=7)
+        self.create_respondant(now, range(1, 8), status=REVIEW_STATE_ACCEPTED)
+        self.create_respondant(now, range(3, 24, 3), status=REVIEW_STATE_NEEDED)
+        self.create_respondant(now - week, range(1, 8), status=REVIEW_STATE_ACCEPTED)
+        self.create_respondant(now - week, range(5, 40, 5), status=REVIEW_STATE_ACCEPTED)
+
+        rows, labels = self.request('day', status=REVIEW_STATE_ACCEPTED)
         expected = 2
         count = 0
         for row in rows:

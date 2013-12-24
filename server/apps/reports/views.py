@@ -82,6 +82,8 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
     start_date = filters.get('startdate', None)
     end_date = filters.get('enddate', None)
     group = filters.get('group', None)
+    market = filters.get('market', None)
+    status = filters.get('status', None)
     try:
         if start_date is not None:
             start_date = datetime.datetime.strptime(start_date, '%Y%m%d') - datetime.timedelta(days=1)
@@ -97,6 +99,13 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
 
         if start_date is not None and end_date is not None:
             question_a_responses = question_a_responses.filter(respondant__ts__range=(start_date, end_date))
+
+        if market is not None:
+            question_a_responses = question_a_responses.filter(respondant__survey_site=market)
+
+        if status is not None:
+            question_a_responses = question_a_responses.filter(respondant__review_status=status)
+
         crosstab = []
         obj = {
             'question_a': question_a.title,
@@ -328,7 +337,7 @@ def surveyor_stats_raw_data_csv(request, survey_slug):
     return response
 
 
-def _grid_standard_deviation(interval, question_slug, row_label=None, market=None, col_label=None):
+def _grid_standard_deviation(interval, question_slug, row_label=None, market=None, col_label=None, status=None):
     rows = (GridAnswer.objects.filter(response__question__slug=question_slug)
                               .extra(select={'date': "date_trunc(%s, survey_response.ts)"},
                                      select_params=(interval,),
@@ -339,6 +348,8 @@ def _grid_standard_deviation(interval, question_slug, row_label=None, market=Non
         rows = rows.filter(col_label=col_label)
     if market is not None:
         rows = rows.filter(response__respondant__survey_site=market)
+    if status is not None:
+        rows = rows.filter(response__respondant__review_status=status)
     labels = list(rows.values_list('row_label', flat=True))
     rows = (rows.values('row_text', 'row_label', 'date')
                 .order_by('date')
@@ -352,7 +363,11 @@ def _grid_standard_deviation(interval, question_slug, row_label=None, market=Non
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def grid_standard_deviation_json(request, question_slug, interval):
     col_label = request.GET.get('col', None)
-    rows, labels = _grid_standard_deviation(interval, question_slug, col_label=col_label)
+    market = request.GET.get('market', None)
+    status = request.GET.get('status', None)
+    rows, labels = _grid_standard_deviation(interval, question_slug,
+                                            col_label=col_label, market=market,
+                                            status=status)
     graph_data = defaultdict(list)
     for row in rows:
         row['date'] = calendar.timegm(row['date'].utctimetuple()) * 1000
