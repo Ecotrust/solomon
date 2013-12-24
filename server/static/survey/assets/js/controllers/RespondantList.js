@@ -117,10 +117,10 @@ angular.module('askApp')
         $scope.survey = data;
         reportsCommon.setup_market_dropdown($scope);
         var start_date = $location.search().ts__gte ?
-            new Date(parseInt($location.search().ts__gte), 10) :
+            new Date(parseInt($location.search().ts__gte, 10)) :
             reportsCommon.dateFromISO($scope.survey.response_date_start);
         var end_date = $location.search().ts__lte ?
-            new Date(parseInt($location.search().ts__lte), 10) :
+            new Date(parseInt($location.search().ts__lte, 10)) :
             reportsCommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
             min: reportsCommon.dateFromISO($scope.survey.response_date_start).valueOf(),
