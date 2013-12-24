@@ -69,15 +69,6 @@ angular.module('askApp')
         zoom: 7
     }
 
-
-    //$scope.$watch('review_comment', function (newValue) {
-    //    $scope.updateStatus(newValue);
-    //}, false);
-
-    //$scope.$watch('current_status', function (newValue) {
-    //    $scope.updateStatus(newValue);
-    //}, false);
-
     $scope.updateStatus = function() {
         $http({
             url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
