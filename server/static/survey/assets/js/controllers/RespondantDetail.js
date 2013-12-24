@@ -35,6 +35,7 @@ angular.module('askApp')
     $http.get('/api/v1/reportrespondantdetails/'  + $routeParams.uuidSlug + '/?format=json&survey__slug=' + $routeParams.surveySlug).success(function(data) {
         //order responses to reflect the order in which they were presented in the survey
         data.responses = _.sortBy(data.responses, function(response) { return response.question.order; });
+        $scope.review_next_uuid = data.meta.next.unfiltered;
         _.each(data.responses, function (response) {
 
             response.answer_parsed = JSON.parse(response.answer_raw);
@@ -76,6 +77,10 @@ angular.module('askApp')
             method: 'PATCH'
         }).success(function(data) {
             $scope.last_status = $scope.current_status;
+            if ($scope.review_next_uuid) {
+                window.location = "#/RespondantDetail/" + $scope.surveySlug +
+                    "/" + $scope.review_next_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
+            }
         });
     }
 

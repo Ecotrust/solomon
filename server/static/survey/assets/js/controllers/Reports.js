@@ -4,6 +4,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         var url = ['/reports/crosstab', slug, qa, qb].join('/');
         url = url + '?startdate=' + sdate;
         url = url + '&enddate=' + edate;
+        url = url + '&group=' + $scope.surveyorTimeFilter;
 
         if ($scope.market) {
             url = url + '&market=' + $scope.market;
@@ -224,10 +225,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
     }
 
     function total_weight_for_market(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
-        url = url + '?startdate=' + start_date;
-        url = url + '&enddate=' + end_date;
-        url = url + '&group=week';
+        var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'total-weight');
 
         return $http.get(url).success(function(data) {
             var sdate = new Date($scope.filter.startDate);
