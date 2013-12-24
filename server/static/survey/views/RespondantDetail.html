@@ -5,7 +5,7 @@
         </div>
         <div class="col-md-6">
             <div id="review_buttons">
-                <a ng-show="filtered_list_url" href="{{filtered_list_url}}"><button class="btn btn-default" type="button">&laquo; Back</button></a>
+                <a ng-show="filtered_list_url" href="{{filtered_list_url}}" class="btn btn-default">&laquo; Back</a>
                 <button ng-show="!confirmDelete && user.is_superuser" class="btn btn-danger" ng-click="confirmDelete = true">Delete</button>
                 <div ng-show="confirmDelete && user.is_superuser" class="btn-group">
                     <a class="btn btn-default btn-danger" ng-click="delete_respondent()">Delete</a>

@@ -42,7 +42,7 @@
     display: inline;
     margin-left: 1em;
 }
-#global-navbar button {
+#global-navbar .btn {
     margin-right: 1em;
 }
 .main-container {
