@@ -183,6 +183,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
             url = url + '&col=Day1';
+        var fish_name_whitelist = ["Common Reef Fish", "Coral grouper/Coral trout",
+            "Deepwater Snapper", "Humphead/Napoleon Wrasse", "Kingfish",
+            "Ratfish", "Spanish Mackerel", "Topa",
+            "Mollusc/squid/octopus/lobster"];
 
         return $http.get(url).success(function(data) {
             var to_graph = {}
@@ -197,17 +201,20 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                     })
                 }
             });
-            _.each(_.keys(to_graph), function(x) {
+            to_graph = _.filter(to_graph, function(x) {
+                return fish_name_whitelist.indexOf(x.name) != -1;
+            });
+            _.each(to_graph, function(x) {
                 var min_struct = {
-                    name: to_graph[x].name + " Minimum",
-                    data: to_graph[x].min_data
+                    name: x.name + " Minimum",
+                    data: x.min_data
                 }
                 var max_struct = {
-                    name: to_graph[x].name + " Maximum",
-                    data: to_graph[x].max_data
+                    name: x.name + " Maximum",
+                    data: x.max_data
                 }
                 charts.push({
-                    title: "Minimum and Maximum Expenses for " + x,
+                    title: "Minimum and Maximum Expenses for " + x.name,
                     labels: ["Minimum", "Maximum"],
                     seriesNames: data.seriesNames,
                     type: "time-series",
