@@ -179,7 +179,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         });
     }
     function min_max_charts(charts, start_date, end_date, slug) {
-        var url = "/reports/grid-standard-deviation/cost/" + $scope.surveyorTimeFilter
+        var url = "/reports/grid-standard-deviation/price-per-pound/" + $scope.surveyorTimeFilter
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
 
