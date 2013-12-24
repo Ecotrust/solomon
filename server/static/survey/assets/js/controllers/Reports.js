@@ -1,10 +1,21 @@
 
-angular.module('askApp').controller('ReportCtrl', function($scope, $http, $routeParams, reportsCommon, surveyShared) {
-    function fish_weight_by_market(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
+angular.module('askApp').controller('ReportCtrl', function($scope, $http, $location, $routeParams, reportsCommon, surveyShared) {
+    function build_crosstab_url(sdate, edate, slug, qa, qb) {
+        var url = ['/reports/crosstab', slug, qa, qb].join('/');
+        url = url + '?startdate=' + sdate;
+        url = url + '&enddate=' + edate;
 
+        if ($scope.market) {
+            url = url + '&market=' + $scope.market;
+        }
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
+        return url;
+
+    }
+    function fish_weight_by_market(charts, start_date, end_date, slug) {
+        var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'total-weight');
         return $http.get(url).success(function(data) {
             charts.push({
                 title: "Total Fish Weight by Market",
@@ -23,10 +34,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     }
 
     function fish_weight_by_province(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'province-purchased-caught', 'total-weight'].join('/');
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
-
+        var url = build_crosstab_url(start_date, end_date, slug, 'province-purchased-caught', 'total-weight');
         return $http.get(url).success(function(data) {
             charts.push({
                 title: "Total Fish Weight by Province",
@@ -45,10 +53,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     }
 
     function occurrence_of_sales(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'survey-site', 'how-sold'].join('/');
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
-
+        var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'how-sold');
         return $http.get(url).success(function(data) {
             charts.push({
                 title: "Frequency of Sales Types",
@@ -66,10 +71,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     }
 
     function occurrence_of_resource(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'survey-site', 'type-of-fish'].join('/');
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
-
+        var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'type-of-fish');
         return $http.get(url).success(function(data) {
             charts.push({
                 title: "Frequency of Resources",
@@ -87,10 +89,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     }
 
     function occurrence_of_bought_vs_caught(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'survey-site', 'buy-or-catch'].join('/');
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
-
+        var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'buy-or-catch');
         return $http.get(url).success(function(data) {
             charts.push({
                 title: "Occurrence of Bought vs. Caught",
@@ -107,10 +106,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         });
     }
     function occurrence_per_family(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'survey-site', 'fish-per-family'].join('/');
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
-
+        var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'fish-per-family');
         return $http.get(url).success(function(data) {
             charts.push({
                 title: "Fish Families Per Market",
@@ -128,10 +124,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     }
 
     function average_trip_costs_by_market(charts, start_date, end_date, slug) {
-        var url = ['/reports/crosstab', slug, 'survey-site', 'cost'].join('/');
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
-
+        var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'cost');
         return $http.get(url).success(function(data) {
             charts.push({
                 title: "Average Trip Costs by Market",
@@ -301,6 +294,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
                 surveySlug);
         }
     }
+    $scope.market = $location.search().survey_site || null;
     $scope.surveyorTimeFilter = 'week';
     $scope.filter = null;
     $scope.charts = [];
@@ -308,10 +302,13 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
     $scope.viewPath = app.viewPath;
     $scope.surveyorTimeFilter = 'week';
     $scope.activePage = $routeParams.reportName.toLowerCase();
+    $scope.statuses = [];
+    $scope.status_single = $location.search().status || null;
 
     surveyShared.getSurvey(function(data) {
         data.questions.reverse();
         $scope.survey = data;
+        reportsCommon.setup_market_dropdown($scope);
         var start_date = reportsCommon.dateFromISO($scope.survey.response_date_start);
         var end_date = reportsCommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
@@ -341,6 +338,18 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
 
     $scope.$watch('filter', function (newValue) {
         if (newValue) {
+            filters_changed($routeParams.surveySlug);
+        }
+    }, true);
+
+    $scope.$watch('status_single', function (newValue) {
+        if ($scope.filter) {
+            filters_changed($routeParams.surveySlug);
+        }
+    }, false);
+
+    $scope.$watch('market', function (newValue) {
+        if ($scope.filter) {
             filters_changed($routeParams.surveySlug);
         }
     }, true);

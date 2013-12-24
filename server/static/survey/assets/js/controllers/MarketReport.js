@@ -39,7 +39,6 @@ angular.module('askApp')
             filtered_answers = _.filter(data.crosstab, function(answer) {
                 return (!$scope.market || $scope.market == answer.name);
             });
-            console.log("Filtered: ", filtered_answers);
             $scope.total_market_weight = _.reduce(filtered_answers, function(accum, val) {
                 return accum + _.reduce(val.value, function(x,y) { return x + parseInt(y.sum); }, 0);
             }, 0);
