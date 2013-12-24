@@ -118,13 +118,20 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                                           .order_by('row_label')
                                           .distinct()
                                           .annotate(average=Avg('answer_number')))
-                obj['seriesNames'] = list(rows.values_list('row_text', flat=True))
+
+                row_vals = set(rows.values_list('row_text', flat=True))
+                if 'seriesNames' in obj:
+                    obj['seriesNames'] |= row_vals
+                else:
+                    obj['seriesNames'] = row_vals
+
                 for row in rows:
                     row['average'] = int(row['average'])
                 crosstab.append({
                     'name': question_a_answer['answer'],
                     'value': list(rows)
                 })
+
             elif question_b.type == 'multi-select':
                 obj['type'] = 'stacked-column-count'
                 rows = (MultiAnswer.objects.filter(response__respondant__in=respondants,
@@ -133,13 +140,11 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                                            .order_by('answer_text')
                                            .annotate(count=Count('answer_text')))
 
-                row_vals = rows.values_list('answer_text', flat=True)
-                # For some reason I was occasionally getting answers to questions that weren't complete, or something.
-                # For instance: If everyone only answers 'Caught' to bought or caught and it happens to be the last
-                # question, it'll overwrite the series names for all the others and we're left with just 'Caught'
-                # which messes up the graph. This will work for now, ideally something smarter should happen here. -QWP
-                if obj.get('seriesNames', None) is None or (len(row_vals) > obj['seriesNames']):
-                    obj['seriesNames'] = list(row_vals)
+                row_vals = set(rows.values_list('answer_text', flat=True))
+                if 'seriesNames' in obj:
+                    obj['seriesNames'] |= row_vals
+                else:
+                    obj['seriesNames'] = row_vals
 
                 crosstab.append({
                     'name': question_a_answer['answer'],
@@ -171,6 +176,8 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
 
             obj['crosstab'] = crosstab
             obj['success'] = 'true'
+        if 'seriesNames' in obj:
+            obj['seriesNames'] = sorted(obj['seriesNames'])
         return obj
     except Exception, err:
         print Exception, err
