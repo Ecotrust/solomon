@@ -119,7 +119,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
 
         bundle.data['meta']['next'] = {}
 
-        base_filter = Respondant.objects.filter(ts__gt=bundle.obj.ts).order_by('-ts')
+        base_filter = Respondant.objects.filter(ts__lt=bundle.obj.ts).order_by('-ts')
         if base_filter.exists():
             bundle.data['meta']['next']['unfiltered'] = base_filter[0].pk
 
