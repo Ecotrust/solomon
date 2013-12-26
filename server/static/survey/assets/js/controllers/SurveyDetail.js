@@ -1386,7 +1386,7 @@ angular.module('askApp')
                 $scope.question.options = [];
                 _.each($scope.question.rows.split('\n'), function(row, index) {
                     var matches = _.filter($scope.answer || [], function(answer) {
-                        return answer.text === row;
+                        return answer === row || answer.text === row;
                     });
 
                     $scope.question.options.push({
@@ -1434,7 +1434,6 @@ angular.module('askApp')
                     // Skip this question since we have no items to list.
                     $scope.gotoNextQuestion();
                 }
-
                 if ($scope.answer) {
                     $scope.answer = _.groupBy($scope.answer, 'text');
                 } else {
