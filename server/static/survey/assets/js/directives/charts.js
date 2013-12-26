@@ -119,7 +119,7 @@ angular.module('askApp')
                             yAxis: {
                                 min: 0,
                                 title: {
-                                    text: 'Average Cost (SBD)'
+                                    text: scope.chart.yLabel || 'Average Cost (SBD)'
                                 },
                                 stackLabels: {
                                     enabled: true,
@@ -155,7 +155,12 @@ angular.module('askApp')
                                     stacking: 'normal',
                                     dataLabels: {
                                         enabled: true,
-                                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                        formatter: (scope.chart.labelPercentage ?
+                                                function() {
+                                                    return "%" + ((this.y/this.total)*100).toFixed(2);
+                                                } :
+                                                function() { return this.y; } )
                                     }
                                 }
                             },

@@ -18,11 +18,22 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
     function fish_weight_by_market(charts, start_date, end_date, slug) {
         var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'total-weight');
         return $http.get(url).success(function(data) {
+            var sdate = new Date($scope.filter.startDate);
+            var edate = new Date($scope.filter.endDate);
+
+            var filtered = _.map(data.crosstab, function(answer) {
+                answer.value = _.filter(answer.value, function(x) {
+                    var d = reportsCommon.dateFromISO(x.date);
+                    return (d >= sdate && d <= edate);
+                });
+                return answer;
+            });
+
             charts.push({
                 title: "Total Fish Weight by Market",
                 type: data.type,
-                labels: _.pluck(data.crosstab, 'name'),
-                data: _.pluck(data.crosstab, 'value'),
+                labels: _.pluck(filtered, 'name'),
+                data: filtered,
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
                 yLabel: 'Total Weight (kg)',
@@ -37,11 +48,22 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
     function fish_weight_by_province(charts, start_date, end_date, slug) {
         var url = build_crosstab_url(start_date, end_date, slug, 'province-purchased-caught', 'total-weight');
         return $http.get(url).success(function(data) {
+            var sdate = new Date($scope.filter.startDate);
+            var edate = new Date($scope.filter.endDate);
+
+            var filtered = _.map(data.crosstab, function(answer) {
+                answer.value = _.filter(answer.value, function(x) {
+                    var d = reportsCommon.dateFromISO(x.date);
+                    return (d >= sdate && d <= edate);
+                });
+                return answer;
+            });
+
             charts.push({
                 title: "Total Fish Weight by Province",
                 type: data.type,
-                labels: _.pluck(data.crosstab, 'name'),
-                data: _.pluck(data.crosstab, 'value'),
+                labels: _.pluck(filtered, 'name'),
+                data: filtered,
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Province',
                 yLabel: 'Total Weight (kg)',
@@ -59,10 +81,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             charts.push({
                 title: "Frequency of Sales Types",
                 type: "stacked-column",
+                yLabel: "Amount of Sales",
                 labels: _.pluck(data.crosstab, 'name'),
                 data: data.crosstab,
                 download_url: url.replace("how-sold", "how-sold" + '.csv'),
                 order: 1,
+                labelPercentage: true,
                 seriesNames: data.seriesNames,
                 message: data.message,
                 unit: ''
@@ -80,6 +104,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 labels: _.pluck(data.crosstab, 'name'),
                 data: data.crosstab,
                 download_url: url.replace("type-of-fish", "type-of-fish" + '.csv'),
+                labelPercentage: true,
+                yLabel: 'Cost',
                 order: 1,
                 seriesNames: data.seriesNames,
                 message: data.message,
@@ -96,8 +122,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 title: "Occurrence of Bought vs. Caught",
                 type: "stacked-column",
                 labels: _.pluck(data.crosstab, 'name'),
+                yLabel: 'Total Bought or Caught',
                 data: data.crosstab,
                 download_url: url.replace("buy-or-catch", "buy-or-catch" + '.csv'),
+                labelPercentage: true,
                 order: 1,
                 seriesNames: data.seriesNames,
                 message: data.message,
@@ -128,14 +156,14 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'cost');
         return $http.get(url).success(function(data) {
             charts.push({
-                title: "Average Trip Costs by Market",
+                title: "Total Trip Costs",
                 labels: _.pluck(data.crosstab, 'name'),
                 seriesNames: data.seriesNames,
                 type: data.type,
                 data: data.crosstab,
                 download_url: url.replace("cost", "cost" + '.csv'),
                 xLabel: 'Market',
-                yLabel: 'Average Trip Costs',
+                yLabel: 'Cost',
                 order: 1,
                 message: data.message
             });
@@ -158,14 +186,14 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 }
             });
             charts.push({
-                title: "Expenses Over Time",
+                title: "Prices Over Time for All Markets",
                 unit: '$',
                 labels: _.keys(to_graph),
                 seriesNames: _.keys(to_graph),
                 type: "time-series",
                 raw_data: _.values(to_graph),
                 xLabel: 'Market',
-                yLabel: 'Average Trip Costs',
+                yLabel: 'Cost',
                 order: 1,
                 message: data.message
             });
@@ -208,7 +236,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                     data: x.max_data
                 }
                 charts.push({
-                    title: "Minimum and Maximum Expenses for " + x.name,
+                    title: "Max-Min Prices for " + x.name,
                     labels: ["Minimum", "Maximum"],
                     seriesNames: data.seriesNames,
                     type: "time-series",
@@ -267,7 +295,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
 
         // FIXME: Actually pull these charts from the DB or something.
         if ($scope.activePage == 'economic') {
-            $scope.subtitle = "Socio-Economic Information"
+            $scope.subtitle = "Economic Report"
             occurrence_of_bought_vs_caught($scope.charts, start_date, end_date,
                 surveySlug);
             occurrence_of_sales($scope.charts, start_date, end_date,
@@ -279,7 +307,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             $scope.sectioned_charts["Max / Min Reported Market Prices "] = [];
             min_max_charts($scope.sectioned_charts["Max / Min Reported Market Prices "], start_date, end_date, surveySlug);
         } else if ($scope.activePage == 'biological') {
-            $scope.subtitle = "Biologic Information"
+            $scope.subtitle = "Biological Report"
             occurrence_of_resource($scope.charts, start_date, end_date,
                 surveySlug);
             occurrence_per_family($scope.charts, start_date, end_date,
@@ -317,23 +345,9 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         }
     });
 
-    $scope.getRespondents = function (url) {
-        $scope.respondentsLoading = true;
-        if (! url) {
-            url = '/api/v1/reportrespondant/?format=json&limit=10&survey__slug__exact=' + $routeParams.surveySlug;
-        }
-        if ($scope.filter.startDate && url.indexOf("&ts__gte=") == -1) {
-            url = url + '&ts__gte=' + new Date($scope.filter.startDate).add(-1).day().toString('yyyy-MM-dd');
-        }
-        if ($scope.filter.endDate && url.indexOf("&ts__lte=") == -1) {
-            url = url + '&ts__lte=' + new Date($scope.filter.endDate).add(2).day().toString('yyyy-MM-dd');
-        }
-
-        $http.get(url).success(function(data) {
-            $scope.respondentsLoading = false;
-            $scope.respondents = data.objects;
-            $scope.meta = data.meta;
-        });
+    $scope.getRespondents = function(url) {
+        // Higher order function to make the next/prve buttons work.
+        return reportsCommon.getRespondents(url, $scope);
     }
 
     $scope.$watch('filter', function (newValue) {
