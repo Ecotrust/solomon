@@ -206,7 +206,7 @@ def get_crosstab_csv(request, survey_slug, question_a_slug, question_b_slug):
         return obj
 
     response = _create_csv_response('crosstab-{0}-{1}.csv'.format(question_a_slug, question_b_slug))
-    if obj['type'] == 'stacked-column':
+    if obj['type'] in ('stacked-column', 'stacked-column-count'):
         fields = obj['seriesNames']
         fields.insert(0, obj['question_a'])
 
@@ -217,7 +217,10 @@ def get_crosstab_csv(request, survey_slug, question_a_slug, question_b_slug):
                 obj['question_a']: row['name']
             }
             for v in row['value']:
-                data[v['row_text']] = v['average']
+                if obj['type'] == 'stacked-column':
+                    data[v['row_text']] = v['average']
+                else:
+                    data[v['answer_text']] = v['count']
             writer.writerow(data)
     elif obj['type'] == 'bar-chart':
         writer = csv.writer(response)
