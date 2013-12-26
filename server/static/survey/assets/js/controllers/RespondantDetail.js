@@ -22,6 +22,9 @@ angular.module('askApp')
             'Content-Type': 'application/json;charset=utf-8',
             'X-CSRFToken': getCookie('csrftoken')
         }
+        $httpProvider.defaults.headers['delete'] = {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
     }])
     .controller('RespondantDetailCtrl', function($scope, $routeParams, $http, $location) {
 
@@ -32,6 +35,7 @@ angular.module('askApp')
     $http.get('/api/v1/reportrespondantdetails/'  + $routeParams.uuidSlug + '/?format=json&survey__slug=' + $routeParams.surveySlug).success(function(data) {
         //order responses to reflect the order in which they were presented in the survey
         data.responses = _.sortBy(data.responses, function(response) { return response.question.order; });
+        $scope.review_next_uuid = data.meta.next.unfiltered;
         _.each(data.responses, function (response) {
 
             response.answer_parsed = JSON.parse(response.answer_raw);
@@ -50,6 +54,11 @@ angular.module('askApp')
         $scope.survey = data;
     });
 
+    if (app.user) {
+        $scope.user = app.user;
+    } else {
+        $location.path('/');
+    }
     $scope.uuid = $routeParams.uuidSlug;
     $scope.surveySlug = $routeParams.surveySlug;
 
@@ -61,15 +70,6 @@ angular.module('askApp')
         zoom: 7
     }
 
-
-    //$scope.$watch('review_comment', function (newValue) {
-    //    $scope.updateStatus(newValue);
-    //}, false);
-
-    //$scope.$watch('current_status', function (newValue) {
-    //    $scope.updateStatus(newValue);
-    //}, false);
-
     $scope.updateStatus = function() {
         $http({
             url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
@@ -77,9 +77,21 @@ angular.module('askApp')
             method: 'PATCH'
         }).success(function(data) {
             $scope.last_status = $scope.current_status;
+            if ($scope.review_next_uuid) {
+                window.location = "#/RespondantDetail/" + $scope.surveySlug +
+                    "/" + $scope.review_next_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
+            }
         });
     }
 
+    $scope.delete_respondent = function () {
+        $http({
+            method: 'DELETE',
+            url: "/api/v1/respondant/" + $scope.uuid + "/"
+        }).success(function (data) {
+            window.location = "#/RespondantList/" + $scope.surveySlug;
+        });
+    };
     $scope.getResponseBySlug = function(slug) {
         var question = _.filter($scope.response.responses, function(item) {
             return item.question.slug === slug;

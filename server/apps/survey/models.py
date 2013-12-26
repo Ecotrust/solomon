@@ -1,7 +1,8 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Max, Min, Count, Sum
-from django.contrib.auth.models import User
 from django.db.models import signals
+from django.utils.timezone import utc
 
 import datetime
 import uuid
@@ -47,11 +48,13 @@ class Respondant(caching.base.CachingMixin, models.Model):
 
     locations = models.IntegerField(null=True, blank=True)
 
-    ts = models.DateTimeField(auto_now_add=True)
+    ts = models.DateTimeField()
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True, default=None)
 
     surveyor = models.ForeignKey(User, null=True, blank=True)
 
+    csv_row = models.ForeignKey('reports.CSVRow', null=True, blank=True)
     test_data = models.BooleanField(default=False)
 
     objects = caching.base.CachingManager()
@@ -65,8 +68,19 @@ class Respondant(caching.base.CachingMixin, models.Model):
     def save(self, *args, **kwargs):
         if self.uuid and ":" in self.uuid:
             self.uuid = self.uuid.replace(":", "_")
+        if not self.ts:
+            self.ts = datetime.datetime.utcnow().replace(tzinfo=utc)
         self.locations = self.location_set.all().count()
+
+        if not self.csv_row:
+            # Circular import dodging
+            from apps.reports.models import CSVRow
+            self.csv_row = CSVRow.objects.create()
         super(Respondant, self).save(*args, **kwargs)
+        # Do this after saving so save_related is called to catch
+        # all the updated responses.
+        self.csv_row.json_data = simplejson.dumps(self.generate_flat_dict())
+        self.csv_row.save()
 
     @classmethod
     def get_field_names(cls):
@@ -380,8 +394,14 @@ class Response(caching.base.CachingMixin, models.Model):
     answer_number = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     answer_raw = models.TextField(null=True, blank=True)
     answer_date = models.DateTimeField(null=True, blank=True)
-    ts = models.DateTimeField(auto_now_add=True)
+    ts = models.DateTimeField()
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     objects = caching.base.CachingManager()
+
+    def save(self, *args, **kwargs):
+        if not self.ts:
+            self.ts = datetime.datetime.utcnow().replace(tzinfo=utc)
+        super(Response, self).save(*args, **kwargs)
 
     def generate_flat_dict(self):
         flat = {}

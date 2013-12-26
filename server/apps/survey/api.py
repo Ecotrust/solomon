@@ -6,7 +6,8 @@ from tastypie.authentication import SessionAuthentication, ApiKeyAuthentication,
 from tastypie.resources import ModelResource, ALL, ALL_WITH_RELATIONS
 
 from survey.models import (Survey, Question, Option, Respondant, Response,
-                           Page, Block, REVIEW_STATE_CHOICES)
+                           Page, Block, REVIEW_STATE_CHOICES, REVIEW_STATE_NEEDED,
+                           REVIEW_STATE_FLAGGED, REVIEW_STATE_ACCEPTED)
 
 
 class SurveyModelResource(ModelResource):
@@ -111,7 +112,29 @@ class ReportRespondantResource(AuthSurveyModelResource):
         return data
 
     def alter_detail_data_to_serialize(self, request, bundle):
-        bundle.data['meta'] = {'statuses': REVIEW_STATE_CHOICES}
+        if 'meta' not in bundle.data:
+            bundle.data['meta'] = {}
+
+        bundle.data['meta']['statuses'] = REVIEW_STATE_CHOICES
+
+        bundle.data['meta']['next'] = {}
+
+        base_filter = Respondant.objects.filter(ts__gt=bundle.obj.ts).order_by('ts')
+        if base_filter.exists():
+            bundle.data['meta']['next']['unfiltered'] = base_filter[0].pk
+
+        needed = base_filter.filter(review_status=REVIEW_STATE_NEEDED)
+        if needed.exists():
+            bundle.data['meta']['next']['needed'] = needed[0].pk
+
+        flagged = base_filter.filter(review_status=REVIEW_STATE_FLAGGED)
+        if flagged.exists():
+            bundle.data['meta']['next']['flagged'] = flagged[0].pk
+
+        not_accepted = base_filter.exclude(review_status=REVIEW_STATE_ACCEPTED)
+        if not_accepted.exists():
+            bundle.data['meta']['next']['not_accepted'] = not_accepted[0].pk
+
         return bundle
 
 

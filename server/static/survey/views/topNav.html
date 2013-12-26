@@ -4,8 +4,8 @@
         <a href="#/"><img src="{{user.static_url}}survey/assets/img/hapifis-small.jpg"></img></a>
         <h1 ng-show="getSurveyName()">{{getSurveyName()}}</h1>
     </div>
-    <a href="{{user.logout_url}}"><button type="button" class="navbar-btn navbar-right btn btn-default">Sign Out</button></a>
-    <a ng-show="user.is_staff" href="{{user.admin_url}}"><button type="button" class="navbar-btn navbar-right btn btn-info">Admin</button></a>
+    <a class="navbar-btn navbar-right btn btn-default" href="{{user.logout_url}}">Sign Out</a>
+    <a ng-show="user.is_superuser" class="navbar-btn navbar-right btn btn-info" href="{{user.admin_url}}">Admin</a>
     <p class="navbar-text navbar-right">Signed in as {{user.username}}</p>
   </div>
 </nav>

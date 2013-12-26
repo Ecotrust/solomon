@@ -1,7 +1,7 @@
 angular.module('askApp')
     .directive('printButton', function() {
             return {
-                template: '<button id="print_button" class="btn btn-warning" ng-click="print()"><i class="icon-print"></i> Print</button>',
+                template: '<a id="print_button" class="btn btn-warning" ng-click="print()"><i class="icon-print"></i> Print</a>',
                 restrict: 'EA',
                 transclude: true,
                 replace: true,
