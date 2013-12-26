@@ -1,11 +1,51 @@
 angular.module('askApp')
     .controller('MarketReportCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
 
+    function average_for_resource(charts, start_date, end_date, slug) {
+        var url = "/reports/grid-standard-deviation/price-per-pound/" + $scope.surveyorTimeFilter
+            url = url + '?startdate=' + start_date;
+            url = url + '&enddate=' + end_date;
+            url = url + '&col=Day1';
+        var fish_name_whitelist = ["Common Reef Fish", "Coral grouper/Coral trout",
+            "Deepwater Snapper", "Humphead/Napoleon Wrasse", "Kingfish",
+            "Ratfish", "Spanish Mackerel", "Topa",
+            "Mollusc/squid/octopus/lobster"];
+
+        return $http.get(url).success(function(data) {
+            var to_graph = {};
+            _.each(_.keys(data.graph_data), function(item) {
+                to_graph[item] = {
+                    name: item,
+                    data: _.map(data.graph_data[item], function(x) {
+                        return [parseInt(x.date), parseFloat(x.average)];
+                    })
+                }
+            });
+            to_graph = _.filter(to_graph, function(x) {
+                return fish_name_whitelist.indexOf(x.name) != -1;
+            });
+            $scope.average_for_resource = {
+                title: "Average Price for Resource",
+                unit: '$',
+                labels: _.keys(to_graph),
+                seriesNames: _.keys(to_graph),
+                type: "time-series",
+                raw_data: _.values(to_graph),
+                xLabel: 'Date',
+                yLabel: 'Price',
+                order: 1,
+                message: data.message
+            }
+        });
+    }
     function filters_changed(surveySlug) {
         reportsCommon.getRespondents(null, $scope);
         var url = reportsCommon.build_survey_stats_url($scope);
 
-        total_weight_for_market(surveySlug);
+        var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
+        var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
+
+        average_for_resource($scope.charts, start_date, end_date, $routeParams.surveySlug);
 
         $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {
@@ -15,33 +55,6 @@ angular.module('askApp')
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
             }
-        });
-    }
-
-    function total_weight_for_market(slug) {
-        var sdate = new Date($scope.filter.startDate);
-        var edate = new Date($scope.filter.endDate);
-
-        var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
-        url = url + '?startdate=' + sdate.toString("yyyyMMdd");
-        url = url + '&enddate=' + edate.toString("yyyyMMdd");
-        url = url + '&group=week';
-
-        return $http.get(url).success(function(data) {
-            var filtered_answers = _.map(data.crosstab, function(answer) {
-                answer.value = _.filter(answer.value, function(x) {
-                    var d = reportsCommon.dateFromISO(x.date);
-                    return (d >= sdate && d <= edate);
-                });
-                return answer;
-            });
-
-            filtered_answers = _.filter(data.crosstab, function(answer) {
-                return (!$scope.market || $scope.market == answer.name);
-            });
-            $scope.total_market_weight = _.reduce(filtered_answers, function(accum, val) {
-                return accum + _.reduce(val.value, function(x,y) { return x + parseInt(y.sum); }, 0);
-            }, 0);
         });
     }
 
