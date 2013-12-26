@@ -108,3 +108,33 @@ angular.module('askApp')
             }
         }
     });
+angular.module('askApp')
+    .directive('datePicker', function() {
+
+    return {
+        template: '<input class="datepicker" ng-model="answer">',
+        restrict: 'EA',
+        transclude: true,
+        replace: true,
+        scope: {
+            answer: '=answer'
+        },
+        link: function (scope, element, attrs) {
+            var scroller = element.scroller({
+                preset: 'date',
+                mode: 'clickpick',
+                // theme: 'android-ics light',
+                dateFormat : "dd/mm/yy",
+                onSelect: function (date) {
+                     scope.$apply(function (s) {
+                        s.answer = date;    
+                    });
+                }
+            });
+
+            if (scope.answer) {
+                scroller.scroller('setValue', scope.answer, true);
+            }
+        }
+    }
+});
