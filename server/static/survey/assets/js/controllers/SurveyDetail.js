@@ -148,16 +148,14 @@ angular.module('askApp')
     .controller('SurveyDetailCtrl', function($scope, $routeParams, $http, $location, $dialog, $interpolate, $timeout) {
         $scope.loading = true;
         $scope.path = $location.path().slice(1, 5);
-        if (app.user) {
+        if (app && app.user) {
             $scope.user = app.user;
         } else if (app.offline) {
-            console.log('redirecting' + $location.path());
             if (!app) {
                 app = {};
             }
             app.next = $location.path();
             $location.path('/');
-            return false;
         }
 
         $scope.survey = {
@@ -165,7 +163,6 @@ angular.module('askApp')
         };
 
         $scope.answers = {};
-
         // Only show the progress bar if we're ie9 and above
         $scope.showProgressBar = $("html").is(".lt-ie9");
 
@@ -763,6 +760,7 @@ angular.module('askApp')
 
             if ($routeParams.questionSlug === 'first') {
                 app.offline = false;
+                $scope.saveState(app);
                 $location.path(['survey', $routeParams.surveySlug, $scope.survey.questions[0].slug, $routeParams.uuidSlug].join('/'));
             }
             if (!$scope.question) {
@@ -1552,7 +1550,6 @@ angular.module('askApp')
         };
         $scope.viewPath = app.viewPath;
         if ($routeParams.uuidSlug && $routeParams.uuidSlug !== 'online' && !_.string.startsWith($routeParams.uuidSlug, 'offline') && app.offline) {
-
             $http.get(app.server + '/api/v1/survey/' + $routeParams.surveySlug + '/?format=json').success(function(data) {
                 var responses = [];
                 app.data = {
@@ -1601,6 +1598,8 @@ angular.module('askApp')
             });
         } else {
             if ($routeParams.uuidSlug === 'online') {
+                app.offline = false;
+
                 $http.get(app.server + '/respond/' + $routeParams.surveySlug + '?get-uid=true').success(function(data) {
                     $location.path(['survey', $routeParams.surveySlug, 'first', data.uuid].join('/'));
                 }).error(function(data, status, headers, config) {
