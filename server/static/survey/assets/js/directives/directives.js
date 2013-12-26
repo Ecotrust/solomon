@@ -15,7 +15,7 @@ angular.module('askApp')
     .directive('dateRangePicker', function() {
 
         return {
-            template: '<div id="reportrange" ng-show="start" class="pull-right"><i class="icon-calendar icon-large"></i> <span>{{ start|validDate: "dd-MM-yyyy"  }} to {{ end|validDate: "dd-MM-yyyy" }}</span></div>',
+            template: '<div><i class="icon-calendar icon-large"></i> <span ng-bind="displayMin"></span> to <span ng-bind="displayMax"></span></div>',
             restrict: 'EA',
             transclude: true,
             replace: true,
@@ -49,7 +49,9 @@ angular.module('askApp')
                     }, function(start, end) {
                         scope.$apply(function(s) {
                             s.start = start;
+                            s.displayMin = (new Date(start)).toString('dd-MM-yyyy')
                             s.end = end;
+                            s.displayMax = (new Date(end)).toString('dd-MM-yyyy')
                         });
                     });
                 });
@@ -57,7 +59,7 @@ angular.module('askApp')
 
                 scope.$watch('min', function(newValue) {
                     if (newValue) {
-                        min = (new Date(newValue)).toString('dd-MM-yyyy');
+                        scope.displayMin = min = (new Date(newValue)).toString('dd-MM-yyyy');
                         if (max && min) {
                             initializePicker(min, max);
                         }
@@ -66,7 +68,7 @@ angular.module('askApp')
                 });
                 scope.$watch('max', function(newValue) {
                     if (newValue) {
-                        max = (new Date(newValue)).toString('dd-MM-yyyy');
+                        scope.displayMax = max = (new Date(newValue)).toString('dd-MM-yyyy');
                         if (max && min) {
                             initializePicker(min, max);
                         }
