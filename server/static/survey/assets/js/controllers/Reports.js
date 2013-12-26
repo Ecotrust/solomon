@@ -59,10 +59,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             charts.push({
                 title: "Frequency of Sales Types",
                 type: "stacked-column",
+                yLabel: "Amount of Sales",
                 labels: _.pluck(data.crosstab, 'name'),
                 data: data.crosstab,
                 download_url: url.replace("how-sold", "how-sold" + '.csv'),
                 order: 1,
+                labelPercentage: true,
                 seriesNames: data.seriesNames,
                 message: data.message,
                 unit: ''
