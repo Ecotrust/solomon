@@ -40,9 +40,7 @@ angular.module('askApp')
                                 type: scope.chart.type == 'bar-chart' ? 'column' : 'bar'
                             },
                             backgroundColor: 'rgba(255, 255, 255, 0)',
-                            title: {
-                                text: scope.chart.title || false
-                            },
+                            title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             tooltip: {
                                 formatter: function() {
                                     return '<b>' + this.series.name + '</b>' + ': ' + this.y;
@@ -107,9 +105,7 @@ angular.module('askApp')
                                 type: 'column'
                             },
                             backgroundColor: 'rgba(255, 255, 255, 0)',
-                            title: {
-                                text: false
-                            },
+                            title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             xAxis: {
                                 categories: scope.chart.labels,
                                 title: {
@@ -132,21 +128,10 @@ angular.module('askApp')
                             credits: {
                                 enabled: false
                             },
-                            // Commenting this out as per sprint.ly #148.
-                            //legend: {
-                            //    align: 'right',
-                            //    x: -70,
-                            //    verticalAlign: 'top',
-                            //    y: 20,
-                            //    floating: true,
-                            //    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColorSolid) || 'white',
-                            //    borderColor: '#CCC',
-                            //    borderWidth: 1,
-                            //    shadow: false
-                            //},
                             tooltip: {
                                 formatter: function() {
                                     return this.series.name + ': ' + this.y + '<br/>' +
+                                        'Percentage: ' + ((this.y/this.total)*100).toFixed(0) + "%" + '<br/>' +
                                         'Total: ' + this.point.stackTotal;
                                 }
                             },
@@ -160,7 +145,7 @@ angular.module('askApp')
                                                 function() {
                                                     return ((this.y/this.total)*100).toFixed(0) + "%" ;
                                                 } :
-                                                function() { return this.y; } )
+                                                scope.chart.formatFunc || function() { return this.y; } )
                                     }
                                 }
                             },
@@ -227,7 +212,7 @@ angular.module('askApp')
                             chart: {
                                 type: 'line'
                             },
-                            title: { text: scope.chart.title } || false,
+                            title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             subtitle: false,
                             xAxis: {
                                 type: 'datetime',

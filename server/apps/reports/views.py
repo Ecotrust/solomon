@@ -350,7 +350,7 @@ def _grid_standard_deviation(interval, question_slug, row_label=None, market=Non
         rows = rows.filter(response__respondant__survey_site=market)
     if status is not None:
         rows = rows.filter(response__respondant__review_status=status)
-    labels = list(rows.values_list('row_label', flat=True))
+    labels = list(rows.values_list('row_label', flat=True).distinct())
     rows = (rows.values('row_text', 'row_label', 'date')
                 .order_by('date')
                 .annotate(minimum=Min('answer_number'),
@@ -378,6 +378,35 @@ def grid_standard_deviation_json(request, question_slug, interval):
         'graph_data': graph_data,
         'labels': list(labels),
     }, cls=CustomJSONEncoder), content_type='application/json')
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def grid_standard_deviation_csv(request, question_slug, interval):
+    col_label = request.GET.get('col', None)
+    row_label = request.GET.get('row', None)
+    market = request.GET.get('market', None)
+    status = request.GET.get('status', None)
+    response = _create_csv_response('grid_standard_deviation_{0}_{1}_{2}.csv'.format(
+                                    question_slug, row_label, interval))
+    rows, _ = _grid_standard_deviation(interval, question_slug, row_label=row_label,
+                                       col_label=col_label, market=market, status=status)
+
+    field_names = OrderedDict((
+        ('row_text', 'Type'),
+        ('date', 'Date'),
+        ('minimum', 'Minimum'),
+        ('average', 'Average'),
+        ('maximum', 'Maximum'),
+        ('total', 'Total')
+    ))
+
+    writer = SlugCSVWriter(response, field_names)
+    writer.writeheader()
+    for row in rows:
+        row.pop('row_label')
+        row['date'] = str(row['date'])
+        writer.writerow(row)
+    return response
 
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
