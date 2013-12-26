@@ -96,6 +96,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 title: "Occurrence of Bought vs. Caught",
                 type: "stacked-column",
                 labels: _.pluck(data.crosstab, 'name'),
+                yLabel: 'Total Bought or Caught',
                 data: data.crosstab,
                 download_url: url.replace("buy-or-catch", "buy-or-catch" + '.csv'),
                 order: 1,
