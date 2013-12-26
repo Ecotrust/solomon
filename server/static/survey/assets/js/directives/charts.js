@@ -40,9 +40,7 @@ angular.module('askApp')
                                 type: scope.chart.type == 'bar-chart' ? 'column' : 'bar'
                             },
                             backgroundColor: 'rgba(255, 255, 255, 0)',
-                            title: {
-                                text: scope.chart.title || false
-                            },
+                            title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             tooltip: {
                                 formatter: function() {
                                     return '<b>' + this.series.name + '</b>' + ': ' + this.y;
@@ -107,9 +105,7 @@ angular.module('askApp')
                                 type: 'column'
                             },
                             backgroundColor: 'rgba(255, 255, 255, 0)',
-                            title: {
-                                text: false
-                            },
+                            title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             xAxis: {
                                 categories: scope.chart.labels,
                                 title: {

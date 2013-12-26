@@ -54,9 +54,11 @@
             </div>
             <i ng-show="respondentsLoading" class="icon-spinner icon-spin"></i>
             <div id="surveyor_total_chart">
+                <h2>{{ surveyor_total.title }}</h2>
                 <div bar-chart chart="surveyor_total"></div>
             </div>
             <div id="surveyor_by_time_chart">
+                <h2>{{ surveyor_by_time.title }}</h2>
                 <div time-series chart="surveyor_by_time"></div>
             </div>
         </div>

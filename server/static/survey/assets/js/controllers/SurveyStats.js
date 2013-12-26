@@ -9,6 +9,7 @@ angular.module('askApp')
             $scope.surveyor_by_time = {
                 yLabel: "Surveys Collected",
                 title: "Surveys Collected by Date",
+                displayTitle: false,
                 raw_data: data.graph_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 unit: "surveys"
@@ -21,6 +22,7 @@ angular.module('askApp')
             );
             $scope.surveyor_total = {
                 labels: _.pluck(data.graph_data, 'name'),
+                displayTitle: false,
                 yLabel: "Surveys Collected",
                 title: "Total Surveys Collected by Surveyor",
                 type: "bar",
