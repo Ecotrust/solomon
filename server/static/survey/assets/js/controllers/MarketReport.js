@@ -1,6 +1,33 @@
 angular.module('askApp')
     .controller('MarketReportCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
 
+    function total_weight_for_market(slug) {
+        var sdate = new Date($scope.filter.startDate);
+        var edate = new Date($scope.filter.endDate);
+
+        var url = ['/reports/crosstab', slug, 'survey-site', 'total-weight'].join('/');
+        url = url + '?startdate=' + sdate.toString("yyyyMMdd");
+        url = url + '&enddate=' + edate.toString("yyyyMMdd");
+        url = url + '&group=week';
+
+        return $http.get(url).success(function(data) {
+            var filtered_answers = _.map(data.crosstab, function(answer) {
+                answer.value = _.filter(answer.value, function(x) {
+                    var d = reportsCommon.dateFromISO(x.date);
+                    return (d >= sdate && d <= edate);
+                });
+                return answer;
+            });
+
+            filtered_answers = _.filter(data.crosstab, function(answer) {
+                return (!$scope.market || $scope.market == answer.name);
+            });
+            $scope.total_market_weight = _.reduce(filtered_answers, function(accum, val) {
+                return accum + _.reduce(val.value, function(x,y) { return x + parseInt(y.sum); }, 0);
+            }, 0);
+        });
+    }
+
     function average_for_resource(charts, start_date, end_date, slug) {
         var url = "/reports/grid-standard-deviation/price-per-pound/" + $scope.surveyorTimeFilter
             url = url + '?startdate=' + start_date;
@@ -45,6 +72,7 @@ angular.module('askApp')
         var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
         var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
 
+        total_weight_for_market(surveySlug);
         average_for_resource($scope.charts, start_date, end_date, $routeParams.surveySlug);
 
         $http.get(url).success(function(data) {
