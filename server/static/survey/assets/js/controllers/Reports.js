@@ -99,6 +99,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 yLabel: 'Total Bought or Caught',
                 data: data.crosstab,
                 download_url: url.replace("buy-or-catch", "buy-or-catch" + '.csv'),
+                labelPercentage: true,
                 order: 1,
                 seriesNames: data.seriesNames,
                 message: data.message,

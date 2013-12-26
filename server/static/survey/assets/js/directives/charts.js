@@ -155,7 +155,12 @@ angular.module('askApp')
                                     stacking: 'normal',
                                     dataLabels: {
                                         enabled: true,
-                                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                                        color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                        formatter: (scope.chart.labelPercentage ?
+                                                function() {
+                                                    return "%" + ((this.y/this.total)*100).toFixed(2);
+                                                } :
+                                                function() { return this.y; } )
                                     }
                                 }
                             },
