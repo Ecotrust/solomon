@@ -160,6 +160,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $route
         var start_date = reportsCommon.dateFromISO($scope.survey.response_date_start);
         var end_date = reportsCommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
+            min: start_date.valueOf(),
+            max: end_date.valueOf(),
             startDate: start_date.valueOf(),
             endDate: end_date.valueOf()
         }
