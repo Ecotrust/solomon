@@ -155,3 +155,6 @@ input.datepicker {
     display: inline-block;
     float: right;
 }
+.print-show {
+    display: none;
+}
