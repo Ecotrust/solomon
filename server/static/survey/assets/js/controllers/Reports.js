@@ -273,13 +273,19 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 return answer;
             });
 
+            var bar_data = _.map(filtered,
+                function (x) {
+                    return _.reduce(x.value, function (attr, val) { return attr + parseInt(val.sum); }, 0);
+                }
+            );
+
             charts.push({
-                title: "Total Weight for Week by Market",
+                title: "Total Weight by Market",
                 displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 seriesNames: data.seriesNames,
-                type: data.type,
-                data: filtered,
+                type: 'bar-chart',
+                data: bar_data,
                 unit: 'kg',
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
