@@ -160,7 +160,7 @@ angular.module('askApp')
                                                 function() {
                                                     return ((this.y/this.total)*100).toFixed(0) + "%" ;
                                                 } :
-                                                function() { return this.y; } )
+                                                scope.chart.formatFunc || function() { return this.y; } )
                                     }
                                 }
                             },
@@ -227,7 +227,7 @@ angular.module('askApp')
                             chart: {
                                 type: 'line'
                             },
-                            title: { text: scope.chart.title } || false,
+                            title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             subtitle: false,
                             xAxis: {
                                 type: 'datetime',

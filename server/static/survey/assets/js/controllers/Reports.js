@@ -32,11 +32,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             charts.push({
                 title: "Total Fish Weight by Market",
                 type: data.type,
+                displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 data: filtered,
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
-                yLabel: 'Total Weight (kg)',
+                yLabel: 'Weight (kg)',
                 order: 2,
                 message: data.message,
                 unit: 'kg'
@@ -62,11 +63,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             charts.push({
                 title: "Total Fish Weight by Province",
                 type: data.type,
+                displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 data: filtered,
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Province',
-                yLabel: 'Total Weight (kg)',
+                yLabel: 'Weight (kg)',
                 order: 3,
                 message: data.message,
                 unit: 'kg'
@@ -99,13 +101,13 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'type-of-fish');
         return $http.get(url).success(function(data) {
             charts.push({
-                title: "Frequency of Resources",
+                title: "Frequency of Resource Type by Market",
                 type: "stacked-column",
                 labels: _.pluck(data.crosstab, 'name'),
                 data: data.crosstab,
                 download_url: url.replace("type-of-fish", "type-of-fish" + '.csv'),
-                labelPercentage: true,
-                yLabel: 'Cost',
+                formatFunc: function() { return null; },
+                yLabel: 'Number',
                 order: 1,
                 seriesNames: data.seriesNames,
                 message: data.message,
@@ -122,7 +124,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 title: "Occurrence of Bought vs. Caught",
                 type: "stacked-column",
                 labels: _.pluck(data.crosstab, 'name'),
-                yLabel: 'Total Bought or Caught',
+                yLabel: 'Fish Weight (kg)',
                 data: data.crosstab,
                 download_url: url.replace("buy-or-catch", "buy-or-catch" + '.csv'),
                 labelPercentage: true,
@@ -138,12 +140,15 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'fish-per-family');
         return $http.get(url).success(function(data) {
             charts.push({
-                title: "Fish Families Per Market",
+                title: "Frequency of Fish Family by Market",
+                displayTitle: false,
                 type: "stacked-column",
-                labels: _.pluck(data.crosstab, 'name'),
+                labels: false,//_.pluck(data.crosstab, 'name'),
+                formatFunc: function() { return null; },
                 data: data.crosstab,
                 download_url: url.replace("fish-per-family", "fish-per-family" + '.csv'),
                 order: 1,
+                yLabel: "Number",
                 seriesNames: data.seriesNames,
                 message: data.message,
                 unit: ''
@@ -193,7 +198,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 type: "time-series",
                 raw_data: _.values(to_graph),
                 xLabel: 'Market',
-                yLabel: 'Cost',
+                yLabel: 'Price',
                 order: 1,
                 message: data.message
             });
@@ -269,6 +274,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
 
             charts.push({
                 title: "Total Weight for Week by Market",
+                displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 seriesNames: data.seriesNames,
                 type: data.type,
@@ -276,7 +282,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 unit: 'kg',
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Market',
-                yLabel: 'Total Weight (kg)',
+                yLabel: 'Weight (kg)',
                 order: 4,
                 startDate: start_date,
                 endDate: end_date,
