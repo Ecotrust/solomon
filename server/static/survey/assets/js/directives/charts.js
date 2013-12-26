@@ -158,7 +158,7 @@ angular.module('askApp')
                                         color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
                                         formatter: (scope.chart.labelPercentage ?
                                                 function() {
-                                                    return "%" + ((this.y/this.total)*100).toFixed(2);
+                                                    return ((this.y/this.total)*100).toFixed(0) + "%" ;
                                                 } :
                                                 function() { return this.y; } )
                                     }
