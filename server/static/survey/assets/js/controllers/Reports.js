@@ -267,7 +267,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
 
         // FIXME: Actually pull these charts from the DB or something.
         if ($scope.activePage == 'economic') {
-            $scope.subtitle = "Socio-Economic Information"
+            $scope.subtitle = "Economic Report"
             occurrence_of_bought_vs_caught($scope.charts, start_date, end_date,
                 surveySlug);
             occurrence_of_sales($scope.charts, start_date, end_date,
@@ -279,7 +279,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             $scope.sectioned_charts["Max / Min Reported Market Prices "] = [];
             min_max_charts($scope.sectioned_charts["Max / Min Reported Market Prices "], start_date, end_date, surveySlug);
         } else if ($scope.activePage == 'biological') {
-            $scope.subtitle = "Biologic Information"
+            $scope.subtitle = "Biological Report"
             occurrence_of_resource($scope.charts, start_date, end_date,
                 surveySlug);
             occurrence_per_family($scope.charts, start_date, end_date,
