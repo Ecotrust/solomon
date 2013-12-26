@@ -119,7 +119,7 @@ angular.module('askApp')
                             yAxis: {
                                 min: 0,
                                 title: {
-                                    text: 'Average Cost (SBD)'
+                                    text: scope.chart.yLabel || 'Average Cost (SBD)'
                                 },
                                 stackLabels: {
                                     enabled: true,
