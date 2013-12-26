@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 from reports.views import (full_data_dump_csv, get_crosstab_json,
                            get_crosstab_csv, get_distribution, get_geojson,
                            grid_standard_deviation_json,
+                           grid_standard_deviation_csv,
                            surveyor_stats_csv, surveyor_stats_json,
                            surveyor_stats_raw_data_csv)
 
@@ -23,6 +24,10 @@ urlpatterns = patterns('',
     url(r'/surveyor-stats/(?P<survey_slug>[\w\d-]+)/(?P<interval>[\w]+)',
         surveyor_stats_json,
         name='reports_surveyor_stats_json'),
+
+    url(r'/grid-standard-deviation/(?P<question_slug>[\w\d-]+)/(?P<interval>[\w]+).csv',
+        grid_standard_deviation_csv,
+        name='reports_grid_standard_deviation_csv'),
 
     url(r'/grid-standard-deviation/(?P<question_slug>[\w\d-]+)/(?P<interval>[\w]+)',
         grid_standard_deviation_json,
