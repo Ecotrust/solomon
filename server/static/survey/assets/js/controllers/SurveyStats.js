@@ -25,6 +25,7 @@ angular.module('askApp')
                 displayTitle: false,
                 yLabel: "Surveys Collected",
                 title: "Total Surveys Collected by Surveyor",
+                categories: [""],
                 type: "bar",
                 data: bar_data,
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + ".csv"),
