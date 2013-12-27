@@ -30,7 +30,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             });
 
             charts.push({
-                title: "Total Fish Weight by Market",
+                title: "Total Fish Weight Over Time",
                 type: data.type,
                 displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
@@ -294,7 +294,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             );
 
             charts.push({
-                title: "Total Weight by Market",
+                title: "Total Fish Weight by Market",
                 displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 seriesNames: data.seriesNames,
