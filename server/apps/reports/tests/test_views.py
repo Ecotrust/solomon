@@ -4,11 +4,12 @@ import json
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.utils.text import slugify
 from django.utils.timezone import utc
 from django.test import TestCase
 
 from survey.models import Question, Respondant, Response, Survey, REVIEW_STATE_ACCEPTED, REVIEW_STATE_NEEDED
-from ..views import _get_crosstab, _grid_standard_deviation
+from ..views import _get_crosstab, _grid_standard_deviation, _vendor_resource_type_frequency
 
 
 class BaseSurveyorStatsCase(TestCase):
@@ -128,7 +129,7 @@ class ResponseMixin(object):
         return text_response
 
     def create_multi_select_response(self, question, respondant, when, answers):
-        raw_answer = [{'text': a.title(), 'label': a.lower(),
+        raw_answer = [{'text': a, 'label': slugify(unicode(a)),
                        'checked': True, 'isGroupName': False}
                       for a in answers]
         ms_response = Response(question=question, respondant=respondant,
@@ -226,8 +227,8 @@ class TestCrossTabMultiSelect(TestCase, ResponseMixin):
 
     def test_stacked_column(self):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
-        self.create_respondant(now, 'Ball Beach', ('caught',))
-        self.create_respondant(now, 'Ball Beach', ('caught', 'bought'))
+        self.create_respondant(now, 'Ball Beach', ('Caught',))
+        self.create_respondant(now, 'Ball Beach', ('Caught', 'Bought'))
 
         obj = self.request({})
         self.assertIn('crosstab', obj)
@@ -245,8 +246,8 @@ class TestCrossTabMultiSelect(TestCase, ResponseMixin):
 
     def test_market_filter(self):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
-        self.create_respondant(now, 'Ball Beach', ('caught',))
-        self.create_respondant(now, 'Maro Maro', ('bought',))
+        self.create_respondant(now, 'Ball Beach', ('Caught',))
+        self.create_respondant(now, 'Maro Maro', ('Bought',))
 
         obj = self.request({'market': 'Ball Beach'})
         self.assertIn('crosstab', obj)
@@ -259,8 +260,8 @@ class TestCrossTabMultiSelect(TestCase, ResponseMixin):
 
     def test_status_filter(self):
         now = datetime.datetime.utcnow().replace(tzinfo=utc)
-        self.create_respondant(now, 'Ball Beach', ('caught',), status=REVIEW_STATE_NEEDED)
-        self.create_respondant(now, 'Maro Maro', ('bought',), status=REVIEW_STATE_ACCEPTED)
+        self.create_respondant(now, 'Ball Beach', ('Caught',), status=REVIEW_STATE_NEEDED)
+        self.create_respondant(now, 'Maro Maro', ('Bought',), status=REVIEW_STATE_ACCEPTED)
 
         obj = self.request({'status': REVIEW_STATE_ACCEPTED})
         self.assertIn('crosstab', obj)
@@ -391,3 +392,61 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
         body = json.loads(res.content)
         self.assertIn('labels', body)
         self.assertIn('graph_data', body)
+
+
+class TestVendorResourceFrequency(TestCase, ResponseMixin):
+    fixtures = ['reef.json', 'users.json']
+    vendor_a = 'Cathrine Molea'
+    vendor_b = 'Charles Darwin'
+    fish_a = 'Lethrinidae (emperors)'
+    fish_b = 'Caesionidae (fusiliers)'
+
+    def setUp(self):
+        self.user = User.objects.get(username='superuser_alpha')
+        self.survey = Survey.objects.get(slug='reef-fish-market-survey')
+        self.question_vendor = Question.objects.get(slug='vendor')
+        self.question_fishes = Question.objects.get(slug='fish-families')
+        self.question_market = Question.objects.get(slug='survey-site')
+
+    def create_respondant(self, vendor, fishes, market=None, status=None):
+        when = datetime.datetime.utcnow().replace(tzinfo=utc)
+        respondant = Respondant(survey=self.survey,
+                                ts=when,
+                                surveyor=self.user)
+        if status is not None:
+            respondant.review_status = status
+
+        respondant.save()
+
+        if market is not None:
+            response_market = self.create_text_response(self.question_market,
+                                                        respondant, when, market)
+            respondant.responses.add(response_market)
+
+        response_vendor = self.create_text_response(self.question_vendor,
+                                                    respondant, when, vendor)
+        respondant.responses.add(response_vendor)
+
+        response_fishes = self.create_multi_select_response(self.question_fishes,
+                                                            respondant, when, fishes)
+        respondant.responses.add(response_fishes)
+        respondant.save()
+        return respondant
+
+    def test_percents(self):
+        self.create_respondant(self.vendor_a, (self.fish_a, self.fish_b))
+        self.create_respondant(self.vendor_b, (self.fish_a,))
+        rows, vendor_count = _vendor_resource_type_frequency()
+
+        expected = 2
+        count = 0
+        for row in rows:
+            if row['answer_text'] == self.fish_a:
+                count += 1
+                self.assertEqual(row['count'], 2)
+                self.assertEqual(row['percent'], '%.2f' % (2.0 / vendor_count))
+            elif row['answer_text'] == self.fish_b:
+                count += 1
+                self.assertEqual(row['count'], 1)
+                self.assertEqual(row['percent'], '%.2f' % (1.0 / vendor_count))
+        self.assertEqual(count, expected)

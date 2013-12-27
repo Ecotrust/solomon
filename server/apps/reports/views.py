@@ -412,6 +412,66 @@ def grid_standard_deviation_csv(request, question_slug, interval):
     return response
 
 
+def _vendor_resource_type_frequency(market=None, status=None):
+    base_values = Question.objects.get(slug='fish-families').rows.splitlines()
+    vendors = Question.objects.get(slug='vendor').rows.splitlines()
+    vendor_count = len(vendors)
+    rows = (MultiAnswer.objects.filter(response__question__slug='fish-families',
+                                       response__respondant__vendor__in=vendors,
+                                       answer_text__in=base_values))
+
+    if market is not None:
+        rows.filter(response__respondant__survey_site=market)
+
+    if status is not None:
+        rows.filter(response__respondant__review_status=market)
+
+    rows = (rows.values('answer_text')
+                .annotate(count=Count('response__respondant__vendor')))
+
+    for row in rows:
+        row['percent'] = '%.2f' % (float(row['count']) / vendor_count)
+
+    return rows, vendor_count
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def vendor_resource_type_frequency_csv(request):
+    market = request.GET.get('market', None)
+    status = request.GET.get('status', None)
+
+    response = _create_csv_response('vendor_resource_frequency.csv')
+
+    rows, vendor_count = _vendor_resource_type_frequency(market=market, status=status)
+
+    field_names = OrderedDict((
+        ('answer_text', 'Fish Family'),
+        ('count', 'Count'),
+        ('percent', 'Percent')
+    ))
+
+    writer = SlugCSVWriter(response, field_names)
+    writer.writeheader()
+    for row in rows:
+        row.pop('row_label')
+        row['date'] = str(row['date'])
+        writer.writerow(row)
+    return response
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def vendor_resource_type_frequency_json(request):
+    market = request.GET.get('market', None)
+    status = request.GET.get('status', None)
+    rows, vendor_count = _vendor_resource_type_frequency(market=market, status=status)
+
+    return HttpResponse(json.dumps({
+        'success': True,
+        'graph_data': rows,
+        'vendor_count': vendor_count
+    }, cls=CustomJSONEncoder), content_type='application/json')
+
+
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def full_data_dump_csv(request, survey_slug):
     survey = Survey.objects.get(slug=survey_slug)
