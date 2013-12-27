@@ -15,7 +15,6 @@ from ordereddict import OrderedDict
 from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer, GridAnswer, MultiAnswer
 from .decorators import api_user_passes_test
 from .forms import SurveyorStatsForm
-from .models import QuestionReport
 from .utils import SlugCSVWriter
 
 
@@ -38,7 +37,7 @@ def get_geojson(request, survey_slug, question_slug):
         for filter in filter_list:
             slug = filter.keys()[0]
             value = filter[slug]
-            filter_question = QuestionReport.objects.get(slug=slug, survey=survey)
+            filter_question = Question.objects.get(slug=slug, survey=survey)
             locations = locations.filter(location__respondant__responses__in=filter_question.response_set.filter(answer__in=value))
 
     geojson = []
@@ -62,7 +61,7 @@ def get_geojson(request, survey_slug, question_slug):
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def get_distribution(request, survey_slug, question_slug):
     survey = get_object_or_404(Survey, slug=survey_slug)
-    question = get_object_or_404(QuestionReport, slug=question_slug, survey=survey)
+    question = get_object_or_404(Question, slug=question_slug, survey=survey)
 
     filter_list = []
 
