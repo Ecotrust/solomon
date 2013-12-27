@@ -180,6 +180,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         var url = "/reports/grid-standard-deviation/cost/" + $scope.surveyorTimeFilter
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
+        if ($scope.market) {
+            url = url + '&market=' + $scope.market;
+        }
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
 
         return $http.get(url).success(function(data) {
             var to_graph = {};
@@ -212,6 +218,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             url = url + '?startdate=' + start_date;
             url = url + '&enddate=' + end_date;
             url = url + '&col=Day1';
+        if ($scope.market) {
+            url = url + '&market=' + $scope.market;
+        }
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
         var fish_name_whitelist = ["Common Reef Fish", "Coral grouper/Coral trout",
             "Deepwater Snapper", "Humphead/Napoleon Wrasse", "Kingfish",
             "Ratfish", "Spanish Mackerel", "Topa",
