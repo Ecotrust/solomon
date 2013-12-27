@@ -49,7 +49,8 @@ angular.module('askApp')
                             xAxis: {
                                 title: {
                                     text: scope.chart.xLabel
-                                }
+                                },
+                                categories: scope.chart.categories || []
                             },
                             yAxis: {
                                 title: {

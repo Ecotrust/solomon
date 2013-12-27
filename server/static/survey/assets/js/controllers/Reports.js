@@ -298,6 +298,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 seriesNames: data.seriesNames,
+                categories: [""],
                 type: 'bar-chart',
                 data: bar_data,
                 unit: 'kg',
