@@ -63,7 +63,7 @@
              hardcoding the /static/survey part -->
         <div ng-include="'/static/survey/views/topNav.html'"></div>
     {% endif %}
-    <div ng-view></div>
+    <div class="view-container" ng-view></div>
     <script src="{{ STATIC_URL }}survey/components/flatui/js/jquery-1.8.2.min.js"></script>
     <script src="{{ STATIC_URL }}survey/components/jquery-ui/ui/jquery-ui.js"></script>
     <script src="{{ STATIC_URL }}survey/components/angular/angular.js"></script>

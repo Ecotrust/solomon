@@ -99,7 +99,7 @@
 #sidenav_respondants #respondant_stats {
     border-top: solid 5px #2f3577;
     border-bottom: solid 5px #2f3577;
-    padding: 5px;
+    padding: 5px 0;
 }
 #side_total, #side_flagged, #side_reviews_needed{
     color: #FFF;
@@ -157,4 +157,9 @@ input.datepicker {
 }
 .print-show {
     display: none;
+}
+.view-container > .container {
+    /*margin-left: 0;*/
+    padding-left: 0;
+    padding-right: 0;
 }
