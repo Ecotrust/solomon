@@ -4,7 +4,9 @@ from reports.views import (full_data_dump_csv, get_crosstab_json,
                            grid_standard_deviation_json,
                            grid_standard_deviation_csv,
                            surveyor_stats_csv, surveyor_stats_json,
-                           surveyor_stats_raw_data_csv)
+                           surveyor_stats_raw_data_csv,
+                           vendor_resource_type_frequency_csv,
+                           vendor_resource_type_frequency_json)
 
 
 urlpatterns = patterns('',
@@ -32,6 +34,14 @@ urlpatterns = patterns('',
     url(r'/grid-standard-deviation/(?P<question_slug>[\w\d-]+)/(?P<interval>[\w]+)',
         grid_standard_deviation_json,
         name='reports_grid_standard_deviation_json'),
+
+    url(r'/vendor-resource-frequency.csv',
+        vendor_resource_type_frequency_csv,
+        name='vendor_resource_type_frequency_csv'),
+
+    url(r'/vendor-resource-frequency',
+        vendor_resource_type_frequency_json,
+        name='vendor_resource_type_frequency_json'),
 
     url(r'/full-survey-data/(?P<survey_slug>[\w\d-]+)',
         full_data_dump_csv,
