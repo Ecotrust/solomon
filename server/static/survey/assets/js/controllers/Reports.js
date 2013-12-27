@@ -121,7 +121,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'buy-or-catch');
         return $http.get(url).success(function(data) {
             charts.push({
-                title: "Occurrence of Bought vs. Caught",
+                title: "Frequency Vendor Bought or Caught Fish",
                 type: "stacked-column",
                 labels: _.pluck(data.crosstab, 'name'),
                 formatFunc: function() { },
@@ -161,7 +161,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'cost');
         return $http.get(url).success(function(data) {
             charts.push({
-                title: "Total Trip Costs",
+                title: "Average Vendor Expenses Per Trip",
                 labels: _.pluck(data.crosstab, 'name'),
                 seriesNames: data.seriesNames,
                 formatFunc: function() { },
@@ -169,7 +169,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 data: data.crosstab,
                 download_url: url.replace("cost", "cost" + '.csv'),
                 xLabel: 'Market',
-                yLabel: 'Cost',
+                yLabel: 'Average Expenses (SBD)',
                 order: 1,
                 message: data.message
             });
@@ -192,14 +192,14 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 }
             });
             charts.push({
-                title: "Prices Over Time for All Markets",
+                title: "Vendor Expenses Over Time for All Markets",
                 unit: '$',
                 labels: _.keys(to_graph),
                 seriesNames: _.keys(to_graph),
                 type: "time-series",
                 raw_data: _.values(to_graph),
                 xLabel: 'Market',
-                yLabel: 'Price',
+                yLabel: 'Expense (SBD)',
                 order: 1,
                 message: data.message
             });
@@ -242,13 +242,13 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                     data: x.max_data
                 }
                 charts.push({
-                    title: "Max-Min Prices for " + x.name,
-                    labels: ["Minimum", "Maximum"],
+                    title: "Max/Min Price on First Day of Sale - " + x.name,
+                    labels: ["Min Price", "Max Price"],
                     seriesNames: data.seriesNames,
                     type: "time-series",
                     raw_data: [ min_struct, max_struct],
                     xLabel: 'Date',
-                    yLabel: 'Cost',
+                    yLabel: 'Price per {ound (SBD)',
                     order: 1,
                     message: data.message,
                     unit: "$"
