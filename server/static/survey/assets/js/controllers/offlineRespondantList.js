@@ -84,8 +84,11 @@ angular.module('askApp')
         }
 
         $scope.deleteRespondent = function (respondent) {
+            var toBeDeleted = _.findWhere($scope.respondents,
+                {uuid: respondent.uuid});
             $scope.respondents = _.without($scope.respondents, respondent);
             $scope.saveState();
+            localStorage.removeItem('hapifish-' + respondent.uuid);
             $location.path('/respondents');
         }
 
