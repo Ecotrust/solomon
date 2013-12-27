@@ -57,6 +57,7 @@ angular.module('askApp')
                 labels: _.keys(to_graph),
                 seriesNames: _.keys(to_graph),
                 type: "time-series",
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 raw_data: _.values(to_graph),
                 xLabel: 'Date',
                 yLabel: 'Price',

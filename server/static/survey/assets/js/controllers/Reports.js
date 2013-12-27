@@ -195,6 +195,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 title: "Vendor Expenses Over Time for All Markets",
                 unit: '$',
                 labels: _.keys(to_graph),
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                 seriesNames: _.keys(to_graph),
                 type: "time-series",
                 raw_data: _.values(to_graph),
@@ -244,6 +245,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 charts.push({
                     title: "Max/Min Price on First Day of Sale - " + x.name,
                     labels: ["Min Price", "Max Price"],
+                    download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                     seriesNames: data.seriesNames,
                     type: "time-series",
                     raw_data: [ min_struct, max_struct],
