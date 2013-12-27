@@ -143,7 +143,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 title: "Frequency of Fish Family by Market",
                 displayTitle: false,
                 type: "stacked-column",
-                labels: false,//_.pluck(data.crosstab, 'name'),
+                labels: _.pluck(data.crosstab, 'name'),
                 formatFunc: function() { return null; },
                 data: data.crosstab,
                 download_url: url.replace("fish-per-family", "fish-per-family" + '.csv'),
