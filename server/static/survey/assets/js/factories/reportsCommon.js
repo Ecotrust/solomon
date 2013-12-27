@@ -9,7 +9,7 @@ angular.module('askApp').factory('reportsCommon', function($http, $routeParams, 
         url += '&end_date=' + end_date;
 
         if ($scope.market) {
-            url += '&survey_site=' + $scope.market;
+            url += '&market=' + $scope.market;
         }
 
         if ($scope.status_single) {
