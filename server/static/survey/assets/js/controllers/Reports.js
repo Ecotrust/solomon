@@ -198,7 +198,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 }
             });
             charts.push({
-                title: "Vendor Expenses Over Time for All Markets",
+                title: "Vendor Expenses Over Time",
                 unit: '$',
                 labels: _.keys(to_graph),
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
@@ -262,7 +262,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                     type: "time-series",
                     raw_data: [ min_struct, max_struct],
                     xLabel: 'Date',
-                    yLabel: 'Price per {ound (SBD)',
+                    yLabel: 'Price per Pound (SBD)',
                     order: 1,
                     message: data.message,
                     unit: "$"
