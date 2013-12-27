@@ -10,6 +10,13 @@ angular.module('askApp')
         url = url + '&enddate=' + edate.toString("yyyyMMdd");
         url = url + '&group=week';
 
+        if ($scope.market) {
+            url = url + '&market=' + $scope.market;
+        }
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
+
         return $http.get(url).success(function(data) {
             var filtered_answers = _.map(data.crosstab, function(answer) {
                 answer.value = _.filter(answer.value, function(x) {
