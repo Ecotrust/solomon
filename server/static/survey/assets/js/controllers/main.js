@@ -49,7 +49,6 @@ angular.module('askApp')
     $scope.showInfo = false;
     $scope.authenticateUser = function (user) {
         var url = app.server + "/account/authenticateUser";
-
         $http({
             method: 'POST',
             url: url,
