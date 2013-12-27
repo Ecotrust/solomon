@@ -79,6 +79,9 @@ class Respondant(caching.base.CachingMixin, models.Model):
         super(Respondant, self).save(*args, **kwargs)
         # Do this after saving so save_related is called to catch
         # all the updated responses.
+        self.update_csv_row()
+
+    def update_csv_row(self):
         self.csv_row.json_data = simplejson.dumps(self.generate_flat_dict())
         self.csv_row.save()
 
@@ -500,8 +503,13 @@ class Response(caching.base.CachingMixin, models.Model):
                             print answer
             question_slug = self.question.slug.replace('-', '_')
             if hasattr(self.respondant, question_slug):
+                # Switched to filter and update rather than just modifying and
+                # saving. This doesn't trigger post_save, but still updates
+                # self.respondant and the related CSVRow object.
+                (Respondant.objects.filter(pk=self.respondant.pk)
+                                   .update(**{question_slug: self.answer}))
                 setattr(self.respondant, question_slug, self.answer)
-                self.respondant.save()
+                self.respondant.update_csv_row()
             self.save()
 
     def __unicode__(self):
