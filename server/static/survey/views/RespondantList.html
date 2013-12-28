@@ -13,9 +13,9 @@
     </div>
     <div class="col-md-10 print-hide">
         <div class="col-md-10">
-            <h1>
+            <h2>
                 Overview
-            </h1>
+            </h2>
         </div>
         <div class="print-hide col-md-2">
             <button print-button></button>
@@ -43,7 +43,7 @@
     <div class="col-md-10">
         <p ng-show="message">{{message}}</p>
         <div>
-            <h3>Total Surveys Collected by Date</h3>
+            <h2>Total Surveys Collected by Date</h2>
             <div class="btn-group print-hide">
                 <button ng-class="{'active': surveyorTimeFilter == 'hour'}"
                     type="button"
@@ -74,7 +74,7 @@
             </div> -->
         </div>
         <div class="respondent-table print-hide">
-        <h3>Survey Responses</h3>
+        <h2>Survey Responses</h2>
             <table class="table" ng-class="{ 'loading': respondentsLoading }">
                 <tbody>
                     <tr>
