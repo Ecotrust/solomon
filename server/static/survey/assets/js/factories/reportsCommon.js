@@ -32,8 +32,8 @@ angular.module('askApp').factory('reportsCommon', function($http, $routeParams, 
         }
 
         var location_obj = {};
-        var start_date = $scope.filter.startDate;
-        var end_date = $scope.filter.endDate;
+        var start_date = $scope.filter.startDate.valueOf();
+        var end_date = $scope.filter.endDate.valueOf();
         var status_single = $scope.status_single;
         var market = $scope.market;
 
