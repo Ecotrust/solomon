@@ -3,7 +3,7 @@ angular.module('askApp').factory('reportsCommon', function($http, $routeParams, 
 
     factory.build_survey_stats_url = function($scope) {
         var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
-        var end_date = new Date($scope.filter.endDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).add(1).day().toString('yyyy-MM-dd');
         var url = '/report/surveyor-stats/' + $routeParams.surveySlug + '/' + $scope.surveyorTimeFilter;
         url += '?start_date=' + start_date;
         url += '&end_date=' + end_date;

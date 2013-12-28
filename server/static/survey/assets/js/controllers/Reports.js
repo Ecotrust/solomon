@@ -319,7 +319,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         $scope.getRespondents();
 
         var start_date = new Date($scope.filter.startDate).toString('yyyyMMdd');
-        var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
+        var end_date = new Date($scope.filter.endDate).day().toString('yyyyMMdd');
 
         // FIXME: Actually pull these charts from the DB or something.
         if ($scope.activePage == 'economic') {
@@ -363,11 +363,15 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         data.questions.reverse();
         $scope.survey = data;
         reportsCommon.setup_market_dropdown($scope);
-        var start_date = reportsCommon.dateFromISO($scope.survey.response_date_start);
-        var end_date = reportsCommon.dateFromISO($scope.survey.response_date_end);
+        var start_date = $location.search().ts__gte ?
+            new Date(parseInt($location.search().ts__gte, 10)) :
+            reportsCommon.dateFromISO($scope.survey.response_date_start);
+        var end_date = $location.search().ts__lte ?
+            new Date(parseInt($location.search().ts__lte, 10)) :
+            reportsCommon.dateFromISO($scope.survey.response_date_end);
         $scope.filter = {
-            min: start_date.valueOf(),
-            max: end_date.valueOf(),
+            min: reportsCommon.dateFromISO($scope.survey.response_date_start).valueOf(),
+            max: reportsCommon.dateFromISO($scope.survey.response_date_end).valueOf(),
             startDate: start_date.valueOf(),
             endDate: end_date.valueOf()
         }
