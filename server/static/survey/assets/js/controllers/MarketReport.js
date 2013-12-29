@@ -51,13 +51,12 @@ angular.module('askApp')
             $scope.resource_frequency = {
                 labels: _.pluck(data.graph_data, 'answer_text'),
                 xLabel: 'Fish Family',
-                title: "Average Price for Resource",
+                title: "Occurrence of Resource Among Vendors",
                 categories: [""],
                 type: "bar",
-                unit: '$',
-                //download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
-                data: _.map(data.graph_data, function(x) { return x.count; }),
-                yLabel: 'Cost (SBD)'
+                unit: '%',
+                data: _.map(data.graph_data, function(x) { return (parseFloat(x.percent) * 100); }),
+                yLabel: 'Percentage of Occurrence'
             }
         });
     }

@@ -43,7 +43,8 @@ angular.module('askApp')
                             title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             tooltip: {
                                 formatter: function() {
-                                    return '<b>' + this.series.name + '</b>' + ': ' + this.y;
+                                    return '<b>' + this.series.name + '</b>' + ': ' + this.y +
+                                        (scope.chart.unit ? scope.chart.unit : "");
                                 }
                             },
                             xAxis: {
