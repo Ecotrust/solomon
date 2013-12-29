@@ -168,12 +168,17 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
                     }
                 else:
                     obj['type'] = 'time-series'
-                    values = (Response.objects.filter(respondant__in=respondants, question=question_b)
-                                              .extra(select={'date': "date_trunc(%s, ts)"},
-                                                     select_params=(group,))
-                                              .order_by('date')
-                                              .values('date')
-                                              .annotate(sum=Sum('answer_number')))
+                    values = Response.objects.filter(respondant__in=respondants, question=question_b)
+                    if start_date is not None and end_date is not None:
+                        values = values.filter(respondant__ts__lte=end_date,
+                                               respondant__ts__gte=start_date)
+
+                    values = (values.extra(select={'date': "date_trunc(%s, survey_respondant.ts)"},
+                                           select_params=(group,),
+                                           tables=('survey_respondant',))
+                                    .order_by('date')
+                                    .values('date')
+                                    .annotate(sum=Sum('answer_number')))
 
                     d = {
                         'name': question_a_answer['answer'],
