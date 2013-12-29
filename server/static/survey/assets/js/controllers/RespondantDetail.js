@@ -94,7 +94,7 @@ angular.module('askApp')
                 window.location = "#/RespondantDetail/" + $scope.surveySlug +
                     "/" + $scope.review_previous_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
             }
-        }
+        });
     }
 
     $scope.delete_respondent = function () {
