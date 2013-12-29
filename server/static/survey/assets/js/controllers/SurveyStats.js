@@ -1,8 +1,13 @@
 angular.module('askApp')
     .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
 
-    function filters_changed(surveySlug) {
-        reportsCommon.getRespondents(null, $scope);
+    function total_surveys_by_province() {
+    }
+
+    function total_surveys_by_province() {
+    }
+
+    function build_survey_totals() {
         var url = reportsCommon.build_survey_stats_url($scope);
 
         $http.get(url).success(function(data) {
@@ -32,6 +37,13 @@ angular.module('askApp')
                 unit: "surveys"
             }
         });
+    }
+
+    function filters_changed(surveySlug) {
+        reportsCommon.getRespondents(null, $scope);
+        build_survey_totals();
+        total_surveys_by_province();
+        total_surveys_by_market();
     }
 
     function setup_columns() {
