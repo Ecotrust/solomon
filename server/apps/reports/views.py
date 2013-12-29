@@ -481,6 +481,66 @@ def vendor_resource_type_frequency_json(request):
     }, cls=CustomJSONEncoder), content_type='application/json')
 
 
+def _single_select_count(question_slug, market=None, status=None,
+                         start_date=None, end_date=None):
+    question = Question.objects.get(slug=question_slug)
+    rows = Response.objects.filter(question=question)
+    labels = None
+    if question.rows:
+        labels = question.rows.splitlines()
+        rows = rows.filter(answer__in=labels)
+
+    if market is not None:
+        rows.filter(respondant__survey_site=market)
+    if status is not None:
+        rows.filter(respondant__review_status=market)
+    if start_date is not None:
+        rows = rows.filter(respondant__ts__gte=start_date)
+    if end_date is not None:
+        rows = rows.filter(respondant__ts__lt=end_date)
+
+    if labels is None:
+        labels = rows.distinct().values_list('answer', flat=True)
+
+    rows = (rows.values('answer')
+                .annotate(count=Count('answer')))
+    return rows, labels
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def single_select_count_json(request, question_slug):
+    form = APIFilterForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
+    rows, labels = _single_select_count(question_slug, **form.cleaned_data)
+
+    return HttpResponse(json.dumps({
+        'success': True,
+        'graph_data': list(rows),
+        'labels': list(labels)
+    }, cls=CustomJSONEncoder), content_type='application/json')
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def single_select_count_csv(request, question_slug):
+    form = APIFilterForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
+    rows, labels = _single_select_count(question_slug, **form.cleaned_data)
+
+    response = _create_csv_response('vendor_resource_frequency.csv')
+    field_names = OrderedDict((
+        ('answer', question_slug),
+        ('count', 'Count'),
+    ))
+
+    writer = SlugCSVWriter(response, field_names)
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row)
+    return response
+
+
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def full_data_dump_csv(request, survey_slug):
     survey = Survey.objects.get(slug=survey_slug)

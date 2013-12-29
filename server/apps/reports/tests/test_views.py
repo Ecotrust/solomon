@@ -8,8 +8,10 @@ from django.utils.text import slugify
 from django.utils.timezone import utc
 from django.test import TestCase
 
-from survey.models import Question, Respondant, Response, Survey, REVIEW_STATE_ACCEPTED, REVIEW_STATE_NEEDED
-from ..views import _get_crosstab, _grid_standard_deviation, _vendor_resource_type_frequency
+from survey.models import (Question, Respondant, Response, Survey,
+                           REVIEW_STATE_ACCEPTED, REVIEW_STATE_NEEDED)
+from ..views import (_get_crosstab, _grid_standard_deviation,
+                     _single_select_count, _vendor_resource_type_frequency)
 
 
 class BaseSurveyorStatsCase(TestCase):
@@ -398,6 +400,7 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
         week_ago = now - datetime.timedelta(days=7)
         week_from_now = now + datetime.timedelta(days=7)
         two_days_ago = now - datetime.timedelta(days=2)
+        two_days_from_now = now + datetime.timedelta(days=2)
         # These price sets are picked so that the average is twice the first
         # price set, and thrice for the other set.
         self.create_respondant(week_ago, range(1, 8))
@@ -414,7 +417,7 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
                                               'interval': 'day'}),
                               data={
                                   'start_date': two_days_ago.strftime('%Y-%m-%d'),
-                                  'end_date': now.strftime('%Y-%m-%d')
+                                  'end_date': two_days_from_now.strftime('%Y-%m-%d')
                               })
         self.assertEqual(res.status_code, 200)
         body = json.loads(res.content)
@@ -505,7 +508,7 @@ class TestVendorResourceFrequency(TestCase, ResponseMixin):
         res = self.client.get(reverse('vendor_resource_type_frequency_json'),
                               data={
                                   'start_date': (now - datetime.timedelta(days=2)).strftime('%Y-%m-%d'),
-                                  'end_date': now.strftime('%Y-%m-%d')
+                                  'end_date': (now + datetime.timedelta(days=2)).strftime('%Y-%m-%d')
                               })
 
         self.assertEqual(200, res.status_code)
@@ -519,3 +522,44 @@ class TestVendorResourceFrequency(TestCase, ResponseMixin):
             row['count'] = 1
             count += 1
         self.assertEqual(count, expected)
+
+
+class TestSingleSelectCount(TestCase, ResponseMixin):
+    fixtures = ['reef.json', 'users.json']
+    market_a = 'Ball Beach'
+    market_b = 'Maro Maro'
+
+    def setUp(self):
+        self.user = User.objects.get(username='superuser_alpha')
+        self.survey = Survey.objects.get(slug='reef-fish-market-survey')
+        self.question_market = Question.objects.get(slug='survey-site')
+
+    def create_respondant(self, market, status=None, when=None):
+        if when is None:
+            when = datetime.datetime.utcnow().replace(tzinfo=utc)
+        respondant = Respondant(survey=self.survey,
+                                ts=when,
+                                surveyor=self.user)
+        if status is not None:
+            respondant.review_status = status
+
+        respondant.save()
+
+        response_market = self.create_text_response(self.question_market,
+                                                    respondant, when, market)
+        respondant.responses.add(response_market)
+
+        respondant.save()
+        return respondant
+
+    def test_market_servey_count(self):
+        self.create_respondant(self.market_a)
+        self.create_respondant(self.market_a)
+        self.create_respondant(self.market_b)
+
+        rows, labels = _single_select_count('survey-site')
+        for row in rows:
+            if row['answer'] == self.market_a:
+                self.assertEqual(row['count'], 2)
+            elif row['answer'] == self.market_b:
+                self.assertEqual(row['count'], 1)
