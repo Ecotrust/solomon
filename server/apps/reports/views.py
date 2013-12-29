@@ -494,9 +494,9 @@ def _single_select_count(question_slug, market=None, status=None,
         rows = rows.filter(answer__in=labels)
 
     if market is not None:
-        rows.filter(respondant__survey_site=market)
+        rows = rows.filter(respondant__survey_site=market)
     if status is not None:
-        rows.filter(respondant__review_status=market)
+        rows = rows.filter(respondant__review_status=market)
     if start_date is not None:
         rows = rows.filter(respondant__ts__gte=start_date)
     if end_date is not None:

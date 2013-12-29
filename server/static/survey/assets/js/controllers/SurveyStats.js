@@ -2,9 +2,36 @@ angular.module('askApp')
     .controller('SurveyStatsCtrl', function($scope, $http, $routeParams, $location, reportsCommon, surveyShared) {
 
     function total_surveys_by_province() {
+        var start_date = new Date($scope.filter.startDate).toString('yyyy-MM-dd');
+        var end_date = new Date($scope.filter.endDate).add(1).day().toString('yyyy-MM-dd');
+        var url = "/reports/single-select-count/survey-site";
+        url += '?start_date=' + start_date;
+        url += '&end_date=' + end_date;
+
+        if ($scope.market) {
+            url += '&market=' + $scope.market;
+        }
+
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
+
+        $http.get(url).success(function(data) {
+            $scope.surveys_by_province = {
+                labels: data.labels,
+                displayTitle: false,
+                yLabel: "",
+                title: "Surveys by Province",
+                categories: [""],
+                type: "bar",
+                data: _.pluck(data.graph_data, "count"),
+                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + ".csv"),
+                unit: "surveys"
+            }
+        });
     }
 
-    function total_surveys_by_province() {
+    function total_surveys_by_market() {
     }
 
     function build_survey_totals() {
