@@ -35,6 +35,32 @@ angular.module('askApp')
         });
     }
 
+    function resource_frequency(charts, start_date, end_date, slug) {
+        var url = "/reports/vendor-resource-frequency/";
+        url = url + '?startdate=' + start_date;
+        url = url + '&enddate=' + end_date;
+
+        if ($scope.market) {
+            url = url + '&market=' + $scope.market;
+        }
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
+
+        return $http.get(url).success(function(data) {
+            $scope.resource_frequency = {
+                labels: _.pluck(data.graph_data, 'answer_text'),
+                xLabel: 'Fish Family',
+                title: "Average Price for Resource",
+                categories: [""],
+                type: "bar",
+                unit: '$',
+                //download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
+                data: _.map(data.graph_data, function(x) { return x.count; }),
+                yLabel: 'Cost (SBD)'
+            }
+        });
+    }
     function average_for_resource(charts, start_date, end_date, slug) {
         var url = "/reports/grid-standard-deviation/price-per-pound/" + $scope.surveyorTimeFilter
             url = url + '?startdate=' + start_date;
@@ -88,6 +114,7 @@ angular.module('askApp')
 
         total_weight_for_market(surveySlug);
         average_for_resource($scope.charts, start_date, end_date, $routeParams.surveySlug);
+        resource_frequency($scope.charts, start_date, end_date, $routeParams.surveySlug);
 
         $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {
