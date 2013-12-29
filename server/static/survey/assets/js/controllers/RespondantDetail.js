@@ -85,9 +85,15 @@ angular.module('askApp')
         });
     }
     $scope.goToPrevious = function() {
-        if ($scope.review_previous_uuid) {
-            window.location = "#/RespondantDetail/" + $scope.surveySlug +
-                "/" + $scope.review_previous_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
+        $http({
+            url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
+            data: { 'review_status': $scope.current_status[0], 'review_comment': $scope.review_comment },
+            method: 'PATCH'
+        }).success(function(data) {
+            if ($scope.review_previous_uuid) {
+                window.location = "#/RespondantDetail/" + $scope.surveySlug +
+                    "/" + $scope.review_previous_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
+            }
         }
     }
 
