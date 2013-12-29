@@ -461,8 +461,6 @@ def vendor_resource_type_frequency_csv(request):
     writer = SlugCSVWriter(response, field_names)
     writer.writeheader()
     for row in rows:
-        row.pop('row_label')
-        row['date'] = str(row['date'])
         writer.writerow(row)
     return response
 
