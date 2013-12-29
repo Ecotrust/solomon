@@ -56,6 +56,7 @@ angular.module('askApp')
                 type: "bar",
                 unit: '%',
                 data: _.map(data.graph_data, function(x) { return (parseFloat(x.percent) * 100); }),
+                download_url: url.replace('vendor-resource-frequency', 'vendor-resource-frequency.csv'),
                 yLabel: 'Percentage of Occurrence'
             }
         });
