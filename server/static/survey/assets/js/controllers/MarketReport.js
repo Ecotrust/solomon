@@ -67,8 +67,8 @@ angular.module('askApp')
     }
     function average_for_resource(charts, start_date, end_date, slug) {
         var url = "/reports/grid-standard-deviation/price-per-pound/" + $scope.surveyorTimeFilter
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
+            url = url + '?start_date=' + start_date;
+            url = url + '&end_date=' + end_date;
             url = url + '&col=Day1';
         if ($scope.market) {
             url = url + '&market=' + $scope.market;
@@ -117,7 +117,10 @@ angular.module('askApp')
         var end_date = new Date($scope.filter.endDate).toString('yyyyMMdd');
 
         total_weight_for_market(surveySlug);
-        average_for_resource($scope.charts, start_date, end_date, $routeParams.surveySlug);
+        average_for_resource($scope.charts,
+            new Date($scope.filter.startDate).toString('yyyy-MM-dd'),
+            new Date($scope.filter.endDate).toString('yyyy-MM-dd'),
+            $routeParams.surveySlug);
         resource_frequency($scope.charts, start_date, end_date, $routeParams.surveySlug);
 
         $http.get(url).success(function(data) {

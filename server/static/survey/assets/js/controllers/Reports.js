@@ -216,8 +216,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
     }
     function expenses_over_time(charts, start_date, end_date, slug) {
         var url = "/reports/grid-standard-deviation/cost/" + $scope.surveyorTimeFilter
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
+            url = url + '?start_date=' + start_date;
+            url = url + '&end_date=' + end_date;
         if ($scope.market) {
             url = url + '&market=' + $scope.market;
         }
@@ -253,8 +253,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
     }
     function min_max_charts(charts, start_date, end_date, slug) {
         var url = "/reports/grid-standard-deviation/price-per-pound/" + $scope.surveyorTimeFilter
-            url = url + '?startdate=' + start_date;
-            url = url + '&enddate=' + end_date;
+            url = url + '?start_date=' + start_date;
+            url = url + '&end_date=' + end_date;
             url = url + '&col=Day1';
         if ($scope.market) {
             url = url + '&market=' + $scope.market;
@@ -368,10 +368,15 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 surveySlug);
             average_trip_costs_by_market($scope.charts, start_date, end_date,
                 surveySlug);
-            expenses_over_time($scope.charts, start_date, end_date,
+            expenses_over_time($scope.charts,
+                new Date($scope.filter.startDate).toString('yyyy-MM-dd'),
+                new Date($scope.filter.endDate).day().toString('yyyy-MM-dd'),
                 surveySlug);
             $scope.sectioned_charts["Max / Min Reported Market Prices "] = [];
-            min_max_charts($scope.sectioned_charts["Max / Min Reported Market Prices "], start_date, end_date, surveySlug);
+            min_max_charts($scope.sectioned_charts["Max / Min Reported Market Prices "],
+                new Date($scope.filter.startDate).toString('yyyy-MM-dd'),
+                new Date($scope.filter.endDate).day().toString('yyyy-MM-dd'),
+                surveySlug);
         } else if ($scope.activePage == 'biological') {
             $scope.subtitle = "Biological Report"
             occurrence_of_resource($scope.charts, start_date, end_date,
