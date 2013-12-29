@@ -36,6 +36,7 @@ angular.module('askApp')
         //order responses to reflect the order in which they were presented in the survey
         data.responses = _.sortBy(data.responses, function(response) { return response.question.order; });
         $scope.review_next_uuid = data.meta.next.unfiltered;
+        $scope.review_previous_uuid = data.meta.prev.unfiltered;
         _.each(data.responses, function (response) {
 
             response.answer_parsed = JSON.parse(response.answer_raw);
@@ -82,6 +83,12 @@ angular.module('askApp')
                     "/" + $scope.review_next_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
             }
         });
+    }
+    $scope.goToPrevious = function() {
+        if ($scope.review_previous_uuid) {
+            window.location = "#/RespondantDetail/" + $scope.surveySlug +
+                "/" + $scope.review_previous_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
+        }
     }
 
     $scope.delete_respondent = function () {

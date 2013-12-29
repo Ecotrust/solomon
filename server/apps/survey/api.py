@@ -136,7 +136,7 @@ class ReportRespondantResource(AuthSurveyModelResource):
         if not_accepted.exists():
             bundle.data['meta']['next']['not_accepted'] = not_accepted[0].pk
 
-        base_prev = Respondant.objects.filter(ts__lt=bundle.obj.ts).order_by('ts')
+        base_prev = Respondant.objects.filter(ts__gt=bundle.obj.ts).order_by('ts')
         if base_prev.exists():
             bundle.data['meta']['prev']['unfiltered'] = base_prev[0].pk
 
