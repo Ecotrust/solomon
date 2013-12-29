@@ -432,9 +432,9 @@ def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
                                        answer_text__in=base_values))
 
     if market is not None:
-        rows.filter(response__respondant__survey_site=market)
+        rows = rows.filter(response__respondant__survey_site=market)
     if status is not None:
-        rows.filter(response__respondant__review_status=market)
+        rows = rows.filter(response__respondant__review_status=market)
     if start_date is not None:
         rows = rows.filter(response__respondant__ts__gte=start_date)
     if end_date is not None:

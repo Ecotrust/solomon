@@ -25,7 +25,7 @@ angular.module('askApp')
                 categories: [""],
                 type: "bar",
                 data: _.pluck(data.graph_data, "count"),
-                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + ".csv"),
+                download_url: url.replace("survey-province", "survey-province.csv"),
                 unit: "surveys"
             }
         });
@@ -55,7 +55,7 @@ angular.module('askApp')
                 categories: [""],
                 type: "bar",
                 data: _.pluck(data.graph_data, "count"),
-                download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + ".csv"),
+                download_url: url.replace("survey-site", "survey-site.csv"),
                 unit: "surveys"
             }
         });

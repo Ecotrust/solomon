@@ -42,9 +42,17 @@ angular.module('askApp')
                             backgroundColor: 'rgba(255, 255, 255, 0)',
                             title: scope.chart.displayTitle ? { text: scope.chart.title } : false,
                             tooltip: {
-                                formatter: function() {
-                                    return '<b>' + this.series.name + '</b>' + ': ' + this.y +
-                                        (scope.chart.unit ? scope.chart.unit : "");
+                                formatter: scope.chart.formatter ? scope.chart.formatter :
+                                    function() {
+                                        return '<b>' + this.series.name + '</b>' + ': ' + this.y +
+                                            (scope.chart.unit ? scope.chart.unit : "");
+                                    }
+                            },
+                            plotOptions: {
+                                bar: {
+                                    dataLabels: {
+                                        formatter: scope.chart.dataLabels ? scope.chart.dataLabels : null
+                                    }
                                 }
                             },
                             xAxis: {

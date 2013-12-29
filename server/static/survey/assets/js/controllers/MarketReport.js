@@ -51,10 +51,14 @@ angular.module('askApp')
             $scope.resource_frequency = {
                 labels: _.pluck(data.graph_data, 'answer_text'),
                 xLabel: 'Fish Family',
-                title: "Occurrence of Resource Among Vendors",
+                title: "Frequency of Fish Family When Sold By Piece/Heap",
                 categories: [""],
                 type: "bar",
                 unit: '%',
+                formatter: function() {
+                    return '<b>' + this.series.name + '</b>' + ': ' + this.y + "%";
+                },
+                dataLabels: function () { return this.y + "%"; },
                 data: _.map(data.graph_data, function(x) { return (parseFloat(x.percent) * 100); }),
                 download_url: url.replace('vendor-resource-frequency', 'vendor-resource-frequency.csv'),
                 yLabel: 'Percentage of Occurrence'
