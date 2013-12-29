@@ -118,22 +118,39 @@ class ReportRespondantResource(AuthSurveyModelResource):
         bundle.data['meta']['statuses'] = REVIEW_STATE_CHOICES
 
         bundle.data['meta']['next'] = {}
+        bundle.data['meta']['prev'] = {}
 
-        base_filter = Respondant.objects.filter(ts__lt=bundle.obj.ts).order_by('-ts')
-        if base_filter.exists():
-            bundle.data['meta']['next']['unfiltered'] = base_filter[0].pk
+        base_next = Respondant.objects.filter(ts__lt=bundle.obj.ts).order_by('-ts')
+        if base_next.exists():
+            bundle.data['meta']['next']['unfiltered'] = base_next[0].pk
 
-        needed = base_filter.filter(review_status=REVIEW_STATE_NEEDED)
+        needed = base_next.filter(review_status=REVIEW_STATE_NEEDED)
         if needed.exists():
             bundle.data['meta']['next']['needed'] = needed[0].pk
 
-        flagged = base_filter.filter(review_status=REVIEW_STATE_FLAGGED)
+        flagged = base_next.filter(review_status=REVIEW_STATE_FLAGGED)
         if flagged.exists():
             bundle.data['meta']['next']['flagged'] = flagged[0].pk
 
-        not_accepted = base_filter.exclude(review_status=REVIEW_STATE_ACCEPTED)
+        not_accepted = base_next.exclude(review_status=REVIEW_STATE_ACCEPTED)
         if not_accepted.exists():
             bundle.data['meta']['next']['not_accepted'] = not_accepted[0].pk
+
+        base_prev = Respondant.objects.filter(ts__lt=bundle.obj.ts).order_by('+ts')
+        if base_prev.exists():
+            bundle.data['meta']['prev']['unfiltered'] = base_prev[0].pk
+
+        needed = base_prev.filter(review_status=REVIEW_STATE_NEEDED)
+        if needed.exists():
+            bundle.data['meta']['prev']['needed'] = needed[0].pk
+
+        flagged = base_prev.filter(review_status=REVIEW_STATE_FLAGGED)
+        if flagged.exists():
+            bundle.data['meta']['prev']['flagged'] = flagged[0].pk
+
+        not_accepted = base_prev.exclude(review_status=REVIEW_STATE_ACCEPTED)
+        if not_accepted.exists():
+            bundle.data['meta']['prev']['not_accepted'] = not_accepted[0].pk
 
         return bundle
 
