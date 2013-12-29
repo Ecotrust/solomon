@@ -14,7 +14,7 @@ from ordereddict import OrderedDict
 
 from apps.survey.models import Survey, Question, Response, Respondant, LocationAnswer, GridAnswer, MultiAnswer
 from .decorators import api_user_passes_test
-from .forms import SurveyorStatsForm
+from .forms import APIFilterForm, GridStandardDeviationForm, SurveyorStatsForm
 from .utils import SlugCSVWriter
 
 
@@ -339,19 +339,25 @@ def surveyor_stats_raw_data_csv(request, survey_slug):
     return response
 
 
-def _grid_standard_deviation(interval, question_slug, row_label=None, market=None, col_label=None, status=None):
+def _grid_standard_deviation(interval, question_slug, row=None, market=None,
+                             col=None, status=None, start_date=None, end_date=None):
     rows = (GridAnswer.objects.filter(response__question__slug=question_slug)
                               .extra(select={'date': "date_trunc(%s, survey_response.ts)"},
                                      select_params=(interval,),
                                      tables=('survey_response',)))
-    if row_label is not None:
-        rows = rows.filter(row_label=row_label)
-    if col_label is not None:
-        rows = rows.filter(col_label=col_label)
+    if row is not None:
+        rows = rows.filter(row_label=row)
+    if col is not None:
+        rows = rows.filter(col_label=col)
     if market is not None:
         rows = rows.filter(response__respondant__survey_site=market)
     if status is not None:
         rows = rows.filter(response__respondant__review_status=status)
+    if start_date is not None:
+        rows = rows.filter(response__respondant__ts__gte=start_date)
+    if end_date is not None:
+        rows = rows.filter(response__respondant__ts__lt=end_date)
+
     labels = list(rows.values_list('row_label', flat=True).distinct())
     rows = (rows.values('row_text', 'row_label', 'date')
                 .order_by('date')
@@ -364,12 +370,11 @@ def _grid_standard_deviation(interval, question_slug, row_label=None, market=Non
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def grid_standard_deviation_json(request, question_slug, interval):
-    col_label = request.GET.get('col', None)
-    market = request.GET.get('market', None)
-    status = request.GET.get('status', None)
+    form = GridStandardDeviationForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
     rows, labels = _grid_standard_deviation(interval, question_slug,
-                                            col_label=col_label, market=market,
-                                            status=status)
+                                            **form.cleaned_data)
     graph_data = defaultdict(list)
     for row in rows:
         row['date'] = calendar.timegm(row['date'].utctimetuple()) * 1000
@@ -384,14 +389,15 @@ def grid_standard_deviation_json(request, question_slug, interval):
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def grid_standard_deviation_csv(request, question_slug, interval):
-    col_label = request.GET.get('col', None)
-    row_label = request.GET.get('row', None)
-    market = request.GET.get('market', None)
-    status = request.GET.get('status', None)
-    response = _create_csv_response('grid_standard_deviation_{0}_{1}_{2}.csv'.format(
-                                    question_slug, row_label, interval))
-    rows, _ = _grid_standard_deviation(interval, question_slug, row_label=row_label,
-                                       col_label=col_label, market=market, status=status)
+    form = GridStandardDeviationForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
+    rows, labels = _grid_standard_deviation(interval, question_slug,
+                                            **form.cleaned_data)
+    response = _create_csv_response('grid_standard_deviation_{0}_{1}.csv'.format(
+                                    question_slug, interval))
+    rows, _ = _grid_standard_deviation(interval, question_slug,
+                                       **form.cleaned_data)
 
     field_names = OrderedDict((
         ('row_text', 'Type'),
@@ -411,7 +417,8 @@ def grid_standard_deviation_csv(request, question_slug, interval):
     return response
 
 
-def _vendor_resource_type_frequency(market=None, status=None):
+def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
+                                    end_date=None):
     base_values = Question.objects.get(slug='fish-families').rows.splitlines()
     vendors = Question.objects.get(slug='vendor').rows.splitlines()
     vendor_count = len(vendors)
@@ -421,9 +428,12 @@ def _vendor_resource_type_frequency(market=None, status=None):
 
     if market is not None:
         rows.filter(response__respondant__survey_site=market)
-
     if status is not None:
         rows.filter(response__respondant__review_status=market)
+    if start_date is not None:
+        rows = rows.filter(response__respondant__ts__gte=start_date)
+    if end_date is not None:
+        rows = rows.filter(response__respondant__ts__lt=end_date)
 
     rows = (rows.values('answer_text')
                 .annotate(count=Count('response__respondant__vendor')))
@@ -436,13 +446,12 @@ def _vendor_resource_type_frequency(market=None, status=None):
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def vendor_resource_type_frequency_csv(request):
-    market = request.GET.get('market', None)
-    status = request.GET.get('status', None)
+    form = APIFilterForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
+    rows, vendor_count = _vendor_resource_type_frequency(**form.cleaned_data)
 
     response = _create_csv_response('vendor_resource_frequency.csv')
-
-    rows, vendor_count = _vendor_resource_type_frequency(market=market, status=status)
-
     field_names = OrderedDict((
         ('answer_text', 'Fish Family'),
         ('count', 'Count'),
@@ -460,13 +469,14 @@ def vendor_resource_type_frequency_csv(request):
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def vendor_resource_type_frequency_json(request):
-    market = request.GET.get('market', None)
-    status = request.GET.get('status', None)
-    rows, vendor_count = _vendor_resource_type_frequency(market=market, status=status)
+    form = APIFilterForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
+    rows, vendor_count = _vendor_resource_type_frequency(**form.cleaned_data)
 
     return HttpResponse(json.dumps({
         'success': True,
-        'graph_data': rows,
+        'graph_data': list(rows),
         'vendor_count': vendor_count
     }, cls=CustomJSONEncoder), content_type='application/json')
 

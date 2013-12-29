@@ -393,6 +393,43 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
         self.assertIn('labels', body)
         self.assertIn('graph_data', body)
 
+    def test_json_view_ts_filter(self):
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        week_ago = now - datetime.timedelta(days=7)
+        week_from_now = now + datetime.timedelta(days=7)
+        two_days_ago = now - datetime.timedelta(days=2)
+        # These price sets are picked so that the average is twice the first
+        # price set, and thrice for the other set.
+        self.create_respondant(week_ago, range(1, 8))
+        self.create_respondant(week_ago, range(5, 40, 5))
+        self.create_respondant(now, range(1, 8))
+        self.create_respondant(now, range(3, 24, 3))
+        self.create_respondant(week_from_now, range(1, 8))
+        self.create_respondant(week_from_now, range(5, 40, 5))
+
+        self.client.login(username=self.user.username, password='password')
+
+        res = self.client.get(reverse('reports_grid_standard_deviation_json',
+                                      kwargs={'question_slug': 'cost',
+                                              'interval': 'day'}),
+                              data={
+                                  'start_date': two_days_ago.strftime('%Y-%m-%d'),
+                                  'end_date': now.strftime('%Y-%m-%d')
+                              })
+        self.assertEqual(res.status_code, 200)
+        body = json.loads(res.content)
+        self.assertIn('labels', body)
+        self.assertIn('graph_data', body)
+        air_text = 'Air transport (ticket)'
+        self.assertIn(air_text, body['graph_data'])
+
+        expected = 1
+        count = 0
+        for row in body['graph_data'][air_text]:
+            self.assertEqual(row['average'], 14)
+            count += 1
+        self.assertEqual(expected, count)
+
 
 class TestVendorResourceFrequency(TestCase, ResponseMixin):
     fixtures = ['reef.json', 'users.json']
@@ -408,8 +445,10 @@ class TestVendorResourceFrequency(TestCase, ResponseMixin):
         self.question_fishes = Question.objects.get(slug='fish-families')
         self.question_market = Question.objects.get(slug='survey-site')
 
-    def create_respondant(self, vendor, fishes, market=None, status=None):
-        when = datetime.datetime.utcnow().replace(tzinfo=utc)
+    def create_respondant(self, vendor, fishes, market=None, status=None,
+                          when=None):
+        if when is None:
+            when = datetime.datetime.utcnow().replace(tzinfo=utc)
         respondant = Respondant(survey=self.survey,
                                 ts=when,
                                 surveyor=self.user)
@@ -449,4 +488,34 @@ class TestVendorResourceFrequency(TestCase, ResponseMixin):
                 count += 1
                 self.assertEqual(row['count'], 1)
                 self.assertEqual(row['percent'], '%.2f' % (1.0 / vendor_count))
+        self.assertEqual(count, expected)
+
+    def test_json_view_ts_filter(self):
+        now = datetime.datetime.utcnow().replace(tzinfo=utc)
+        week_ago = now - datetime.timedelta(days=7)
+        week_from_now = now + datetime.timedelta(days=7)
+        self.create_respondant(self.vendor_b, (self.fish_b,),
+                               when=week_ago)
+        self.create_respondant(self.vendor_a, (self.fish_a, self.fish_b),
+                               when=now)
+        self.create_respondant(self.vendor_b, (self.fish_a,),
+                               when=week_from_now)
+
+        self.client.login(username=self.user.username, password='password')
+        res = self.client.get(reverse('vendor_resource_type_frequency_json'),
+                              data={
+                                  'start_date': (now - datetime.timedelta(days=2)).strftime('%Y-%m-%d'),
+                                  'end_date': now.strftime('%Y-%m-%d')
+                              })
+
+        self.assertEqual(200, res.status_code)
+        body = json.loads(res.content)
+
+        self.assertIn('graph_data', body)
+
+        expected = 2
+        count = 0
+        for row in body['graph_data']:
+            row['count'] = 1
+            count += 1
         self.assertEqual(count, expected)
