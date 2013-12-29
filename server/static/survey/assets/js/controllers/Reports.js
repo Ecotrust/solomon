@@ -61,11 +61,49 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             });
 
             charts.push({
-                title: "Total Fish Weight by Province",
+                title: "Total Fish Weight by Province Over Time",
                 type: data.type,
                 displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 data: filtered,
+                download_url: url.replace("total-weight", "total-weight" + '.csv'),
+                xLabel: 'Province',
+                yLabel: 'Weight (kg)',
+                order: 3,
+                message: data.message,
+                unit: 'kg'
+            });
+            charts.sort(function (a,b) { return a-b;})
+        });
+    }
+
+    function fish_weight_by_province_bar(charts, start_date, end_date, slug) {
+        var url = build_crosstab_url(start_date, end_date, slug, 'province-purchased-caught', 'total-weight');
+        return $http.get(url).success(function(data) {
+            var sdate = new Date($scope.filter.startDate);
+            var edate = new Date($scope.filter.endDate);
+
+            var filtered = _.map(data.crosstab, function(answer) {
+                answer.value = _.filter(answer.value, function(x) {
+                    var d = reportsCommon.dateFromISO(x.date);
+                    return (d >= sdate && d <= edate);
+                });
+                return answer;
+            });
+
+            var bar_data = _.map(filtered,
+                function (x) {
+                    return _.reduce(x.value, function (attr, val) { return attr + parseInt(val.sum); }, 0);
+                }
+            );
+
+            charts.push({
+                title: "Total Fish Weight by Province",
+                type: "bar-chart",
+                displayTitle: false,
+                labels: _.pluck(filtered, 'name'),
+                data: bar_data,
+                categories: [""],
                 download_url: url.replace("total-weight", "total-weight" + '.csv'),
                 xLabel: 'Province',
                 yLabel: 'Weight (kg)',
@@ -341,6 +379,8 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             occurrence_per_family($scope.charts, start_date, end_date,
                 surveySlug);
             fish_weight_by_province($scope.charts, start_date, end_date,
+                surveySlug);
+            fish_weight_by_province_bar($scope.charts, start_date, end_date,
                 surveySlug);
             fish_weight_by_market($scope.charts, start_date, end_date,
                 surveySlug)
