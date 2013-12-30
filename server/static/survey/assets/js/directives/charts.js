@@ -51,7 +51,8 @@ angular.module('askApp')
                             plotOptions: {
                                 bar: {
                                     dataLabels: {
-                                        formatter: scope.chart.dataLabels ? scope.chart.dataLabels : null
+                                        formatter: scope.chart.dataLabels ? scope.chart.dataLabels :
+                                            function () { return this.y; }
                                     }
                                 }
                             },
