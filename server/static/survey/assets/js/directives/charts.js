@@ -44,7 +44,7 @@ angular.module('askApp')
                             tooltip: {
                                 formatter: scope.chart.formatter ? scope.chart.formatter :
                                     function() {
-                                        return '<b>' + this.series.name + '</b>' + ': ' + this.y +
+                                        return '<b>' + this.series.name + '</b>' + ': ' + this.y + " " +
                                             (scope.chart.unit ? scope.chart.unit : "");
                                     }
                             },
