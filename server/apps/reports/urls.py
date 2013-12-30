@@ -7,6 +7,8 @@ from reports.views import (full_data_dump_csv, get_crosstab_json,
                            surveyor_stats_raw_data_csv,
                            single_select_count_csv,
                            single_select_count_json,
+                           gear_type_frequency_csv,
+                           gear_type_frequency_json,
                            vendor_resource_type_frequency_csv,
                            vendor_resource_type_frequency_json)
 
@@ -44,6 +46,14 @@ urlpatterns = patterns('',
     url(r'/vendor-resource-frequency',
         vendor_resource_type_frequency_json,
         name='vendor_resource_type_frequency_json'),
+
+    url(r'/gear-type-frequency.csv',
+        gear_type_frequency_csv,
+        name='gear_type_frequency_csv'),
+
+    url(r'/gear-type-frequency',
+        gear_type_frequency_json,
+        name='gear_type_frequency_json'),
 
     url(r'/single-select-count/(?P<question_slug>[\w\d-]+).csv',
         single_select_count_csv,

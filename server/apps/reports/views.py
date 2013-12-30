@@ -544,6 +544,80 @@ def single_select_count_csv(request, question_slug):
     return response
 
 
+def _gear_type_frequency(market=None, status=None, start_date=None,
+                         end_date=None):
+    question = Question.objects.get(slug='type-of-gear')
+    labels = question.rows.splitlines()
+    rows = MultiAnswer.objects.filter(response__question=question,
+                                      answer_text__in=labels)
+
+    if market is not None:
+        rows.filter(response__respondant__survey_site=market)
+    if status is not None:
+        rows.filter(response__respondant__review_status=market)
+    if start_date is not None:
+        rows = rows.filter(response__respondant__ts__gte=start_date)
+    if end_date is not None:
+        rows = rows.filter(response__respondant__ts__lt=end_date)
+
+    ma_count_values = (rows.values('response__respondant__survey_site')
+                           .annotate(count=Count('response__respondant__survey_site')))
+
+    rows = (rows.values('answer_text', 'response__respondant__survey_site')
+                .annotate(count=Count('answer_text')))
+
+    ma_count = {}
+    for count in ma_count_values:
+        ma_count[count['response__respondant__survey_site']] = count['count']
+
+    graph_data = defaultdict(list)
+    for row in rows:
+        row_market = row['response__respondant__survey_site']
+        graph_data[row_market].append({
+            'market': row_market,
+            'percent': '%.2f' % (float(row['count']) / ma_count[row_market]),
+            'count': row['count'],
+            'type': row['answer_text'],
+        })
+
+    return graph_data
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def gear_type_frequency_json(request):
+    form = APIFilterForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
+    rows = _gear_type_frequency(**form.cleaned_data)
+
+    return HttpResponse(json.dumps({
+        'success': True,
+        'graph_data': rows,
+    }, cls=CustomJSONEncoder), content_type='application/json')
+
+
+@api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
+def gear_type_frequency_csv(request):
+    form = APIFilterForm(request.GET)
+    if not form.is_valid():
+        return HttpResponseBadRequest(json.dumps(form.errors))
+    rows = _gear_type_frequency(**form.cleaned_data)
+
+    response = _create_csv_response('vendor_resource_frequency.csv')
+    field_names = OrderedDict((
+        ('market', 'Market'),
+        ('type', 'Gear Type'),
+        ('percent', 'Percent'),
+        ('count', 'Count'),
+    ))
+
+    writer = SlugCSVWriter(response, field_names)
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(row)
+    return response
+
+
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)
 def full_data_dump_csv(request, survey_slug):
     survey = Survey.objects.get(slug=survey_slug)

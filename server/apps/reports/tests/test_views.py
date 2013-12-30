@@ -11,7 +11,8 @@ from django.test import TestCase
 from survey.models import (Question, Respondant, Response, Survey,
                            REVIEW_STATE_ACCEPTED, REVIEW_STATE_NEEDED)
 from ..views import (_get_crosstab, _grid_standard_deviation,
-                     _single_select_count, _vendor_resource_type_frequency)
+                     _single_select_count, _gear_type_frequency,
+                     _vendor_resource_type_frequency)
 
 
 class BaseSurveyorStatsCase(TestCase):
@@ -563,3 +564,81 @@ class TestSingleSelectCount(TestCase, ResponseMixin):
                 self.assertEqual(row['count'], 2)
             elif row['answer'] == self.market_b:
                 self.assertEqual(row['count'], 1)
+
+
+class TestGearTypeFrequency(TestCase, ResponseMixin):
+    fixtures = ['reef.json', 'users.json']
+    market_a = 'Ball Beach'
+    market_b = 'Maro Maro'
+    gear_a = 'Spear'
+    gear_b = 'Net'
+
+    def setUp(self):
+        self.user = User.objects.get(username='superuser_alpha')
+        self.survey = Survey.objects.get(slug='reef-fish-market-survey')
+        self.question_gear = Question.objects.get(slug='type-of-gear')
+        self.question_market = Question.objects.get(slug='survey-site')
+
+    def create_respondant(self, market, gear_types, status=None, when=None):
+        if when is None:
+            when = datetime.datetime.utcnow().replace(tzinfo=utc)
+        respondant = Respondant(survey=self.survey,
+                                ts=when,
+                                surveyor=self.user)
+        if status is not None:
+            respondant.review_status = status
+
+        respondant.save()
+
+        response_market = self.create_text_response(self.question_market,
+                                                    respondant, when, market)
+        respondant.responses.add(response_market)
+
+        response_gear = self.create_multi_select_response(self.question_gear,
+                                                          respondant, when,
+                                                          gear_types)
+        respondant.responses.add(response_gear)
+        respondant.save()
+        return respondant
+
+    def test_gear_frequency(self):
+        self.create_respondant(self.market_a, (self.gear_a,))
+        self.create_respondant(self.market_a, (self.gear_a, self.gear_b))
+        self.create_respondant(self.market_b, (self.gear_a, self.gear_b))
+
+        rows = _gear_type_frequency()
+
+        self.assertIn(self.market_a, rows)
+        expected = 2
+        count = 0
+        for row in rows[self.market_a]:
+            if row['type'] == self.gear_a:
+                self.assertEqual(row['percent'], '0.67')
+                count += 1
+            else:
+                self.assertEqual(row['percent'], '0.33')
+                count += 1
+        self.assertEqual(expected, count)
+
+    def test_gear_frequency_json(self):
+        self.create_respondant(self.market_a, (self.gear_a,))
+        self.create_respondant(self.market_a, (self.gear_a, self.gear_b))
+
+        self.client.login(username=self.user.username, password='password')
+        res = self.client.get(reverse('gear_type_frequency_json'))
+
+        self.assertEqual(200, res.status_code)
+
+        body = json.loads(res.content)
+
+        self.assertIn(self.market_a, body['graph_data'])
+        expected = 2
+        count = 0
+        for row in body['graph_data'][self.market_a]:
+            if row['type'] == self.gear_a:
+                self.assertEqual(row['percent'], '0.67')
+                count += 1
+            else:
+                self.assertEqual(row['percent'], '0.33')
+                count += 1
+        self.assertEqual(expected, count)
