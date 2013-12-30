@@ -96,11 +96,13 @@ angular.module('askApp')
             });
             $scope.average_for_resource = {
                 title: "Average Price for Resource",
-                unit: '$',
                 labels: _.keys(to_graph),
                 seriesNames: _.keys(to_graph),
                 type: "time-series",
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
+                tooltipFormatter: function() {
+                    return '<b>' + this.series.name + '</b>' + ': $' + parseFloat(this.y).toFixed(2);
+                },
                 raw_data: _.values(to_graph),
                 xLabel: 'Date',
                 yLabel: 'Price',
