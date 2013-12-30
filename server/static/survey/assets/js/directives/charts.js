@@ -44,7 +44,7 @@ angular.module('askApp')
                             tooltip: {
                                 formatter: scope.chart.formatter ? scope.chart.formatter :
                                     function() {
-                                        return '<b>' + this.series.name + '</b>' + ': ' + this.y +
+                                        return '<b>' + this.series.name + '</b>' + ': ' + this.y + " " +
                                             (scope.chart.unit ? scope.chart.unit : "");
                                     }
                             },
@@ -248,7 +248,7 @@ angular.module('askApp')
                                 min: 0
                             },
                             tooltip: {
-                                formatter: function() {
+                                formatter: scope.chart.tooltipFormatter || function() {
                                     return '<b>' + this.series.name + '</b><br/>' +
                                         Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' ' + scope.chart.unit || 'kg';
                                 }

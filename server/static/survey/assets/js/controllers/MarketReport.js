@@ -37,8 +37,8 @@ angular.module('askApp')
 
     function resource_frequency(charts, start_date, end_date, slug) {
         var url = "/reports/vendor-resource-frequency/";
-        url = url + '?startdate=' + start_date;
-        url = url + '&enddate=' + end_date;
+        url = url + '?start_date=' + start_date;
+        url = url + '&end_date=' + end_date;
 
         if ($scope.market) {
             url = url + '&market=' + $scope.market;
@@ -96,11 +96,13 @@ angular.module('askApp')
             });
             $scope.average_for_resource = {
                 title: "Average Price for Resource",
-                unit: '$',
                 labels: _.keys(to_graph),
                 seriesNames: _.keys(to_graph),
                 type: "time-series",
                 download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
+                tooltipFormatter: function() {
+                    return '<b>' + this.series.name + '</b>' + ': $' + parseFloat(this.y).toFixed(2);
+                },
                 raw_data: _.values(to_graph),
                 xLabel: 'Date',
                 yLabel: 'Price',
@@ -121,7 +123,10 @@ angular.module('askApp')
             new Date($scope.filter.startDate).toString('yyyy-MM-dd'),
             new Date($scope.filter.endDate).toString('yyyy-MM-dd'),
             $routeParams.surveySlug);
-        resource_frequency($scope.charts, start_date, end_date, $routeParams.surveySlug);
+        resource_frequency($scope.charts,
+            new Date($scope.filter.startDate).toString('yyyy-MM-dd'),
+            new Date($scope.filter.endDate).toString('yyyy-MM-dd'),
+            $routeParams.surveySlug);
 
         $http.get(url).success(function(data) {
             $scope.surveyor_by_time = {

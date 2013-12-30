@@ -18,7 +18,7 @@ angular.module('askApp')
 
         $http.get(url).success(function(data) {
             $scope.surveys_by_province = {
-                labels: data.labels,
+                labels: _.pluck(data.graph_data, "answer"),
                 displayTitle: false,
                 yLabel: "",
                 title: "Surveys by Province",
@@ -48,7 +48,7 @@ angular.module('askApp')
 
         $http.get(url).success(function(data) {
             $scope.surveys_by_market = {
-                labels: data.labels,
+                labels: _.pluck(data.graph_data, "answer"),
                 displayTitle: false,
                 yLabel: "",
                 title: "Surveys by Market",
