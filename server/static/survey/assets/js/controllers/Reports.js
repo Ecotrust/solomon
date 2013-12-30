@@ -246,6 +246,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 xLabel: 'Market',
                 yLabel: 'Expense (SBD)',
                 order: 1,
+                tooltipFormatter: function() {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': $' + this.y;
+                },
                 message: data.message
             });
             charts.sort(function (a,b) { return a-b;})
@@ -303,6 +307,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                     yLabel: 'Price per Pound (SBD)',
                     order: 1,
                     message: data.message,
+                    tooltipFormatter: function() {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                            Highcharts.dateFormat('%d/%m/%y', this.x) + ': $' + this.y;
+                    },
                     unit: "$"
                 });
             });

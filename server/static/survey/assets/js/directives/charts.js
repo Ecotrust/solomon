@@ -248,7 +248,7 @@ angular.module('askApp')
                                 min: 0
                             },
                             tooltip: {
-                                formatter: function() {
+                                formatter: scope.chart.tooltipFormatter || function() {
                                     return '<b>' + this.series.name + '</b><br/>' +
                                         Highcharts.dateFormat('%d/%m/%y', this.x) + ': ' + this.y + ' ' + scope.chart.unit || 'kg';
                                 }
