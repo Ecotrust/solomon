@@ -412,3 +412,9 @@ def package_android_dev():
         run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
         local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
         local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis-dev.pointnineseven.com:/srv/downloads/hapifis-dev.apk")
+
+@task
+def package_android_prod():
+        run("cd %s && %s/bin/python manage.py package https://hapifis.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
+        local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
+        local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis.pointnineseven.com:/srv/downloads/hapifis.apk")
