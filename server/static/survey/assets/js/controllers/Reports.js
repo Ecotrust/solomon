@@ -115,6 +115,50 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         });
     }
 
+    function gear_type_occurrence(charts, start_date, end_date, slug) {
+        var url = "/reports/gear-type-frequency"
+        url = url + '?start_date=' + start_date;
+        url = url + '&end_date=' + end_date;
+        if ($scope.market) {
+            url = url + '&market=' + $scope.market;
+        }
+        if ($scope.status_single) {
+            url += '&status=' + $scope.status_single;
+        }
+        return $http.get(url).success(function(data) {
+            var to_graph = [];
+            _.each(_.keys(data.graph_data), function(x) {
+                to_graph.push({
+                    name: x,
+                    value: _.map(data.graph_data[x], function(y) {
+                        return {
+                            answer_text: y.market,
+                            count: parseFloat(y.percent)
+                        }
+                    })
+                });
+            });
+            charts.push({
+                title: "Gear Type Frequency of Occurrence",
+                unit: '$',
+                labels: _.map(to_graph, function(x) { return x.name; }),
+                seriesNames: _.map(to_graph, function(x) { return x.name; }),
+                download_url: url.replace('gear-type-frequency', 'gear-type-frequency.csv'),
+                type: "stacked-column",
+                data: to_graph,
+                xLabel: 'Market',
+                yLabel: 'Expense (SBD)',
+                order: 1,
+                tooltipFormatter: function() {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': $' + this.y;
+                },
+                message: data.message
+            });
+            charts.sort(function (a,b) { return a-b;})
+        });
+    }
+
     function occurrence_of_sales(charts, start_date, end_date, slug) {
         var url = build_crosstab_url(start_date, end_date, slug, 'survey-site', 'how-sold');
         return $http.get(url).success(function(data) {
@@ -382,6 +426,10 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 surveySlug);
             $scope.sectioned_charts["Max / Min Reported Market Prices "] = [];
             min_max_charts($scope.sectioned_charts["Max / Min Reported Market Prices "],
+                new Date($scope.filter.startDate).toString('yyyy-MM-dd'),
+                new Date($scope.filter.endDate).day().toString('yyyy-MM-dd'),
+                surveySlug);
+            gear_type_occurrence($scope.charts,
                 new Date($scope.filter.startDate).toString('yyyy-MM-dd'),
                 new Date($scope.filter.endDate).day().toString('yyyy-MM-dd'),
                 surveySlug);
