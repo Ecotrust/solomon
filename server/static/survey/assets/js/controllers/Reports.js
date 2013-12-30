@@ -127,12 +127,17 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
         }
         return $http.get(url).success(function(data) {
             var to_graph = [];
+            var series_names = {};
+            var total = 0;
+
             _.each(_.keys(data.graph_data), function(x) {
                 to_graph.push({
                     name: x,
                     value: _.map(data.graph_data[x], function(y) {
+                        series_names[y.type] = null;
+                        total += y.count;
                         return {
-                            answer_text: y.market,
+                            answer_text: y.type,
                             count: parseFloat(y.percent)
                         }
                     })
@@ -141,17 +146,18 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             charts.push({
                 title: "Gear Type Frequency of Occurrence",
                 unit: '$',
-                labels: _.map(to_graph, function(x) { return x.name; }),
-                seriesNames: _.map(to_graph, function(x) { return x.name; }),
+                labels: _.pluck(to_graph, 'name'),
+                seriesNames: _.keys(series_names),
+                stackingType: 'percent',
                 download_url: url.replace('gear-type-frequency', 'gear-type-frequency.csv'),
                 type: "stacked-column",
                 data: to_graph,
-                xLabel: 'Market',
+                xLabel: 'Total Instances: ' + total,
                 yLabel: 'Expense (SBD)',
                 order: 1,
+                formatFunc: function() { },
                 tooltipFormatter: function() {
-                    return '<b>' + this.series.name + '</b><br/>' +
-                        Highcharts.dateFormat('%d/%m/%y', this.x) + ': $' + this.y;
+                    return this.series.name + "<br/><b>Percentage: </b>%" + parseInt(this.y*100) + "<br/>";
                 },
                 message: data.message
             });

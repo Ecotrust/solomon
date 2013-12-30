@@ -120,7 +120,7 @@ angular.module('askApp')
                             xAxis: {
                                 categories: scope.chart.labels,
                                 title: {
-                                    text: 'Market'
+                                    text: scope.chart.xLabel || 'Market'
                                 }
                             },
                             yAxis: {
@@ -140,7 +140,7 @@ angular.module('askApp')
                                 enabled: false
                             },
                             tooltip: {
-                                formatter: function() {
+                                formatter: scope.chart.tooltipFormatter || function() {
                                     return this.series.name + ': ' + this.y + '<br/>' +
                                         'Percentage: ' + ((this.y/this.total)*100).toFixed(0) + "%" + '<br/>' +
                                         'Total: ' + this.point.stackTotal;
@@ -148,7 +148,7 @@ angular.module('askApp')
                             },
                             plotOptions: {
                                 column: {
-                                    stacking: 'normal',
+                                    stacking: scope.chart.stackingType || 'normal',
                                     dataLabels: {
                                         enabled: true,
                                         color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
