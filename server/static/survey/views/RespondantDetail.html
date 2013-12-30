@@ -6,14 +6,9 @@
         <div class="col-md-6">
             <div id="review_buttons">
                 <button ng-show="!!review_previous_uuid" ng-click="goToPrevious()" class="btn btn-default" type="button">&laquo; Previous</button>
-                <a ng-show="filtered_list_url" href="{{filtered_list_url}}" class="btn btn-default">Overview</a>
-                <button ng-show="!confirmDelete && user.is_superuser" class="btn btn-danger" ng-click="confirmDelete = true">Delete</button>
-                <div ng-show="confirmDelete && user.is_superuser" class="btn-group">
-                    <a class="btn btn-default btn-danger" ng-click="delete_respondent()">Delete</a>
-                    <a class="btn btn-default" ng-click="confirmDelete = false">Cancel</a>
-                </div>
+                <!-- <a ng-show="filtered_list_url" href="{{filtered_list_url}}" class="btn btn-default">Overview</a> -->
                 <!-- Look at this madness, fake that ternary operator. Thanks, StackOverflow! -->
-                <button ng-click="updateStatus()" class="btn btn-default" type="button">{{{true: 'Save and Review Next &raquo;', false: 'Save' }[!!review_next_uuid]}}</button>
+                <button ng-show="!!review_next_uuid" ng-click="goToNext()" class="btn btn-default" type="button">Next &raquo;</button>
             </div>
         </div>
     </div>
@@ -36,6 +31,15 @@
             <select class="form-control" ng-model="current_status" ng-options="i as i[1] for i in statuses">
             </select>
             <textarea ng-model="review_comment" placeholder="Type any comments here" class="form-control"></textarea>
+            <div class="save_delete">
+                <button ng-click="updateStatus()" class="btn btn-default" type="button">Save</button>
+                <button ng-show="!confirmDelete && user.is_superuser" class="btn btn-danger" ng-click="confirmDelete = true">Delete</button>
+                <div ng-show="confirmDelete && user.is_superuser" class="btn-group">
+                    <a class="btn btn-default btn-danger" ng-click="delete_respondent()">Delete</a>
+                    <a class="btn btn-default" ng-click="confirmDelete = false">Cancel</a>
+                </div>
+                <p ng-show="saved" ><i class="icon-ok-sign"></i> Saved!</p>
+            </div>
         </div>
     </div>
     <div class="col-md-2"></div>

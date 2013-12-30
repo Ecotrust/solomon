@@ -26,7 +26,7 @@ angular.module('askApp')
             'X-CSRFToken': getCookie('csrftoken')
         }
     }])
-    .controller('RespondantDetailCtrl', function($scope, $routeParams, $http, $location) {
+    .controller('RespondantDetailCtrl', function($scope, $routeParams, $http, $location, $timeout) {
 
     $scope.statuses = [];
     // We don't want to show a non-functioning back button if we have no url to go back to:
@@ -78,23 +78,21 @@ angular.module('askApp')
             method: 'PATCH'
         }).success(function(data) {
             $scope.last_status = $scope.current_status;
-            if ($scope.review_next_uuid) {
-                window.location = "#/RespondantDetail/" + $scope.surveySlug +
-                    "/" + $scope.review_next_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
-            }
+            $scope.saved = true;
+            $timeout(function() { $scope.saved=false; }, 5000);
         });
     }
+    $scope.goToNext = function() {
+        if ($scope.review_next_uuid) {
+            window.location = "#/RespondantDetail/" + $scope.surveySlug +
+                "/" + $scope.review_next_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
+        }
+    }
     $scope.goToPrevious = function() {
-        $http({
-            url: "/api/v1/reportrespondant/" + $scope.respondent.uuid + "/",
-            data: { 'review_status': $scope.current_status[0], 'review_comment': $scope.review_comment },
-            method: 'PATCH'
-        }).success(function(data) {
-            if ($scope.review_previous_uuid) {
-                window.location = "#/RespondantDetail/" + $scope.surveySlug +
-                    "/" + $scope.review_previous_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
-            }
-        });
+        if ($scope.review_previous_uuid) {
+            window.location = "#/RespondantDetail/" + $scope.surveySlug +
+                "/" + $scope.review_previous_uuid + "?filtered_list_url=" + $location.search().filtered_list_url;
+        }
     }
 
     $scope.delete_respondent = function () {

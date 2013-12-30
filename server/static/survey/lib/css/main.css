@@ -1,3 +1,9 @@
+.save_delete {
+    margin-top: 0.5em;
+}
+.save_delete p {
+    display: inline;
+}
 .download_cog {
     position: absolute;
     z-index: 10;
