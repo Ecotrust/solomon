@@ -175,7 +175,7 @@ angular.module('askApp')
 
 
 angular.module('askApp')
-    .directive('timeSeries', function($http) {
+    .directive('timeSeries', function($http, reportsCommon) {
         return {
             templateUrl: '/static/survey/views/chart_400.html',
             restrict: 'EA',
@@ -201,12 +201,12 @@ angular.module('askApp')
                                         var current = parseFloat(value.sum);
                                         if (_.isNumber(current) && !_.isNaN(current)) {
                                             return [
-                                                new Date(value.date).getTime(),
+                                                reportsCommon.dateFromISO(value.date).getTime(),
                                                 parseFloat(current)
                                             ]
                                         } else {
                                             return [
-                                                new Date(value.date).getTime(),
+                                                reportsCommon.dateFromISO(value.date).getTime(),
                                                 null
                                             ]
                                         }

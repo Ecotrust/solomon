@@ -35,7 +35,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 displayTitle: false,
                 labels: _.pluck(filtered, 'name'),
                 data: filtered,
-                download_url: url.replace("total-weight", "total-weight" + '.csv'),
+                download_url: url.replace("total-weight", "total-weight.csv"),
                 xLabel: 'Market',
                 yLabel: 'Weight (kg)',
                 order: 2,
