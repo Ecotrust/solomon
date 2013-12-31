@@ -134,7 +134,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 to_graph.push({
                     name: x,
                     value: _.map(data.graph_data[x], function(y) {
-                        series_names[y.type] = null;
+                        if (series_names[y.type]) {
+                            series_names[y.type][x] = y.count;
+                        } else {
+                            series_names[y.type] = {};
+                            series_names[y.type][x] = y.count;
+                        }
                         total += y.count;
                         return {
                             answer_text: y.type,
@@ -153,11 +158,12 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 type: "stacked-column",
                 data: to_graph,
                 xLabel: 'Total Instances: ' + total,
-                yLabel: 'Expense (SBD)',
+                yLabel: '% Reported Gear Type',
                 order: 1,
                 formatFunc: function() { },
                 tooltipFormatter: function() {
-                    return this.series.name + "<br/><b>Percentage: </b>%" + parseInt(this.y*100) + "<br/>";
+                    return this.series.name + "<br/><b>Percentage: </b>%" + parseInt(this.y*100) + "<br/>" +
+                        "<b>Instances: </b>" + series_names[this.series.name][this.x];
                 },
                 message: data.message
             });
