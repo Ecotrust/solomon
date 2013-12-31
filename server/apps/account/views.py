@@ -70,7 +70,7 @@ def forgotPassword(request):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return HttpResponse("user-not-found", status=404)
+            return HttpResponse("user-not-found", status=500)
         except MultipleObjectsReturned:
             return HttpResponse("multiple-users-found", status=500)
         print email
