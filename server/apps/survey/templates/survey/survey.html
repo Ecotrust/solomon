@@ -8,9 +8,11 @@
     <!--[if lt IE 9]>
      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
      <script>var L_DISABLE_3D=true;</script>
+     <script src="{{ STATIC_URL }}survey/lib/js/respond.min.js"></script>
     <![endif]-->
     <!--[if lt IE 8]>
       <script src="{{ STATIC_URL }}survey/lib/js/json3.min.js"></script>
+      <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome-ie7.min.css" rel="stylesheet">
     <![endif]-->
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
@@ -29,9 +31,9 @@
     <link rel="stylesheet" href="{{ STATIC_URL }}survey/assets/lib/css/mobiscroll-2.0.full.min.css">
 
     <!--[if lt IE 9]>
-    <link rel="stylesheet" href="{{ STATIC_URL }}survey/components/leaflet/dist/leaflet.ie.css">
+     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
+
     <!--[if lt IE 8]>
       <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome-ie7.min.css" rel="stylesheet">
       <link rel="stylesheet" href="{{ STATIC_URL }}survey/styles/main.ie7.css">
@@ -48,13 +50,11 @@
     <!--[if lt IE 9]>
       <script src="{{ STATIC_URL }}survey/components/es5-shim/es5-shim.js"></script>
       <script src="{{ STATIC_URL }}survey/components/json3/lib/json3.min.js"></script>
-      <script src="{{ STATIC_URL }}survey/lib/js/respond.min.js"></script>
     <![endif]-->
 
     <!-- Add your site or application content here -->
 
-    <div class="container" ng-view ng-cloak></div>
-    {% compress js %}
+    <div class="container ng-cloak" ng-view></div>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/date.min.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/jquery-1.8.2.min.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/jquery-ui.min.js"></script>
@@ -84,10 +84,6 @@
     <script src="{{ STATIC_URL }}survey/assets/js/directives/tap.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/lib/js/mobiscroll-2.0.full.min.js"></script>
     <script src="{{ STATIC_URL }}survey/assets/js/directives/directives.js"></script>
-
-    {% endcompress %}
-
-
 
     <script>
     var token = "{{csrf_token}}";
