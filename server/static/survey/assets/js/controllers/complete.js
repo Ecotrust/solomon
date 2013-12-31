@@ -31,7 +31,7 @@ angular.module('askApp')
                 response.answer_raw = JSON.stringify(response.answer);
             });
             var newRespondent = {
-                ts: respondent.ts,
+                ts: new Date(respondent.ts),
                 uuid: respondent.uuid.replace(':', '_'),
                 responses: newResponses,
                 status: respondent.status,
