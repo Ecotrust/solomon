@@ -78,6 +78,9 @@ angular.module('askApp')
         $http.post(url, user)
             .success(function () {
                 $scope.showInfo = 'forgot-user';
+            })
+            .error(function (err) {
+                $scope.showInfo = err;
             });
     };
 

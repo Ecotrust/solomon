@@ -82,7 +82,7 @@
           <form ng-submit="forgotPassword(user)">
             <div class="input-group">
               <div class="input-row">
-                <input type="text" placeholder="enter your username..." ng-model="user.username">
+                <input type="text" placeholder="enter your email..." ng-model="user.email">
               </div>
             </div>
             <button class="btn btn-block btn-large">
@@ -90,6 +90,9 @@
             </button>
             <div class="info" ng-show="showInfo == 'forgot-user'">
               You should receive an email with instructions on how to recover your password.
+            </div>
+            <div class="info error" ng-show="showInfo == 'user-not-found'">
+              Unable to find user with that email
             </div>
           </form>
         </div>

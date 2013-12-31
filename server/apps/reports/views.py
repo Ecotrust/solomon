@@ -426,11 +426,9 @@ def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
                                     end_date=None):
     base_values = Question.objects.get(slug='fish-families').rows.splitlines()
     vendors = Question.objects.get(slug='vendor').rows.splitlines()
-    vendor_count = len(vendors)
     rows = (MultiAnswer.objects.filter(response__question__slug='fish-families',
                                        response__respondant__vendor__in=vendors,
                                        answer_text__in=base_values))
-
     if market is not None:
         rows = rows.filter(response__respondant__survey_site=market)
     if status is not None:
@@ -440,9 +438,12 @@ def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
     if end_date is not None:
         rows = rows.filter(response__respondant__ts__lt=end_date)
 
+    vendor_count = (rows.values_list('response__respondant__vendor', flat=True)
+                        .distinct()
+                        .count())
     rows = (rows.values('answer_text')
                 .annotate(count=Count('response__respondant__vendor',
-                                       distinct=True)))
+                                      distinct=True)))
 
     for row in rows:
         row['percent'] = '%.2f' % (float(row['count']) / vendor_count)
