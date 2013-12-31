@@ -441,7 +441,8 @@ def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
         rows = rows.filter(response__respondant__ts__lt=end_date)
 
     rows = (rows.values('answer_text')
-                .annotate(count=Count('response__respondant__vendor')))
+                .annotate(count=Count('response__respondant__vendor',
+                                       distinct=True)))
 
     for row in rows:
         row['percent'] = '%.2f' % (float(row['count']) / vendor_count)
