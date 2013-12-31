@@ -79,6 +79,9 @@ angular.module('askApp')
             .success(function () {
                 $scope.showInfo = 'forgot-user';
             });
+            .error(function (err) {
+                $scope.showInfo = err;
+            });
     };
 
   });
