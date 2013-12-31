@@ -177,7 +177,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             charts.push({
                 title: "Frequency of Sales Types",
                 type: "stacked-column",
-                yLabel: "Amount of Sales",
+                yLabel: "Frequency of Occurrence",
                 labels: _.pluck(data.crosstab, 'name'),
                 data: data.crosstab,
                 formatFunc: function() { },
@@ -201,7 +201,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 data: data.crosstab,
                 download_url: url.replace("type-of-fish", "type-of-fish" + '.csv'),
                 formatFunc: function() { return null; },
-                yLabel: 'Number',
+                yLabel: "Frequency of Occurrence",
                 order: 1,
                 seriesNames: data.seriesNames,
                 message: data.message,
@@ -219,7 +219,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 type: "stacked-column",
                 labels: _.pluck(data.crosstab, 'name'),
                 formatFunc: function() { },
-                yLabel: 'Fish Weight (kg)',
+                yLabel: 'Frequency of Occurrence',
                 data: data.crosstab,
                 download_url: url.replace("buy-or-catch", "buy-or-catch" + '.csv'),
                 order: 1,
@@ -242,7 +242,7 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
                 data: data.crosstab,
                 download_url: url.replace("fish-per-family", "fish-per-family" + '.csv'),
                 order: 1,
-                yLabel: "Number",
+                yLabel: "Frequency of Occurrence",
                 seriesNames: data.seriesNames,
                 message: data.message,
                 unit: ''
@@ -345,15 +345,15 @@ angular.module('askApp').controller('ReportCtrl', function($scope, $http, $locat
             });
             _.each(to_graph, function(x) {
                 var min_struct = {
-                    name: x.name + " Minimum",
+                    name: "Min Price",
                     data: x.min_data
                 }
                 var max_struct = {
-                    name: x.name + " Maximum",
+                    name:"Max Price",
                     data: x.max_data
                 }
                 charts.push({
-                    title: "Max/Min Price on First Day of Sale - " + x.name,
+                    title: "Price Range on First Day of Sale - " + x.name,
                     labels: ["Min Price", "Max Price"],
                     download_url: url.replace($scope.surveyorTimeFilter, $scope.surveyorTimeFilter + '.csv'),
                     seriesNames: data.seriesNames,
