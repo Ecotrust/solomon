@@ -50,8 +50,8 @@ angular.module('askApp')
         return $http.get(url).success(function(data) {
             $scope.resource_frequency = {
                 labels: _.pluck(data.graph_data, 'answer_text'),
-                xLabel: 'Fish Family',
-                title: "Frequency of Fish Family When Sold By Piece/Heap",
+                xLabel: 'Resource Type',
+                title: "Frequency of Resource Type",
                 categories: [""],
                 type: "bar",
                 unit: '%',

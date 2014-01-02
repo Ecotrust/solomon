@@ -439,14 +439,14 @@ class TestVendorResourceFrequency(TestCase, ResponseMixin):
     fixtures = ['reef.json', 'users.json']
     vendor_a = 'Cathrine Molea'
     vendor_b = 'Charles Darwin'
-    fish_a = 'Lethrinidae (emperors)'
-    fish_b = 'Caesionidae (fusiliers)'
+    fish_a = 'Kingfish'
+    fish_b = 'Ratfish'
 
     def setUp(self):
         self.user = User.objects.get(username='superuser_alpha')
         self.survey = Survey.objects.get(slug='reef-fish-market-survey')
         self.question_vendor = Question.objects.get(slug='vendor')
-        self.question_fishes = Question.objects.get(slug='fish-families')
+        self.question_fishes = Question.objects.get(slug='type-of-fish')
         self.question_market = Question.objects.get(slug='survey-site')
 
     def create_respondant(self, vendor, fishes, market=None, status=None,

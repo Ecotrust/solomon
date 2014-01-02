@@ -424,10 +424,8 @@ def grid_standard_deviation_csv(request, question_slug, interval):
 
 def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
                                     end_date=None):
-    base_values = Question.objects.get(slug='fish-families').rows.splitlines()
-    vendors = Question.objects.get(slug='vendor').rows.splitlines()
-    rows = (MultiAnswer.objects.filter(response__question__slug='fish-families',
-                                       response__respondant__vendor__in=vendors,
+    base_values = Question.objects.get(slug='type-of-fish').rows.splitlines()
+    rows = (MultiAnswer.objects.filter(response__question__slug='type-of-fish',
                                        answer_text__in=base_values))
     if market is not None:
         rows = rows.filter(response__respondant__survey_site=market)
@@ -438,17 +436,16 @@ def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
     if end_date is not None:
         rows = rows.filter(response__respondant__ts__lt=end_date)
 
-    vendor_count = (rows.values_list('response__respondant__vendor', flat=True)
+    response_count = (rows.values_list('response__respondant', flat=True)
                         .distinct()
                         .count())
     rows = (rows.values('answer_text')
-                .annotate(count=Count('response__respondant__vendor',
+                .annotate(count=Count('response__respondant',
                                       distinct=True)))
-
     for row in rows:
-        row['percent'] = '%.2f' % (float(row['count']) / vendor_count)
+        row['percent'] = '%.2f' % (float(row['count']) / response_count)
 
-    return rows, vendor_count
+    return rows, response_count
 
 
 @api_user_passes_test(lambda u: u.is_staff or u.is_superuser)

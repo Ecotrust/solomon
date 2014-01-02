@@ -7,9 +7,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
-    # depends_on = (
-    #     ('account', '0002_api_keys'),
-    # )
+    depends_on = (
+        ('account', '0001_initial'),
+        ('account', '0002_api_keys'),
+    )
 
     def forwards(self, orm):
         # Adding field 'Respondant.surveyor'
