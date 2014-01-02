@@ -38,7 +38,11 @@ angular.module('askApp')
         $scope.review_next_uuid = data.meta.next.unfiltered;
         $scope.review_previous_uuid = data.meta.prev.unfiltered;
         _.each(data.responses, function (response) {
-
+            if (response.question.grid_cols.length) {
+                _.each(response.question.grid_cols, function (grid_col) {
+                    grid_col.label = grid_col.label.replace(/-/, '');
+                });
+            }
             response.answer_parsed = JSON.parse(response.answer_raw);
         });
         $scope.respondent = data;

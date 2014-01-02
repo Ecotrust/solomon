@@ -230,11 +230,13 @@ angular.module('askApp')
                     delete $scope.answers[question.slug];
                 }
                 _.each(app.currentRespondent.responses, function(response, i) {
+                    console.log(question.slug)
                     if (response.question.slug === question.slug) {
                         index = i;
                     }
                 });
-                if (index) {
+
+                if (index || index === 0) {
                     app.currentRespondent.responses.splice(index, 1);
                 }
                 $scope.saveState(app);
