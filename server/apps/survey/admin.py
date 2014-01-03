@@ -7,7 +7,7 @@ class ResponseAdmin(admin.ModelAdmin):
 
 
 class RespondantAdmin(admin.ModelAdmin):
-    readonly_fields = ('uuid', 'responses', )
+    readonly_fields = ('uuid',)# 'responses', )
     list_display = ('uuid', 'ts', 'complete',)
 
 

@@ -20,7 +20,7 @@ class Command(BaseCommand):
         #for response in Response.objects.all():
         white_space = options.get('white_space')
         question_id = options.get('question_id')
-        responses = Response.objects.all().order_by('-ts')
+        responses = Response.objects.all().order_by('-id')
         if question_id:
             responses = responses.filter(question__id=question_id)
         if white_space:

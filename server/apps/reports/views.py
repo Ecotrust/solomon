@@ -38,7 +38,7 @@ def get_geojson(request, survey_slug, question_slug):
             slug = filter.keys()[0]
             value = filter[slug]
             filter_question = Question.objects.get(slug=slug, survey=survey)
-            locations = locations.filter(location__respondant__responses__in=filter_question.response_set.filter(answer__in=value))
+            locations = locations.filter(location__respondant__response_set__in=filter_question.response_set.filter(answer__in=value))
 
     geojson = []
     for location in locations:
@@ -117,7 +117,7 @@ def _get_crosstab(filters, survey_slug, question_a_slug, question_b_slug):
             if start_date is not None and end_date is not None:
                 respondants = respondants.filter(ts__lte=end_date, ts__gte=start_date)
 
-            respondants = respondants.filter(responses__in=question_a_responses.filter(answer=question_a_answer['answer']))
+            respondants = respondants.filter(response__in=question_a_responses.filter(answer=question_a_answer['answer']))
             if question_b.type == 'grid':
                 obj['type'] = 'stacked-column'
                 rows = (GridAnswer.objects.filter(response__respondant__in=respondants,
@@ -437,8 +437,8 @@ def _vendor_resource_type_frequency(market=None, status=None, start_date=None,
         rows = rows.filter(response__respondant__ts__lt=end_date)
 
     response_count = (rows.values_list('response__respondant', flat=True)
-                        .distinct()
-                        .count())
+                    .distinct()
+                    .count())
     rows = (rows.values('answer_text')
                 .annotate(count=Count('response__respondant',
                                       distinct=True)))
@@ -495,7 +495,7 @@ def _single_select_count(question_slug, market=None, status=None,
     if market is not None:
         rows = rows.filter(respondant__survey_site=market)
     if status is not None:
-        rows = rows.filter(respondant__review_status=market)
+        rows = rows.filter(respondant__review_status=status)
     if start_date is not None:
         rows = rows.filter(respondant__ts__gte=start_date)
     if end_date is not None:

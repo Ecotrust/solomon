@@ -15,9 +15,9 @@ from apps.survey.models import Survey, Question, Response, Respondant
 @staff_member_required
 def delete_responses(request, uuid, template='survey/delete.html'):
     respondant = get_object_or_404(Respondant, uuid=uuid)
-    for response in respondant.responses.all():
+    for response in respondant.response_set.all():
         response.delete()
-    respondant.responses.clear()
+    respondant.response_set.clear()
     respondant.save()
     return render_to_response(template, RequestContext(request, {}))
 
@@ -57,17 +57,18 @@ def answer(request, survey_slug, question_slug, uuid):
         if respondant.complete is True and not request.user.is_staff:
             return HttpResponse(simplejson.dumps({'success': False, 'complete': True}))
 
-        response, created = Response.objects.get_or_create(question=question, respondant=respondant)
-        response.answer_raw = simplejson.dumps(simplejson.loads(request.POST.keys()[0]).get('answer', None))
-        response.save_related()
-
-        if created:
-            respondant.responses.add(response)
-
         if request.user and not respondant.surveyor:
             respondant.surveyor = request.user
         respondant.last_question = question_slug
         respondant.save()
+
+        response, created = Response.objects.get_or_create(question=question, respondant=respondant)
+        response.answer_raw = simplejson.dumps(simplejson.loads(request.POST.keys()[0]).get('answer', None))
+        response.save()
+        response.save_related()
+        
+
+
         return HttpResponse(simplejson.dumps({'success': "%s/%s/%s" % (survey_slug, question_slug, uuid)}))
     return HttpResponse(simplejson.dumps({'success': False}))
 

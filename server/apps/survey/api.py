@@ -70,7 +70,7 @@ class OfflineResponseResource(AuthSurveyModelResource):
 
 
 class OfflineRespondantResource(AuthSurveyModelResource):
-    responses = fields.ToManyField(OfflineResponseResource, 'responses', null=True, blank=True)
+    responses = fields.ToManyField(OfflineResponseResource, 'response_set', null=True, blank=True)
     survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True)
 
     class Meta(AuthSurveyModelResource.Meta):
@@ -88,7 +88,7 @@ class OfflineRespondantResource(AuthSurveyModelResource):
 
 
 class ReportRespondantResource(AuthSurveyModelResource):
-    responses = fields.ToManyField(ResponseResource, 'responses', full=False, null=True, blank=True)
+    responses = fields.ToManyField(ResponseResource, 'response_set', full=False, null=True, blank=True)
     survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True, readonly=True)
     user = fields.ToOneField('apps.account.api.UserResource', 'surveyor', null=True, blank=True, full=True, readonly=True)
 
@@ -156,11 +156,11 @@ class ReportRespondantResource(AuthSurveyModelResource):
 
 
 class ReportRespondantDetailsResource(ReportRespondantResource):
-    responses = fields.ToManyField(ResponseResource, 'responses', full=True, null=True, blank=True)
+    responses = fields.ToManyField(ResponseResource, 'response_set', full=True, null=True, blank=True)
 
 
 class RespondantResource(AuthSurveyModelResource):
-    responses = fields.ToManyField(ResponseResource, 'responses', full=True, null=True, blank=True)
+    responses = fields.ToManyField(ResponseResource, 'response_set', full=True, null=True, blank=True)
     survey = fields.ToOneField('apps.survey.api.SurveyResource', 'survey', null=True, blank=True, full=True, readonly=True)
     user = fields.ToOneField('apps.account.api.UserResource', 'surveyor', null=True, blank=True, full=True, readonly=True)
 

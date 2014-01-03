@@ -34,7 +34,7 @@ REVIEW_STATE_CHOICES = (
 class Respondant(caching.base.CachingMixin, models.Model):
     uuid = models.CharField(max_length=36, primary_key=True, default=make_uuid, editable=False)
     survey = models.ForeignKey('Survey')
-    responses = models.ManyToManyField('Response', related_name='responses', null=True, blank=True)
+    # responses = models.ManyToManyField('Response', related_name='responses', null=True, blank=True)
     complete = models.BooleanField(default=False)
     status = models.CharField(max_length=20, choices=STATE_CHOICES, default=None, null=True, blank=True)
     review_status = models.CharField(max_length=20, choices=REVIEW_STATE_CHOICES, default=REVIEW_STATE_NEEDED)
@@ -103,7 +103,8 @@ class Respondant(caching.base.CachingMixin, models.Model):
             'model-complete': self.complete,
             'model-review-status': self.get_review_status_display(),
         }
-        for response in self.responses.all().select_related('question'):
+
+        for response in self.response_set.all().select_related('question'):
             flat.update(response.generate_flat_dict())
         return flat
 
@@ -361,7 +362,7 @@ class Question(caching.base.CachingMixin, models.Model):
                     if filter_question == self:
                         locations = locations.filter(answer__in=value)
                     else:
-                        answers = answers.filter(respondant__responses__in=filter_question.response_set.filter(answer__in=value))
+                        answers = answers.filter(respondant__response_set__in=filter_question.response_set.filter(answer__in=value))
                         locations = locations.filter(location__response__in=answers)
                 else:
                     answers = answers.filter(respondant__responses__in=filter_question.response_set.filter(answer__in=value))
@@ -537,6 +538,7 @@ class Response(caching.base.CachingMixin, models.Model):
                 (Respondant.objects.filter(pk=self.respondant.pk)
                                    .update(**{question_slug: self.answer}))
                 setattr(self.respondant, question_slug, self.answer)
+                self.respondant.save()
                 self.respondant.update_csv_row()
             self.save()
 

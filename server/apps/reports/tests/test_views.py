@@ -162,11 +162,11 @@ class TestCrossTabGrid(TestCase, ResponseMixin):
 
         response_a = self.create_text_response(self.question_a,
                                                respondant, when, market)
-        respondant.responses.add(response_a)
+        respondant.response_set.add(response_a)
 
         response_b = self.create_grid_response(self.question_b,
                                                respondant, when, prices)
-        respondant.responses.add(response_b)
+        respondant.response_set.add(response_b)
         respondant.save()
         return respondant
 
@@ -220,11 +220,11 @@ class TestCrossTabMultiSelect(TestCase, ResponseMixin):
 
         response_a = self.create_text_response(self.question_a,
                                                respondant, when, market)
-        respondant.responses.add(response_a)
+        respondant.response_set.add(response_a)
 
         response_b = self.create_multi_select_response(self.question_b,
                                                        respondant, when, answers)
-        respondant.responses.add(response_b)
+        respondant.response_set.add(response_b)
         respondant.save()
         return respondant
 
@@ -298,11 +298,11 @@ class TestGridStandardDeviation(TestCase, ResponseMixin):
 
         grid_response = self.create_grid_response(self.question, respondant,
                                                   when, prices)
-        respondant.responses.add(grid_response)
+        respondant.response_set.add(grid_response)
         if market is not None:
             market_response = self.create_text_response(self.market_question,
                                                         respondant, when, market)
-            respondant.responses.add(market_response)
+            respondant.response_set.add(market_response)
         respondant.save()
 
     def request(self, interval, **kwargs):
@@ -464,15 +464,15 @@ class TestVendorResourceFrequency(TestCase, ResponseMixin):
         if market is not None:
             response_market = self.create_text_response(self.question_market,
                                                         respondant, when, market)
-            respondant.responses.add(response_market)
+            respondant.response_set.add(response_market)
 
         response_vendor = self.create_text_response(self.question_vendor,
                                                     respondant, when, vendor)
-        respondant.responses.add(response_vendor)
+        respondant.response_set.add(response_vendor)
 
         response_fishes = self.create_multi_select_response(self.question_fishes,
                                                             respondant, when, fishes)
-        respondant.responses.add(response_fishes)
+        respondant.response_set.add(response_fishes)
         respondant.save()
         return respondant
 
@@ -548,7 +548,7 @@ class TestSingleSelectCount(TestCase, ResponseMixin):
 
         response_market = self.create_text_response(self.question_market,
                                                     respondant, when, market)
-        respondant.responses.add(response_market)
+        respondant.response_set.add(response_market)
 
         respondant.save()
         return respondant
@@ -592,12 +592,12 @@ class TestGearTypeFrequency(TestCase, ResponseMixin):
 
         response_market = self.create_text_response(self.question_market,
                                                     respondant, when, market)
-        respondant.responses.add(response_market)
+        respondant.response_set.add(response_market)
 
         response_gear = self.create_multi_select_response(self.question_gear,
                                                           respondant, when,
                                                           gear_types)
-        respondant.responses.add(response_gear)
+        respondant.response_set.add(response_gear)
         respondant.save()
         return respondant
 
