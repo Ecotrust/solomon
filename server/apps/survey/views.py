@@ -66,8 +66,6 @@ def answer(request, survey_slug, question_slug, uuid):
         response.answer_raw = simplejson.dumps(simplejson.loads(request.POST.keys()[0]).get('answer', None))
         response.save()
         response.save_related()
-        
-
 
         return HttpResponse(simplejson.dumps({'success': "%s/%s/%s" % (survey_slug, question_slug, uuid)}))
     return HttpResponse(simplejson.dumps({'success': False}))
