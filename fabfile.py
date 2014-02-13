@@ -369,12 +369,6 @@ def package_test():
         local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-test.apk")
 
 
-@task
-def package_dev():
-        run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
-        local("android/app/cordova/build --debug")
-        # local("cp ./android/app/bin/HapiFis-debug.apk server/static/hapifis-dev.apk")
-
 
 @task
 def transfer_db():
@@ -407,14 +401,34 @@ def restore_db(dump_name):
     #run("cd %s && %s/bin/python manage.py migrate --settings=config.environments.staging" % (env.app_dir, env.venv))
 
 
+# @task
+# def package_android_dev():
+#         run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
+#         local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
+#         local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis-dev.pointnineseven.com:/srv/downloads/hapifis-dev.apk")
+
+# @task
+# def package_android_prod():
+#         run("cd %s && %s/bin/python manage.py package https://hapifis.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
+#         local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
+#         local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis.pointnineseven.com:/srv/downloads/hapifis.apk")
 @task
-def package_android_dev():
-        run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
-        local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
-        local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis-dev.pointnineseven.com:/srv/downloads/hapifis-dev.apk")
+def package_dev():
+        run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
+        local("android/app/cordova/build --debug")
+        local("scp ./android/app/bin/HapiFis-debug.apk hapifis-dev.pointnineseven.com:/srv/downloads/hapifis-dev.apk")
+@task
+def package_prod():
+        run("cd %s && %s/bin/python manage.py package https://hapifis.pointnineseven.com '../android/app/assets/www'" % (vars['app_dir'], vars['venv']))
+        local("android/app/cordova/build --debug")
+        local("scp ./android/app/bin/HapiFis-debug.apk hapifis.pointnineseven.com:/srv/downloads/hapifis-dev.apk")
 
 @task
-def package_android_prod():
-        run("cd %s && %s/bin/python manage.py package https://hapifis.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
-        local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
-        local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis.pointnineseven.com:/srv/downloads/hapifis.apk")
+def run_android_vagrant():
+        run("cd %s && %s/bin/python manage.py package http://192.168.50.172:8000 '../android/app/assets/www'" % ('/vagrant/server', vars['venv']))
+        local("android/app/cordova/run")
+
+@task
+def run_android_prod():
+        run("cd %s && %s/bin/python manage.py package https://hapifis.pointnineseven.com '../android/app/assets/www'" % ('/vagrant/server', vars['venv']))
+        local("android/app/cordova/run")

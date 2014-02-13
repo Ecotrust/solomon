@@ -103,7 +103,6 @@ angular.module('askApp')
                 });
 
                 if (scope.answer) {
-                    console.log(scope.answer);
                     scroller.scroller('setValue', scope.answer, true);
                 }
 
@@ -127,6 +126,7 @@ angular.module('askApp')
                 mode: 'clickpick',
                 // theme: 'android-ics light',
                 dateFormat : "dd/mm/yy",
+                dateOrder: 'ddmmy',
                 onSelect: function (date) {
                      scope.$apply(function (s) {
                         s.answer = date;    

@@ -66,6 +66,7 @@ class Respondant(caching.base.CachingMixin, models.Model):
             return "%s" % self.uuid
 
     def save(self, *args, **kwargs):
+        print "respondant save!!!!!!!!", self.survey_site
         if self.uuid and ":" in self.uuid:
             self.uuid = self.uuid.replace(":", "_")
         if not self.ts:
@@ -535,11 +536,12 @@ class Response(caching.base.CachingMixin, models.Model):
                 # Switched to filter and update rather than just modifying and
                 # saving. This doesn't trigger post_save, but still updates
                 # self.respondant and the related CSVRow object.
-                (Respondant.objects.filter(pk=self.respondant.pk)
-                                   .update(**{question_slug: self.answer}))
-                setattr(self.respondant, question_slug, self.answer)
-                self.respondant.save()
-                self.respondant.update_csv_row()
+                # (Respondant.objects.filter(uuid=self.respondant.uuid)
+                #                    .update(**{question_slug: self.answer}))
+                respondant = Respondant.objects.get(uuid=self.respondant.uuid)
+                setattr(respondant, question_slug, self.answer)
+                respondant.save()
+                respondant.update_csv_row()
             self.save()
 
     def __unicode__(self):

@@ -8,7 +8,7 @@ class ResponseAdmin(admin.ModelAdmin):
 
 class RespondantAdmin(admin.ModelAdmin):
     readonly_fields = ('uuid',)
-    list_display = ('uuid', 'ts', 'complete',)
+    list_display = ('uuid', 'ts', 'complete', 'survey_site', 'vendor', )
 
 
 class PageInline(admin.TabularInline):
