@@ -401,11 +401,11 @@ def restore_db(dump_name):
     #run("cd %s && %s/bin/python manage.py migrate --settings=config.environments.staging" % (env.app_dir, env.venv))
 
 
-# @task
-# def package_android_dev():
-#         run("cd %s && %s/bin/python manage.py package http://hapifis-dev.pointnineseven.com '../mobile/www'" % (env.app_dir, env.venv))
-#         local("cd mobile && /usr/local/share/npm/bin/phonegap build -V android")
-#         local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis-dev.pointnineseven.com:/srv/downloads/hapifis-dev.apk")
+@task
+def package_ios():
+        run("cd %s && %s/bin/python manage.py package http://hapifis.point97.io '../mobile/www'" % (env.app_dir, env.venv))
+        local("cd mobile && /usr/local/share/npm/bin/phonegap build -V ios")
+        # local("scp ./mobile/platforms/android/bin/HapiFisDev-debug.apk hapifis-dev.pointnineseven.com:/srv/downloads/hapifis-dev.apk")
 
 # @task
 # def package_android_prod():
